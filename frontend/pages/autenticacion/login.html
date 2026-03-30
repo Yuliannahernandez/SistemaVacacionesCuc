@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SIGEVAC — CUC</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --g900: #002D72;
+      --g800: #001f52;
+      --g700: #00286a;
+      --g500: #1a5ba8;
+      --g300: #7da6d8;
+      --g100: #ccdcf0;
+      --g050: #e8f0f9;
+      --bone: #F8F9FA;
+      --text: #333333;
+      --muted: rgba(51,51,51,0.45);
+      --nav-h: 56px;
+      --radius: 14px;
+      --trans: all .2s cubic-bezier(.4,0,.2,1);
+      --cream:     #f0f4fa;
+      --pale:      #E0E0E0;
+      --green-acc: #E4002B;
+    }
+    html, body { height: 100%; font-family: 'DM Sans', sans-serif; overflow: hidden; }
+
+    /* ══ Fondo dividido ══ */
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      display: grid; grid-template-columns: 46% 54%;
+    }
+    .bg-left {
+      background-image: url('../../img/fondo.png');
+      background-size: cover; background-position: center left;
+      filter: blur(4px) brightness(0.28) saturate(0.6);
+      transform: scale(1.05);
+    }
+    .bg-right {
+      background-image: url('../../img/fondo.png');
+      background-size: cover; background-position: center right;
+      filter: brightness(0.68) saturate(1.1);
+    }
+    .bg-overlay {
+      position: fixed; inset: 0; z-index: 1;
+      background: linear-gradient(90deg,
+        rgba(0,20,60,0.88) 0%,
+        rgba(0,20,60,0.08) 44%,
+        transparent 62%
+      );
+    }
+    .bg-divider {
+      position: fixed; left: 46%; top: var(--nav-h); bottom: 0; z-index: 2;
+      width: 1px;
+      background: linear-gradient(to bottom,
+        transparent 0%,
+        rgba(125,166,216,0.08) 20%,
+        rgba(125,166,216,0.22) 50%,
+        rgba(125,166,216,0.08) 80%,
+        transparent 100%
+      );
+    }
+    .bg-grain {
+      position: fixed; inset: 0; z-index: 2; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      opacity: 0.28;
+    }
+
+    /* ══ NAVBAR ══ */
+    .topnav {
+      position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); z-index: 200;
+      display: flex; align-items: center; padding: 0 20px; gap: 0;
+      background: rgba(0,45,114,0.96);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon {
+      width: 29px; height: 29px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--g500), var(--g300));
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 13px; height: 13px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; }
+    .logo-text strong { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400; color: rgba(204,220,240,0.9); letter-spacing: .1em; display: block; line-height: 1; }
+    .logo-text small { font-size: 8px; font-weight: 300; color: rgba(125,166,216,0.3); letter-spacing: .18em; text-transform: uppercase; }
+    .nav-vdiv { width: 1px; height: 18px; background: rgba(255,255,255,0.07); margin: 0 16px; flex-shrink: 0; }
+
+    .nav-links { display: flex; align-items: center; gap: 2px; }
+    .nav-link {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 9px;
+      font-size: 11.5px; font-weight: 300;
+      color: rgba(204,220,240,0.35); text-decoration: none;
+      transition: var(--trans); white-space: nowrap;
+    }
+    .nav-link svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; }
+    .nav-link:hover { background: rgba(255,255,255,0.06); color: rgba(204,220,240,0.65); }
+    .nav-link.active {
+      background: rgba(125,166,216,0.11); color: var(--g300);
+      border: 1px solid rgba(125,166,216,0.13);
+    }
+
+    .nav-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+    .nav-date { font-size: 9.5px; font-weight: 300; color: rgba(125,166,216,0.3); font-family: 'DM Mono', monospace; }
+
+    /* ══ Hero text ══ */
+    .hero-text {
+      position: fixed; z-index: 5;
+      left: 4%; top: 50%;
+      transform: translateY(-50%);
+      animation: fadeLeft 1.1s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes fadeLeft {
+      from { opacity: 0; transform: translateY(-50%) translateX(-20px); }
+      to   { opacity: 1; transform: translateY(-50%) translateX(0); }
+    }
+    .hero-eyebrow {
+      font-size: 9px; font-weight: 300; letter-spacing: 0.32em;
+      text-transform: uppercase; color: rgba(125,166,216,0.3);
+      margin-bottom: 10px; display: block; font-family: 'DM Mono', monospace;
+    }
+    .hero-line1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(72px, 10vw, 140px);
+      line-height: 0.88; display: block;
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(125,166,216,0.2);
+      letter-spacing: 0.02em;
+    }
+    .hero-line2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(72px, 10vw, 140px);
+      line-height: 0.88; display: block;
+      color: #fff; letter-spacing: 0.02em;
+      text-shadow: 0 2px 50px rgba(0,0,0,0.35);
+    }
+    .hero-line3 {
+      font-family: 'DM Mono', monospace;
+      font-size: clamp(18px, 2.2vw, 32px);
+      line-height: 1; display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(125,166,216,0.25);
+      letter-spacing: 0.3em; margin-top: 8px;
+    }
+    .hero-desc {
+      font-size: 11px; font-weight: 300; font-style: italic;
+      color: rgba(125,166,216,0.25); letter-spacing: 0.04em;
+      margin-top: 20px; max-width: 220px; display: block; line-height: 1.8;
+    }
+
+    /* ══ Layout ══ */
+    .page {
+      position: relative; z-index: 6;
+      height: 100vh; padding-top: var(--nav-h);
+      display: grid; grid-template-columns: 46% 54%;
+      align-items: center;
+    }
+    .page-right {
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px 32px;
+    }
+
+    /* ══ CARD ══ */
+    .card {
+      width: 100%; max-width: 340px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 24px;
+      backdrop-filter: blur(48px) saturate(170%);
+      -webkit-backdrop-filter: blur(48px) saturate(170%);
+      box-shadow:
+        0 40px 80px rgba(0,0,0,0.55),
+        0 0 0 1px rgba(125,166,216,0.05),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      overflow: hidden;
+      animation: fadeUp 1s 0.1s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card-top {
+      padding: 26px 24px 18px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      background: linear-gradient(160deg, rgba(232,240,249,0.95) 0%, rgba(204,220,240,0.9) 100%);
+      position: relative;
+    }
+    .card-top::after {
+      content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(125,166,216,0.18), transparent);
+    }
+
+    .logo-ring {
+      width: 76px; height: 76px; border-radius: 50%;
+      border: 1px solid rgba(125,166,216,0.2);
+      background: linear-gradient(145deg, var(--g800) 0%, var(--g900) 100%);
+      box-shadow:
+        inset 0 2px 8px rgba(0,0,0,0.4),
+        0 0 28px rgba(26,91,168,0.1),
+        0 0 0 5px rgba(125,166,216,0.04);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .logo-ring img { width: 66%; height: 66%; object-fit: contain; }
+
+    .card-top-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 8.5px; font-weight: 400;
+      letter-spacing: 0.26em; text-transform: uppercase;
+      color: var(--g800); text-align: center;
+    }
+
+    .card-body { padding: 22px 24px 28px; }
+
+    .card-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px; color: var(--g900);
+      line-height: 1.1; margin-bottom: 3px;
+    }
+    .card-title em {
+      font-style: italic; color: #E4002B; font-size: 22px;
+    }
+
+    .card-sub {
+      font-size: 9px; font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 20px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .divider {
+      height: 1px; margin-bottom: 18px;
+      background: linear-gradient(90deg, transparent, rgba(125,166,216,0.14), transparent);
+    }
+
+    /* ══ Inputs ══ */
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block; font-size: 9px; font-weight: 400;
+      color: var(--muted); letter-spacing: 0.16em;
+      text-transform: uppercase; margin-bottom: 7px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .input-wrap { position: relative; }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      background: rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 10px; padding: 12px 14px;
+      color: var(--g900); font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 300; outline: none;
+      transition: border-color 0.22s, background 0.22s, box-shadow 0.22s;
+    }
+    input::placeholder { color: rgba(125,166,216,0.25); }
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: rgba(125,166,216,0.5);
+      background: rgba(125,166,216,0.06);
+      box-shadow: 0 0 0 3px rgba(125,166,216,0.09), 0 2px 8px rgba(0,0,0,0.25);
+    }
+    input.input-error {
+      border-color: rgba(228,0,43,0.5) !important;
+      background: rgba(228,0,43,0.04) !important;
+      box-shadow: 0 0 0 3px rgba(228,0,43,0.08) !important;
+      animation: shake 0.38s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-5px); }
+      40%     { transform: translateX(5px); }
+      60%     { transform: translateX(-3px); }
+      80%     { transform: translateX(3px); }
+    }
+
+    .pass-field { padding-right: 40px; }
+    .toggle-pass {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; padding: 4px;
+      display: flex; align-items: center;
+    }
+    .toggle-pass svg {
+      width: 14px; height: 14px; fill: none;
+      stroke: rgba(125,166,216,0.25); stroke-width: 1.5; stroke-linecap: round;
+      transition: stroke 0.2s;
+    }
+    .toggle-pass:hover svg { stroke: var(--g300); }
+
+    /* ══ Opciones ══ */
+    .options {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 8px 0 18px;
+    }
+    .remember { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+    .remember input[type="checkbox"] {
+      width: 13px; height: 13px; padding: 0;
+      accent-color: var(--g500); cursor: pointer;
+    }
+    .remember span { font-size: 11px; color: var(--muted); font-weight: 300; }
+    .forgot {
+      font-size: 11px; font-weight: 400;
+      color: rgba(125,166,216,0.55);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .forgot:hover { color: var(--g300); text-decoration: underline; }
+
+    /* ══ Botón ══ */
+    .btn-login {
+      width: 100%; padding: 13px; border-radius: 50px; border: none; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase; color: #fff;
+      background: linear-gradient(135deg, var(--g500) 0%, var(--g700) 50%, #E4002B 100%);
+      box-shadow: 0 8px 24px rgba(26,91,168,0.28), inset 0 1px 0 rgba(255,255,255,0.18);
+      transition: transform 0.22s, box-shadow 0.22s, opacity 0.22s;
+      position: relative; overflow: hidden;
+    }
+    .btn-login::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 55%);
+      opacity: 0; transition: opacity 0.22s;
+    }
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(228,0,43,0.28), inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+    .btn-login:hover:not(:disabled)::before { opacity: 1; }
+    .btn-login:active:not(:disabled) { transform: translateY(0); }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ══ Mensajes del sistema (multi-tipo) ══ */
+    .sys-msg {
+      display: none; margin-top: 12px; padding: 10px 14px;
+      border-radius: 10px; font-size: 11.5px;
+      text-align: center; letter-spacing: 0.02em;
+      animation: fadeIn 0.22s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .sys-msg.visible { display: block; }
+    .sys-msg.error {
+      background: rgba(228,0,43,0.08);
+      border: 1px solid rgba(228,0,43,0.22);
+      color: #e4002b;
+    }
+    .sys-msg.warning {
+      background: rgba(185,150,60,0.1);
+      border: 1px solid rgba(185,150,60,0.3);
+      color: #b8922a;
+    }
+    .sys-msg.info {
+      background: rgba(26,91,168,0.08);
+      border: 1px solid rgba(26,91,168,0.2);
+      color: #1a5ba8;
+    }
+
+    .intentos-hint {
+      font-size: 9.5px; color: rgba(228,0,43,0.7);
+      font-family: 'DM Mono', monospace;
+      text-align: center; margin-top: 6px; display: none;
+    }
+    .intentos-hint.visible { display: block; }
+
+    .card-footer {
+      margin-top: 14px; text-align: center;
+      font-size: 8.5px; font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 0.16em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ══ Responsive ══ */
+    @media (max-width: 700px) {
+      .hero-text, .bg-divider { display: none; }
+      .page { grid-template-columns: 1fr; }
+      .page-left { display: none; }
+      .page-right { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="bg-left"></div>
+  <div class="bg-right"></div>
+</div>
+<div class="bg-overlay"></div>
+<div class="bg-divider"></div>
+<div class="bg-grain"></div>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="topnav">
+  <div class="nav-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <div class="logo-text">
+      <strong>SIGEVAC</strong>
+      <small>CUC · RRHH</small>
+    </div>
+  </div>
+  <div class="nav-vdiv"></div>
+  <div class="nav-links">
+    <a class="nav-link active" href="#">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </a>
+    <a class="nav-link" href="#">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Acerca de
+    </a>
+    <a class="nav-link" href="#">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Soporte
+    </a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-date" id="navDate"></div>
+  </div>
+</nav>
+
+<!-- ══ Hero ══ -->
+<div class="hero-text">
+  <span class="hero-eyebrow">Sistema de Gestión</span>
+  <span class="hero-line1">SIGE</span>
+  <span class="hero-line2">VAC</span>
+  <span class="hero-line3">CUC</span>
+  <span class="hero-desc">Gestión integral de vacaciones<br>para el personal institucional.</span>
+</div>
+
+<div class="page">
+  <div class="page-left"></div>
+  <div class="page-right">
+    <div class="card">
+
+      <div class="card-top">
+        <div class="logo-ring">
+          <img src="../../img/logo_cuc.png" alt="Logo CUC"/>
+        </div>
+        <div class="card-top-label">Colegio Universitario de Cartago</div>
+      </div>
+
+      <div class="card-body">
+        <div class="card-title">Bienvenido<br><em>de nuevo</em></div>
+        <div class="card-sub">Acceso al sistema</div>
+        <div class="divider"></div>
+
+        <div class="field">
+          <label>Usuario</label>
+          <input type="text" id="usuarioInput" placeholder="Ingresá tu usuario" autocomplete="username"/>
+        </div>
+
+        <div class="field">
+          <label>Contraseña</label>
+          <div class="input-wrap">
+            <input type="password" id="passInput" class="pass-field" placeholder="••••••••" autocomplete="current-password"/>
+            <button class="toggle-pass" onclick="togglePass()" type="button" tabindex="-1">
+              <svg id="eyeIcon" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="options">
+          <label class="remember">
+            <input type="checkbox" id="rememberMe"/>
+            <span>Recordarme</span>
+          </label>
+          <a href="#" class="forgot">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button class="btn-login" id="btnLogin" onclick="handleLogin()">Iniciar sesión</button>
+        <div class="sys-msg" id="sysMsg"></div>
+        <div class="intentos-hint" id="intentosHint"></div>
+        <div class="card-footer">Acceso exclusivo · Personal autorizado</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:3000';
+
+  // Fecha en navbar
+  const fd = new Date().toLocaleDateString('es-CR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('navDate').textContent = fd.charAt(0).toUpperCase() + fd.slice(1);
+
+  // ── MSG-SEG-003: Sesión cerrada por inactividad ───────────────────────────
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('motivo') === 'inactividad') {
+    mostrarMsg('Sesión cerrada por inactividad. Por favor inicie sesión nuevamente.', 'info');
+  }
+
+  // ── Toggle contraseña ─────────────────────────────────────────────────────
+  function togglePass() {
+    const input = document.getElementById('passInput');
+    const icon  = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+    } else {
+      input.type = 'password';
+      icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    }
+  }
+
+  // ── Mostrar mensaje del sistema ───────────────────────────────────────────
+  function mostrarMsg(texto, tipo = 'error') {
+    const el = document.getElementById('sysMsg');
+    el.textContent = texto;
+    el.className = `sys-msg visible ${tipo}`;
+    if (tipo === 'error') marcarErrorInputs();
+  }
+
+  function ocultarMsg() {
+    document.getElementById('sysMsg').className = 'sys-msg';
+    document.getElementById('intentosHint').className = 'intentos-hint';
+  }
+
+  function marcarErrorInputs() {
+    ['usuarioInput', 'passInput'].forEach(id => {
+      const inp = document.getElementById(id);
+      inp.classList.add('input-error');
+      inp.addEventListener('animationend', () => inp.classList.remove('input-error'), { once: true });
+    });
+  }
+
+  function resetBtn() {
+    const btn = document.getElementById('btnLogin');
+    btn.textContent = 'Iniciar sesión';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+  }
+
+  // ── Login ─────────────────────────────────────────────────────────────────
+  async function handleLogin() {
+    const usuario    = document.getElementById('usuarioInput').value.trim();
+    const contrasena = document.getElementById('passInput').value;
+    const btn        = document.getElementById('btnLogin');
+    ocultarMsg();
+
+    // Validación cliente: campos vacíos
+    if (!usuario || !contrasena) {
+      mostrarMsg('Los campos usuario y contraseña son obligatorios.', 'error');
+      return;
+    }
+
+    btn.textContent = 'Verificando…';
+    btn.style.opacity = '0.65';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario, contrasena })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        // MSG-SEG-001: Acceso autorizado — guardar todos los datos de sesión
+        localStorage.setItem('funcionario',       JSON.stringify(data.funcionario));
+        localStorage.setItem('tipoNombramiento',  JSON.stringify(data.tipoNombramiento));
+        localStorage.setItem('nombramientos',     JSON.stringify(data.nombramientos));
+        localStorage.setItem('sessionToken',      data.sessionToken);
+        localStorage.setItem('sessionExpiry',     String(data.sessionExpiry));
+        window.location.href = '../dashboard.html';
+        return;
+      }
+
+      // Mapeo de códigos a tipo de alerta visual
+      const esAdvertencia = ['MSG-SEG-ERR-001', 'MSG-SEG-ERR-002'].includes(data.codigo);
+      mostrarMsg(data.error || 'Error desconocido.', esAdvertencia ? 'warning' : 'error');
+
+      // Mostrar intentos restantes si aplica (MSG-SEG-ERR-003)
+      if (data.codigo === 'MSG-SEG-ERR-003' && data.intentosRestantes !== undefined) {
+        const hint = document.getElementById('intentosHint');
+        hint.textContent = `Intentos restantes antes del bloqueo: ${data.intentosRestantes}`;
+        hint.className = 'intentos-hint visible';
+      }
+
+    } catch {
+      mostrarMsg('No se pudo conectar con el servidor.', 'error');
+    }
+
+    resetBtn();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SIGEVAC - Aprobación de Vacaciones</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  /* Paleta azul */
+  --g900:#001f52;
+  --g800:#002D72;
+  --g700:#1a5ba8;
+  --g500:#2d7dd2;
+  --g300:#7da6d8;
+  --g100:#ccddf0;
+  --g050:#e8f0fa;
+ 
+  --gold:#b8922a;--gold-bg:rgba(185,150,60,0.1);
+  --bone:#f4f6fb;--text:#001530;--muted:rgba(0,30,80,0.45);--dim:rgba(0,30,80,0.22);
+  --red:#E4002B;--red-bg:rgba(228,0,43,0.08);
+  --nav-h:56px;--radius:14px;--trans:all .2s cubic-bezier(.4,0,.2,1);
+  --glass:rgba(255,255,255,0.55);--glass-border:rgba(255,255,255,0.75);
+}
+[data-theme="dark"]{
+  --bone:#060d1a;--text:#ccddf0;--muted:rgba(125,166,216,0.45);--dim:rgba(125,166,216,0.22);
+  --g050:rgba(0,45,114,0.3);--g100:rgba(0,45,114,0.55);
+  --glass:rgba(0,45,114,0.22);--glass-border:rgba(125,166,216,0.1);
+  --red-bg:rgba(228,0,43,0.15);
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bone);color:var(--text);transition:background .3s,color .3s}
+body{overflow-x:hidden}
+ 
+.bg{position:fixed;inset:0;z-index:0;background:var(--bone);transition:background .3s}
+.bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 40% at 80% 5%,rgba(45,125,210,0.07) 0%,transparent 60%),radial-gradient(ellipse 30% 50% at 5% 95%,rgba(26,91,168,0.05) 0%,transparent 55%)}
+ 
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:200;display:flex;align-items:center;padding:0 20px;background:rgba(26,51,38,0.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.05)}
+.nav-logo{display:flex;align-items:center;gap:10px;margin-right:20px;flex-shrink:0}
+.logo-icon{width:29px;height:29px;border-radius:8px;background:linear-gradient(135deg,var(--g500),var(--g300));display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round}
+.logo-text strong{font-family:'DM Mono',monospace;font-size:12px;font-weight:400;color:rgba(214,237,224,0.9);letter-spacing:.1em;display:block;line-height:1}
+.logo-text small{font-size:8px;font-weight:300;color:rgba(140,201,163,0.3);letter-spacing:.18em;text-transform:uppercase}
+.nav-vdiv{width:1px;height:18px;background:rgba(255,255,255,0.07);margin-right:16px;flex-shrink:0}
+.nav-links{display:flex;align-items:center;gap:1px;flex:1}
+.nav-link{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.4);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap}
+.nav-link svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+.nav-link:hover{background:rgba(255,255,255,0.06);color:rgba(214,237,224,0.7)}
+.nav-link.active{color:var(--g300);background:rgba(140,201,163,0.1)}
+.nav-sep{width:1px;height:14px;background:rgba(255,255,255,0.07);margin:0 4px}
+.nav-group{position:relative;flex-shrink:0}
+.nav-group-btn{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.4);cursor:pointer;transition:var(--trans);white-space:nowrap;user-select:none}
+.nav-group-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+.nav-chevron{margin-left:2px;transition:transform .2s;opacity:.5}
+.nav-group.open .nav-group-btn{background:rgba(140,201,163,0.11);color:var(--g300)}
+.nav-group.open .nav-chevron{transform:rotate(180deg)}
+.nav-submenu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:rgba(22,44,32,0.97);backdrop-filter:blur(16px);border:1px solid rgba(140,201,163,0.1);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,0.25);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+.nav-group.open .nav-submenu{opacity:1;transform:translateY(0);pointer-events:all}
+.nav-sub-item{display:block;padding:8px 12px;border-radius:8px;font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.5);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap}
+.nav-sub-item:hover{background:rgba(140,201,163,0.1);color:rgba(214,237,224,0.85)}
+.nav-sub-item.active{background:rgba(74,140,101,0.15);color:var(--g300)}
+.nav-right{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0}
+.action-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:300;color:rgba(140,201,163,0.38);transition:var(--trans)}
+.action-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+.action-btn:hover{background:rgba(255,255,255,0.05);color:rgba(214,237,224,0.62)}
+.user-pill{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 5px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);cursor:pointer}
+.avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--g700),var(--g500));display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:500;color:#fff}
+.user-pill-name{font-size:11px;font-weight:300;color:rgba(214,237,224,0.62)}
+.user-pill-nom{font-size:8.5px;font-weight:300;color:rgba(140,201,163,0.35)}
+
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;z-index:500;background:rgba(15,26,18,0.7);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s}
+.loading-overlay.hidden{opacity:0;pointer-events:none}
+.spinner{width:36px;height:36px;border:2px solid rgba(140,201,163,0.2);border-top-color:var(--g300);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:'DM Mono',monospace;font-size:11px;color:var(--g300)}
+
+/* LAYOUT */
+.page-wrap{position:relative;z-index:10;margin-top:var(--nav-h);min-height:calc(100vh - var(--nav-h));padding:28px 32px 80px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* PAGE HEADER */
+.page-hd{margin-bottom:24px;animation:fadeUp .35s both;display:flex;align-items:flex-start;justify-content:space-between}
+.breadcrumb{display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:300;color:var(--dim);font-family:'DM Mono',monospace;margin-bottom:6px}
+.breadcrumb span{color:var(--muted)}
+.page-hd h1{font-family:'DM Serif Display',serif;font-size:24px;color:var(--text)}
+.page-hd h1 em{font-style:italic;color:var(--g700)}
+[data-theme="dark"] .page-hd h1 em{color:var(--g300)}
+.page-hd p{font-size:10px;font-weight:300;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px}
+.hd-meta{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.meta-badge{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:var(--g050);border:1px solid var(--g100);font-size:9px;font-weight:300;color:var(--muted);font-family:'DM Mono',monospace}
+.meta-dot{width:5px;height:5px;border-radius:50%;background:var(--g500)}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;animation:fadeUp .35s .05s both}
+.stat-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:14px 16px;backdrop-filter:blur(8px)}
+.stat-label{font-size:8px;font-weight:300;color:var(--dim);font-family:'DM Mono',monospace;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px}
+.stat-val{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text);line-height:1}
+.stat-val.pending{color:var(--gold)}
+.stat-val.approved{color:var(--g500)}
+.stat-val.rejected{color:var(--red)}
+.stat-sub{font-size:9px;font-weight:300;color:var(--muted);margin-top:4px}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;animation:fadeUp .35s .08s both;flex-wrap:wrap}
+.search-box{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;flex:1;min-width:200px;backdrop-filter:blur(8px)}
+.search-box svg{width:12px;height:12px;stroke:var(--muted);fill:none;stroke-width:1.8;flex-shrink:0}
+.search-box input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--text);width:100%}
+.search-box input::placeholder{color:var(--dim)}
+.filter-chip{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;font-size:11px;font-weight:300;cursor:pointer;transition:var(--trans);border:1px solid transparent;white-space:nowrap;background:var(--g050);color:var(--muted)}
+.filter-chip:hover{background:var(--g100)}
+.filter-chip.active{background:rgba(74,140,101,0.12);border-color:rgba(74,140,101,0.25);color:var(--g700)}
+[data-theme="dark"] .filter-chip.active{color:var(--g300)}
+.filter-dot{width:6px;height:6px;border-radius:50%}
+
+/* TABLE */
+.table-wrap{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);backdrop-filter:blur(8px);overflow:hidden;animation:fadeUp .35s .12s both}
+.table-head-row{display:grid;grid-template-columns:64px 1fr 130px 110px 110px 110px 140px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--dim);background:rgba(74,140,101,0.04)}
+.th{font-size:8.5px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);font-family:'DM Mono',monospace}
+.table-row{display:grid;grid-template-columns:64px 1fr 130px 110px 110px 110px 140px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--dim);transition:var(--trans);cursor:pointer}
+.table-row:last-child{border-bottom:none}
+.table-row:hover{background:rgba(74,140,101,0.04)}
+.td-id{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+.td-user{display:flex;align-items:center;gap:9px}
+.td-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--g700),var(--g500));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:#fff;flex-shrink:0}
+.td-name{font-size:12px;font-weight:400;color:var(--text)}
+.td-dept{font-size:9.5px;font-weight:300;color:var(--muted)}
+.td-days{font-family:'DM Mono',monospace;font-size:12px;color:var(--text)}
+.td-date{font-size:11px;font-weight:300;color:var(--muted)}
+.status-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:9.5px;font-weight:400;font-family:'DM Mono',monospace}
+.status-chip.pendiente{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(184,146,42,0.25)}
+.status-chip.aprobada{background:rgba(74,140,101,0.1);color:var(--g500);border:1px solid rgba(74,140,101,0.2)}
+.status-chip.rechazada{background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,0.2)}
+.status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.td-actions{display:flex;align-items:center;gap:6px}
+.btn-aprobar{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:10.5px;font-weight:400;cursor:pointer;transition:var(--trans);border:1px solid rgba(74,140,101,0.3);background:rgba(74,140,101,0.08);color:var(--g500)}
+.btn-aprobar:hover{background:rgba(74,140,101,0.18);border-color:var(--g500)}
+.btn-rechazar{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:10.5px;font-weight:400;cursor:pointer;transition:var(--trans);border:1px solid rgba(192,57,43,0.2);background:var(--red-bg);color:var(--red)}
+.btn-rechazar:hover{background:rgba(192,57,43,0.15);border-color:var(--red)}
+.btn-aprobar svg,.btn-rechazar svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.btn-disabled{opacity:.3;pointer-events:none}
+.empty-state{padding:48px 24px;text-align:center;color:var(--muted)}
+.empty-state svg{width:32px;height:32px;stroke:var(--dim);fill:none;stroke-width:1.3;stroke-linecap:round;margin:0 auto 12px}
+.empty-title{font-size:13px;font-weight:300;margin-bottom:4px}
+.empty-sub{font-size:11px;font-weight:300;color:var(--dim);font-family:'DM Mono',monospace}
+
+/* MODAL OVERLAY */
+.modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(15,26,18,0.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal{background:var(--bone);border:1px solid var(--g100);border-radius:18px;padding:28px;width:480px;max-width:94vw;box-shadow:0 24px 60px rgba(0,0,0,0.18);transform:translateY(10px) scale(.98);transition:transform .22s,opacity .22s;opacity:0}
+[data-theme="dark"] .modal{background:#0f1a12}
+.modal-overlay.show .modal{transform:translateY(0) scale(1);opacity:1}
+.modal-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.modal-icon.ok{background:rgba(74,140,101,0.12)}
+.modal-icon.warn{background:var(--red-bg)}
+.modal-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+.modal-icon.ok svg{stroke:var(--g500)}
+.modal-icon.warn svg{stroke:var(--red)}
+.modal-title{font-family:'DM Serif Display',serif;font-size:19px;margin-bottom:6px}
+.modal-sub{font-size:11.5px;font-weight:300;color:var(--muted);line-height:1.6;margin-bottom:18px}
+.modal-detail{background:var(--g050);border:1px solid var(--g100);border-radius:10px;padding:12px 14px;margin-bottom:18px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.detail-row{display:flex;flex-direction:column;gap:2px}
+.detail-label{font-size:8px;font-weight:300;color:var(--dim);font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase}
+.detail-val{font-size:12px;font-weight:400;color:var(--text)}
+.modal-textarea{width:100%;border:1px solid var(--g100);border-radius:10px;background:var(--g050);padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--text);resize:vertical;min-height:80px;outline:none;transition:border-color .2s;margin-bottom:18px}
+.modal-textarea:focus{border-color:var(--g500)}
+.modal-textarea::placeholder{color:var(--dim)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel{padding:8px 16px;border-radius:9px;font-size:12px;font-weight:300;cursor:pointer;transition:var(--trans);border:1px solid var(--g100);background:transparent;color:var(--muted)}
+.btn-cancel:hover{background:var(--g050)}
+.btn-confirm-ok{padding:8px 18px;border-radius:9px;font-size:12px;font-weight:400;cursor:pointer;transition:var(--trans);border:none;background:linear-gradient(135deg,var(--g700),var(--g500));color:#fff}
+.btn-confirm-ok:hover{filter:brightness(1.08)}
+.btn-confirm-warn{padding:8px 18px;border-radius:9px;font-size:12px;font-weight:400;cursor:pointer;transition:var(--trans);border:none;background:var(--red);color:#fff}
+.btn-confirm-warn:hover{filter:brightness(1.08)}
+
+/* DETAIL MODAL */
+.detail-modal{width:560px}
+.detail-section{margin-bottom:16px}
+.detail-section-title{font-size:8.5px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);font-family:'DM Mono',monospace;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--dim)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.detail-item{display:flex;flex-direction:column;gap:3px}
+.saldo-bar{height:6px;background:var(--g100);border-radius:3px;overflow:hidden;margin-top:4px}
+.saldo-fill{height:100%;background:linear-gradient(90deg,var(--g700),var(--g500));border-radius:3px;transition:width .5s}
+.modal-btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--dim)}
+.btn-detail-aprobar{padding:8px 18px;border-radius:9px;font-size:12px;font-weight:400;cursor:pointer;transition:var(--trans);border:1px solid rgba(74,140,101,0.35);background:rgba(74,140,101,0.1);color:var(--g500);display:flex;align-items:center;gap:6px}
+.btn-detail-aprobar:hover{background:rgba(74,140,101,0.2)}
+.btn-detail-rechazar{padding:8px 18px;border-radius:9px;font-size:12px;font-weight:400;cursor:pointer;transition:var(--trans);border:1px solid rgba(192,57,43,0.25);background:var(--red-bg);color:var(--red);display:flex;align-items:center;gap:6px}
+.btn-detail-rechazar:hover{background:rgba(192,57,43,0.15)}
+.btn-detail-aprobar svg,.btn-detail-rechazar svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);z-index:600;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:400;font-family:'DM Mono',monospace;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--g800);color:var(--g100);border:1px solid rgba(140,201,163,0.2)}
+.toast.err{background:#3b1110;color:#f5a09a;border:1px solid rgba(192,57,43,0.3)}
+.toast.info{background:rgba(30,50,40,0.9);color:var(--g300);border:1px solid rgba(140,201,163,0.15)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Cargando solicitudes...</div>
+</div>
+
+
+
+<!-- MAIN -->
+<main class="page-wrap">
+
+  <!-- HEADER -->
+  <div class="page-hd">
+    <div>
+      <div class="breadcrumb">
+        <span>Módulo</span> › <span>Vacaciones</span> › <span style="color:var(--g500)">Aprobación Jefatura</span>
+      </div>
+      <h1>Solicitudes <em>pendientes</em></h1>
+      <p>RQ-SVC-2026 · Aprobación o rechazo por parte de la jefatura</p>
+    </div>
+    <div class="hd-meta">
+      <div class="meta-badge"><div class="meta-dot"></div>Jefatura activa</div>
+      <div class="meta-badge" id="metaTs" style="font-size:8.5px;color:var(--dim)"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Pendientes</div>
+      <div class="stat-val pending" id="statPendientes">0</div>
+      <div class="stat-sub">Por revisar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Aprobadas hoy</div>
+      <div class="stat-val approved" id="statAprobadas">0</div>
+      <div class="stat-sub">Esta sesión</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Rechazadas hoy</div>
+      <div class="stat-val rejected" id="statRechazadas">0</div>
+      <div class="stat-sub">Esta sesión</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total revisadas</div>
+      <div class="stat-val" id="statTotal">0</div>
+      <div class="stat-sub">Este período</div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Buscar por nombre, ID o usuario..." oninput="filterTable()"/>
+    </div>
+    <div class="filter-chip active" id="f-todas" onclick="setFilter('todas')">Todas</div>
+    <div class="filter-chip" id="f-pendiente" onclick="setFilter('pendiente')">
+      <div class="filter-dot" style="background:var(--gold)"></div>Pendientes
+    </div>
+    <div class="filter-chip" id="f-aprobada" onclick="setFilter('aprobada')">
+      <div class="filter-dot" style="background:var(--g500)"></div>Aprobadas
+    </div>
+    <div class="filter-chip" id="f-rechazada" onclick="setFilter('rechazada')">
+      <div class="filter-dot" style="background:var(--red)"></div>Rechazadas
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-head-row">
+      <div class="th">ID</div>
+      <div class="th">Funcionario</div>
+      <div class="th">Días solicitados</div>
+      <div class="th">Fecha inicio</div>
+      <div class="th">Fecha fin</div>
+      <div class="th">Estado</div>
+      <div class="th">Acciones</div>
+    </div>
+    <div id="tableBody"></div>
+  </div>
+
+</main>
+
+<!-- MODAL: DETALLE -->
+<div class="modal-overlay" id="modalDetalle">
+  <div class="modal detail-modal">
+    <div class="detail-section">
+      <div class="detail-section-title">Información de la solicitud</div>
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">ID Solicitud</span><span class="detail-val" id="det-id">—</span></div>
+        <div class="detail-item"><span class="detail-label">Estado actual</span><span class="detail-val" id="det-estado">—</span></div>
+        <div class="detail-item"><span class="detail-label">Funcionario</span><span class="detail-val" id="det-nombre">—</span></div>
+        <div class="detail-item"><span class="detail-label">Usuario</span><span class="detail-val" id="det-usuario">—</span></div>
+        <div class="detail-item"><span class="detail-label">Fecha de inicio</span><span class="detail-val" id="det-inicio">—</span></div>
+        <div class="detail-item"><span class="detail-label">Fecha de fin</span><span class="detail-val" id="det-fin">—</span></div>
+        <div class="detail-item"><span class="detail-label">Días solicitados</span><span class="detail-val" id="det-dias">—</span></div>
+        <div class="detail-item"><span class="detail-label">Días disponibles</span><span class="detail-val" id="det-saldo">—</span></div>
+      </div>
+      <div style="margin-top:10px">
+        <div class="saldo-bar"><div class="saldo-fill" id="det-saldo-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Observaciones</div>
+      <div class="detail-val" id="det-obs" style="font-size:12px;font-weight:300;color:var(--muted);line-height:1.6">—</div>
+    </div>
+    <div class="modal-btn-row">
+      <button class="btn-cancel" onclick="closeModal('modalDetalle')">Cerrar</button>
+      <button class="btn-detail-rechazar" id="btnDetRechazar" onclick="openRechazar(currentSolicitud)">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Rechazar
+      </button>
+      <button class="btn-detail-aprobar" id="btnDetAprobar" onclick="openAprobar(currentSolicitud)">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Aprobar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: APROBAR (MSG-001 confirmación) -->
+<div class="modal-overlay" id="modalAprobar">
+  <div class="modal">
+    <div class="modal-icon ok">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="modal-title">Confirmar aprobación</div>
+    <div class="modal-sub" id="msgAprobar">¿Confirma que aprobó la solicitud?</div>
+    <div class="modal-detail">
+      <div class="detail-row"><span class="detail-label">Funcionario</span><span class="detail-val" id="apr-nombre">—</span></div>
+      <div class="detail-row"><span class="detail-label">Días</span><span class="detail-val" id="apr-dias">—</span></div>
+      <div class="detail-row"><span class="detail-label">Fecha inicio</span><span class="detail-val" id="apr-inicio">—</span></div>
+      <div class="detail-row"><span class="detail-label">Fecha fin</span><span class="detail-val" id="apr-fin">—</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalAprobar')">Cancelar</button>
+      <button class="btn-confirm-ok" onclick="confirmarAprobar()">Confirmar aprobación</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: RECHAZAR (MSG-002 + motivo) -->
+<div class="modal-overlay" id="modalRechazar">
+  <div class="modal">
+    <div class="modal-icon warn">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+    <div class="modal-title">Confirmar rechazo</div>
+    <div class="modal-sub" id="msgRechazar">¿Confirma que rechazó la solicitud? Por favor ingrese el motivo.</div>
+    <div class="modal-detail">
+      <div class="detail-row"><span class="detail-label">Funcionario</span><span class="detail-val" id="rej-nombre">—</span></div>
+      <div class="detail-row"><span class="detail-label">Días</span><span class="detail-val" id="rej-dias">—</span></div>
+      <div class="detail-row"><span class="detail-label">Fecha inicio</span><span class="detail-val" id="rej-inicio">—</span></div>
+      <div class="detail-row"><span class="detail-label">Fecha fin</span><span class="detail-val" id="rej-fin">—</span></div>
+    </div>
+    <textarea class="modal-textarea" id="motivoRechazo" placeholder="Motivo del rechazo (requerido)..."></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modalRechazar')">Cancelar</button>
+      <button class="btn-confirm-warn" onclick="confirmarRechazar()">Confirmar rechazo</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="/frontend/components/navbar.js"></script>
+<script src="/frontend/js/session.js"></script>
+
+<app-navbar></app-navbar>
+
+<script>
+/* ── MOCK DATA ── */
+var MOCK = [
+  { id: 'SOL-001', usuario: 'msolis', nombre: 'Mario Solís', apellido: 'Vargas', depto: 'Informática', dias: 5, inicio: '2026-04-07', fin: '2026-04-11', estado: 'Pendiente', saldo_disponible: 8.5, saldo_acumulado: 10, obs: 'Vacaciones de semana santa. Sin actividades pendientes.' },
+  { id: 'SOL-002', usuario: 'lhidalgo', nombre: 'Laura Hidalgo', apellido: 'Mora', depto: 'Contabilidad', dias: 3, inicio: '2026-03-25', fin: '2026-03-27', estado: 'Pendiente', saldo_disponible: 6, saldo_acumulado: 9, obs: 'Asuntos personales.' },
+  { id: 'SOL-003', usuario: 'earias', nombre: 'Esteban Arias', apellido: 'Castro', depto: 'Biblioteca', dias: 2, inicio: '2026-04-01', fin: '2026-04-02', estado: 'Pendiente', saldo_disponible: 4, saldo_acumulado: 6, obs: '' },
+  { id: 'SOL-004', usuario: 'kmolina', nombre: 'Karen Molina', apellido: 'Rojas', depto: 'Recursos Humanos', dias: 7, inicio: '2026-04-14', fin: '2026-04-22', estado: 'Aprobada', saldo_disponible: 10, saldo_acumulado: 12, obs: 'Viaje al exterior aprobado por dirección.' },
+  { id: 'SOL-005', usuario: 'dchavarria', nombre: 'Diego Chavarría', apellido: 'Núñez', depto: 'Informática', dias: 4, inicio: '2026-03-30', fin: '2026-04-02', estado: 'Rechazada', saldo_disponible: 5, saldo_acumulado: 7, obs: 'Fecha solicitada en período de cierre.' },
+];
+
+var solicitudes = JSON.parse(JSON.stringify(MOCK));
+var currentSolicitud = null;
+var activeFilter = 'todas';
+var sessionAprobadas = 0;
+var sessionRechazadas = 0;
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('metaTs').textContent = fmtDate(new Date().toISOString());
+  setTimeout(function() {
+    renderTable();
+    updateStats();
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }, 700);
+});
+
+/* ── FORMAT ── */
+function fmtDate(iso) {
+  if (!iso) return '—';
+  var d = new Date(iso);
+  return d.toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function initials(nombre, apellido) {
+  return ((nombre||'')[0]||'') + ((apellido||'')[0]||'');
+}
+
+/* ── RENDER ── */
+function renderTable() {
+  var q = (document.getElementById('searchInput').value || '').toLowerCase();
+  var list = solicitudes.filter(function(s) {
+    var matchFilter = activeFilter === 'todas' || s.estado.toLowerCase() === activeFilter;
+    var matchSearch = !q || s.nombre.toLowerCase().includes(q) || s.id.toLowerCase().includes(q) || s.usuario.toLowerCase().includes(q);
+    return matchFilter && matchSearch;
+  });
+  var body = document.getElementById('tableBody');
+  if (list.length === 0) {
+    body.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg><div class="empty-title">Sin solicitudes</div><div class="empty-sub">No hay resultados para los filtros actuales.</div></div>';
+    return;
+  }
+  body.innerHTML = list.map(function(s) {
+    var isPendiente = s.estado === 'Pendiente';
+    var estadoClass = s.estado.toLowerCase();
+    return '<div class="table-row" onclick="openDetalle(\'' + s.id + '\')">' +
+      '<div class="td-id">' + s.id + '<\/div>' +
+      '<div class="td-user"><div class="td-avatar">' + initials(s.nombre, s.apellido) + '<\/div><div><div class="td-name">' + s.nombre + ' ' + s.apellido + '<\/div><div class="td-dept">' + s.depto + '<\/div><\/div><\/div>' +
+      '<div class="td-days">' + s.dias + ' días<\/div>' +
+      '<div class="td-date">' + fmtDate(s.inicio) + '<\/div>' +
+      '<div class="td-date">' + fmtDate(s.fin) + '<\/div>' +
+      '<div><span class="status-chip ' + estadoClass + '"><span class="status-dot"><\/span>' + s.estado + '<\/span><\/div>' +
+      '<div class="td-actions" onclick="event.stopPropagation()">' +
+        '<button class="btn-aprobar' + (isPendiente ? '' : ' btn-disabled') + '" onclick="openAprobar(\'' + s.id + '\')">' +
+          '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"\/><\/svg>Aprobar' +
+        '<\/button>' +
+        '<button class="btn-rechazar' + (isPendiente ? '' : ' btn-disabled') + '" onclick="openRechazar(\'' + s.id + '\')">' +
+          '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"\/><line x1="6" y1="6" x2="18" y2="18"\/><\/svg>Rechazar' +
+        '<\/button>' +
+      '<\/div>' +
+    '<\/div>';
+  }).join('');
+}
+
+function updateStats() {
+  var pendientes = solicitudes.filter(function(s){return s.estado==='Pendiente';}).length;
+  var total = solicitudes.length;
+  document.getElementById('statPendientes').textContent = pendientes;
+  document.getElementById('statAprobadas').textContent = sessionAprobadas;
+  document.getElementById('statRechazadas').textContent = sessionRechazadas;
+  document.getElementById('statTotal').textContent = total;
+}
+
+/* ── FILTERS ── */
+function setFilter(f) {
+  activeFilter = f;
+  ['todas','pendiente','aprobada','rechazada'].forEach(function(id) {
+    document.getElementById('f-' + id).classList.toggle('active', id === f);
+  });
+  renderTable();
+}
+function filterTable() { renderTable(); }
+
+/* ── DETALLE MODAL ── */
+function openDetalle(id) {
+  var s = getSolicitud(id);
+  currentSolicitud = id;
+  document.getElementById('det-id').textContent = s.id;
+  document.getElementById('det-nombre').textContent = s.nombre + ' ' + s.apellido;
+  document.getElementById('det-usuario').textContent = s.usuario;
+  document.getElementById('det-inicio').textContent = fmtDate(s.inicio);
+  document.getElementById('det-fin').textContent = fmtDate(s.fin);
+  document.getElementById('det-dias').textContent = s.dias + ' días';
+  document.getElementById('det-saldo').textContent = s.saldo_disponible + ' días';
+  document.getElementById('det-obs').textContent = s.obs || 'Sin observaciones.';
+  var pct = Math.min(100, Math.round((s.saldo_disponible / (s.saldo_acumulado || 1)) * 100));
+  document.getElementById('det-saldo-bar').style.width = pct + '%';
+  // Status chip
+  var estadoClass = s.estado.toLowerCase();
+  document.getElementById('det-estado').innerHTML = '<span class="status-chip ' + estadoClass + '"><span class="status-dot"><\/span>' + s.estado + '<\/span>';
+  // Disable buttons if not pending
+  var isPendiente = s.estado === 'Pendiente';
+  document.getElementById('btnDetAprobar').classList.toggle('btn-disabled', !isPendiente);
+  document.getElementById('btnDetRechazar').classList.toggle('btn-disabled', !isPendiente);
+  openModal('modalDetalle');
+}
+
+/* ── APROBAR MODAL ── */
+function openAprobar(id) {
+  var s = getSolicitud(id);
+  if (!s || s.estado !== 'Pendiente') { showToast('Esta solicitud no está pendiente','info'); return; }
+  currentSolicitud = id;
+  closeModal('modalDetalle');
+  document.getElementById('apr-nombre').textContent = s.nombre + ' ' + s.apellido;
+  document.getElementById('apr-dias').textContent = s.dias + ' días';
+  document.getElementById('apr-inicio').textContent = fmtDate(s.inicio);
+  document.getElementById('apr-fin').textContent = fmtDate(s.fin);
+  openModal('modalAprobar');
+}
+function confirmarAprobar() {
+  var s = getSolicitud(currentSolicitud);
+  s.estado = 'Aprobada';
+  sessionAprobadas++;
+  closeModal('modalAprobar');
+  renderTable();
+  updateStats();
+  showToast('Solicitud ' + s.id + ' aprobada correctamente.','ok'); // MSG-003
+}
+
+/* ── RECHAZAR MODAL ── */
+function openRechazar(id) {
+  var s = getSolicitud(id);
+  if (!s || s.estado !== 'Pendiente') { showToast('Esta solicitud no está pendiente','info'); return; }
+  currentSolicitud = id;
+  closeModal('modalDetalle');
+  document.getElementById('rej-nombre').textContent = s.nombre + ' ' + s.apellido;
+  document.getElementById('rej-dias').textContent = s.dias + ' días';
+  document.getElementById('rej-inicio').textContent = fmtDate(s.inicio);
+  document.getElementById('rej-fin').textContent = fmtDate(s.fin);
+  document.getElementById('motivoRechazo').value = '';
+  openModal('modalRechazar');
+}
+function confirmarRechazar() {
+  var motivo = document.getElementById('motivoRechazo').value.trim();
+  if (!motivo) { showToast('Debe ingresar un motivo de rechazo','err'); return; }
+  var s = getSolicitud(currentSolicitud);
+  s.estado = 'Rechazada';
+  s.obs = motivo;
+  sessionRechazadas++;
+  closeModal('modalRechazar');
+  renderTable();
+  updateStats();
+  showToast('Solicitud ' + s.id + ' rechazada correctamente.','info'); // MSG-004
+}
+
+/* ── HELPERS ── */
+function getSolicitud(id) { return solicitudes.find(function(s){return s.id===id;}); }
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + (type||'ok') + ' show';
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+function toggleTheme() {
+  var html = document.documentElement;
+  var dark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', dark ? 'light' : 'dark');
+  document.getElementById('themeIcon').innerHTML = dark
+    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"\/>'
+    : '<circle cx="12" cy="12" r="5"\/><line x1="12" y1="1" x2="12" y2="3"\/><line x1="12" y1="21" x2="12" y2="23"\/>';
+}
+function toggleGroup(id) {
+  var grp = document.getElementById('grp-' + id);
+  var isOpen = grp.classList.contains('open');
+  document.querySelectorAll('.nav-group').forEach(function(g){ g.classList.remove('open'); });
+  if (!isOpen) grp.classList.add('open');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.nav-group')) document.querySelectorAll('.nav-group').forEach(function(g){ g.classList.remove('open'); });
+});
+// Close modals on overlay click
+['modalDetalle','modalAprobar','modalRechazar'].forEach(function(id) {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) closeModal(id);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Simulación de Liquidación – CUC</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#f4f1eb;--card:#fff;--accent:#2d6a4f;--accent2:#52b788;
+    --gold:#d4a017;--warn:#e76f51;--text:#1b1b1b;--muted:#6b7280;
+    --border:#e5e0d8;--radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  nav{background:var(--accent);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;}
+  nav .brand{font-family:'DM Serif Display',serif;font-size:1.4rem;color:#fff;}
+  nav a.back{color:#b7e4c7;text-decoration:none;font-size:.85rem;border:1px solid #52b78860;padding:6px 14px;border-radius:8px;}
+
+  .hero{background:linear-gradient(135deg,#1b4332,#2d6a4f);padding:40px 32px 60px;text-align:center;color:#fff;}
+  .hero h1{font-family:'DM Serif Display',serif;font-size:2.2rem;margin-bottom:6px;}
+  .hero p{color:#b7e4c7;font-size:.95rem;max-width:500px;margin:0 auto;}
+
+  .container{max-width:780px;margin:-36px auto 60px;padding:0 24px;}
+
+  .card{background:var(--card);border-radius:var(--radius);padding:28px;border:1px solid var(--border);box-shadow:0 2px 14px #0001;margin-bottom:20px;}
+  .card h3{font-size:1rem;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+
+  /* SELECTOR FUNCIONARIO */
+  .form-group{margin-bottom:16px;}
+  label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+  input, select{width:100%;border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:.9rem;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);}
+  input:focus, select:focus{outline:none;border-color:var(--accent2);box-shadow:0 0 0 3px #52b78820;}
+
+  .btn-primary{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;}
+  .btn-primary:hover{background:#1b4332;}
+  .btn-primary:disabled{background:#9ca3af;cursor:not-allowed;}
+
+  /* RESULTADO */
+  #resultado{display:none;}
+
+  .total-banner{background:linear-gradient(135deg,var(--accent),#1b4332);color:#fff;border-radius:var(--radius);padding:32px 28px;text-align:center;margin-bottom:20px;}
+  .total-banner .label{font-size:.85rem;opacity:.8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
+  .total-banner .total-val{font-family:'DM Serif Display',serif;font-size:3rem;}
+  .total-banner .moneda{font-size:.9rem;opacity:.7;margin-top:6px;}
+
+  .desglose-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);}
+  .desglose-row:last-child{border:none;}
+  .desglose-row .dk{display:flex;align-items:center;gap:10px;font-size:.9rem;}
+  .desglose-row .dk .icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+  .desglose-row .dv{font-weight:700;font-size:1rem;}
+
+  .icon.vac{background:#d1fae5;color:#065f46;}
+  .icon.ces{background:#dbeafe;color:#1e40af;}
+  .icon.agu{background:#fef9c3;color:#854d0e;}
+
+  .disclaimer{background:#fef9c3;border:1px solid #fde68a;border-radius:12px;padding:14px 18px;font-size:.82rem;color:#854d0e;margin-top:16px;}
+
+  .loading-spin{text-align:center;padding:20px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">Sistema Vacaciones CUC</span>
+  <a class="back" href="../dashboard.html">← Dashboard</a>
+</nav>
+
+<div class="hero">
+  <h1>Simulación de Liquidación</h1>
+  <p>Calcula el monto estimado a pagar si un funcionario termina su relación laboral</p>
+</div>
+
+<div class="container">
+
+  <!-- FORMULARIO -->
+  <div class="card">
+    <h3>🧮 Datos para la simulación</h3>
+    <div class="form-group">
+      <label>ID del Funcionario</label>
+      <input type="number" id="inp-id" placeholder="Ej: 1" min="1"/>
+    </div>
+    <button class="btn-primary" id="btn-simular" onclick="simular()">Calcular liquidación</button>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resultado">
+
+    <div class="total-banner">
+      <div class="label">Total estimado de liquidación</div>
+      <div class="total-val" id="total-val">₡0</div>
+      <div class="moneda">Colones costarricenses (CRC)</div>
+    </div>
+
+    <div class="card">
+      <h3>👤 Información del funcionario</h3>
+      <div class="desglose-row">
+        <span class="dk"><span>Nombre</span></span>
+        <span class="dv" id="res-nombre">—</span>
+      </div>
+      <div class="desglose-row">
+        <span class="dk"><span>Fecha de ingreso</span></span>
+        <span class="dv" id="res-ingreso">—</span>
+      </div>
+      <div class="desglose-row">
+        <span class="dk"><span>Antigüedad</span></span>
+        <span class="dv" id="res-anios">—</span>
+      </div>
+      <div class="desglose-row">
+        <span class="dk"><span>Salario mensual</span></span>
+        <span class="dv" id="res-salario">—</span>
+      </div>
+      <div class="desglose-row">
+        <span class="dk"><span>Días vacaciones pendientes</span></span>
+        <span class="dv" id="res-dias">—</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>💰 Desglose del pago</h3>
+      <div class="desglose-row">
+        <span class="dk">
+          <span class="icon vac">🌴</span>
+          <span>Vacaciones no disfrutadas</span>
+        </span>
+        <span class="dv" id="des-vac">₡0</span>
+      </div>
+      <div class="desglose-row">
+        <span class="dk">
+          <span class="icon ces">🏛</span>
+          <span>Cesantía (máx. 8 años)</span>
+        </span>
+        <span class="dv" id="des-ces">₡0</span>
+      </div>
+      <div class="desglose-row">
+        <span class="dk">
+          <span class="icon agu">🎄</span>
+          <span>Aguinaldo proporcional</span>
+        </span>
+        <span class="dv" id="des-agu">₡0</span>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      ⚠ Esta es una <strong>simulación estimada</strong>. Los montos reales pueden variar según deducciones de CCSS, impuestos, cláusulas contractuales y el tipo de despido. Consulte con Recursos Humanos para una liquidación oficial.
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = 'http://localhost:3000/api';
+
+function fmt(n) {
+  return '₡' + Number(n).toLocaleString('es-CR', {minimumFractionDigits:2});
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('es-CR', {day:'2-digit',month:'long',year:'numeric'});
+}
+
+async function simular() {
+  const id = document.getElementById('inp-id').value.trim();
+  if (!id) { alert('Por favor ingrese el ID del funcionario.'); return; }
+
+  const btn = document.getElementById('btn-simular');
+  btn.disabled = true;
+  btn.textContent = 'Calculando…';
+  document.getElementById('resultado').style.display = 'none';
+
+  try {
+    const res = await fetch(`${API}/saldo/liquidacion?id_funcionario=${id}`);
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Error en el servidor');
+
+    // Rellenar
+    document.getElementById('total-val').textContent = fmt(data.total_liquidacion);
+    document.getElementById('res-nombre').textContent = data.funcionario;
+    document.getElementById('res-ingreso').textContent = fmtDate(data.fecha_ingreso);
+    document.getElementById('res-anios').textContent = `${data.anios_servicio} año(s)`;
+    document.getElementById('res-salario').textContent = fmt(data.salario_mensual);
+    document.getElementById('res-dias').textContent = `${data.dias_vacaciones_pendientes} días`;
+    document.getElementById('des-vac').textContent = fmt(data.desglose.pago_vacaciones_pendientes);
+    document.getElementById('des-ces').textContent = fmt(data.desglose.cesantia);
+    document.getElementById('des-agu').textContent = fmt(data.desglose.aguinaldo_proporcional);
+
+    document.getElementById('resultado').style.display = 'block';
+    document.getElementById('resultado').scrollIntoView({behavior:'smooth',block:'start'});
+
+  } catch (e) {
+    alert('Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Calcular liquidación';
+  }
+}
+
+// Enter key
+document.getElementById('inp-id').addEventListener('keydown', e => {
+  if (e.key === 'Enter') simular();
+});
+</script>
+</body>
+</html>

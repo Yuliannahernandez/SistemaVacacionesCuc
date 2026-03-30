@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SIGEVAC — Historial de Solicitudes</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --g900:#001f52;--g800:#002D72;--g700:#1a5ba8;--g500:#2d7dd2;
+      --g300:#7da6d8;--g100:#ccddf0;--g050:#e8f0fa;
+      --gold:#b8922a;--gold-bg:rgba(185,150,60,0.1);
+      --red:#E4002B;--red-bg:rgba(228,0,43,0.06);
+      --bone:#f4f6fb;--text:#001530;
+      --muted:rgba(0,30,80,0.45);--dim:rgba(0,30,80,0.22);
+      --nav-h:56px;--radius:14px;
+      --trans:all .2s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="dark"]{
+      --bone:#060d1a;--text:#ccddf0;
+      --muted:rgba(125,166,216,0.45);--dim:rgba(125,166,216,0.22);
+      --g050:rgba(0,45,114,0.3);--g100:rgba(0,45,114,0.5);
+      --gold:#c8a040;--gold-bg:rgba(185,150,60,0.15);--red-bg:rgba(228,0,43,0.12);
+    }
+    html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bone);color:var(--text);overflow:hidden;transition:background .3s,color .3s}
+    .bg{position:fixed;inset:0;z-index:0;background:var(--bone);transition:background .3s}
+    .bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 75% 10%,rgba(45,125,210,0.08) 0%,transparent 60%),radial-gradient(ellipse 35% 50% at 8% 90%,rgba(26,91,168,0.05) 0%,transparent 55%)}
+
+    /* ══ TOPNAV ══ */
+    .topnav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:200;display:flex;align-items:center;padding:0 20px;background:rgba(0,45,114,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.05)}
+    .nav-logo{display:flex;align-items:center;gap:10px;margin-right:20px;flex-shrink:0}
+    .logo-icon{width:29px;height:29px;border-radius:8px;background:linear-gradient(135deg,#002D72,#7da6d8);display:flex;align-items:center;justify-content:center}
+    .logo-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round}
+    .logo-text strong{font-family:'DM Mono',monospace;font-size:12px;font-weight:400;color:rgba(204,220,240,0.9);letter-spacing:.1em;display:block;line-height:1}
+    .logo-text small{font-size:8px;font-weight:300;color:rgba(125,166,216,0.3);letter-spacing:.18em;text-transform:uppercase}
+    .nav-vdiv{width:1px;height:18px;background:rgba(255,255,255,0.07);margin-right:16px;flex-shrink:0}
+    .nav-sep{width:1px;height:14px;background:rgba(255,255,255,0.07);margin:0 4px;flex-shrink:0}
+    .nav-links{display:flex;align-items:center;gap:1px;flex:1}
+    .nav-link{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.4);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap;flex-shrink:0}
+    .nav-link svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;flex-shrink:0}
+    .nav-link:hover{background:rgba(255,255,255,0.06);color:rgba(204,220,240,0.7)}
+    .nav-group{position:relative;flex-shrink:0}
+    .nav-group-btn{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.4);cursor:pointer;transition:var(--trans);white-space:nowrap;user-select:none}
+    .nav-group-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;flex-shrink:0}
+    .nav-chevron{margin-left:2px;transition:transform .2s;opacity:.5}
+    .nav-group-btn:hover{background:rgba(255,255,255,0.06);color:rgba(204,220,240,0.7)}
+    .nav-group.open .nav-group-btn{background:rgba(125,166,216,0.11);color:var(--g300)}
+    .nav-group.open .nav-chevron{transform:rotate(180deg)}
+    .nav-submenu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,0.25);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+    .nav-group.open .nav-submenu{opacity:1;transform:translateY(0);pointer-events:all}
+    .nav-sub-item{display:block;padding:8px 12px;border-radius:8px;font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.5);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap}
+    .nav-sub-item:hover{background:rgba(125,166,216,0.1);color:rgba(204,220,240,0.85)}
+    .nav-sub-item.active{background:rgba(26,91,168,0.15);color:var(--g300)}
+    .nav-right{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0}
+    .nav-date{font-size:9.5px;font-weight:300;color:rgba(125,166,216,0.3);font-family:'DM Mono',monospace;margin-right:6px}
+    .nav-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--trans)}
+    .nav-btn:hover{background:rgba(255,255,255,0.09)}
+    .nav-btn svg{width:13px;height:13px;stroke:rgba(125,166,216,0.5);fill:none;stroke-width:1.5;stroke-linecap:round}
+    .action-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:300;color:rgba(125,166,216,0.38);transition:var(--trans)}
+    .action-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+    .action-btn:hover{background:rgba(255,255,255,0.05);color:rgba(204,220,240,0.62)}
+    .action-btn.logout:hover{color:rgba(228,0,43,0.7)}
+    .user-wrap{position:relative;margin-left:3px}
+    .user-pill{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 5px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);cursor:pointer;transition:var(--trans)}
+    .user-pill:hover{background:rgba(255,255,255,0.08)}
+    .user-wrap.open .user-pill{background:rgba(125,166,216,0.1);border-color:rgba(125,166,216,0.15)}
+    .avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--g800),var(--g700));display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:500;color:#fff;flex-shrink:0}
+    .user-pill-name{font-size:11px;font-weight:300;color:rgba(204,220,240,0.62);line-height:1.1}
+    .user-pill-nom{font-size:8.5px;font-weight:300;color:rgba(125,166,216,0.35);letter-spacing:.04em}
+    .user-dropdown{position:absolute;top:calc(100% + 7px);right:0;width:210px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:14px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,0.28);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+    .user-wrap.open .user-dropdown{opacity:1;transform:translateY(0);pointer-events:all}
+    .ud-label{font-size:8px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(125,166,216,0.3);margin-bottom:8px;padding:0 4px}
+    .ud-pill{display:flex;flex-direction:column;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid transparent;cursor:pointer;transition:var(--trans);margin-bottom:4px}
+    .ud-pill:last-child{margin-bottom:0}
+    .ud-pill:hover{background:rgba(125,166,216,0.08)}
+    .ud-pill.active{background:rgba(26,91,168,0.15);border-color:rgba(125,166,216,0.18)}
+    .ud-pill-name{font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.55)}
+    .ud-pill.active .ud-pill-name{color:var(--g300)}
+    .ud-pill-sub{font-size:9px;font-weight:300;color:rgba(125,166,216,0.28);margin-top:1px}
+
+    /* ══ LAYOUT ══ */
+    .layout{position:relative;z-index:10;margin-top:var(--nav-h);height:calc(100vh - var(--nav-h));display:flex;flex-direction:column;overflow:hidden}
+    .main{flex:1;overflow-y:auto;overflow-x:hidden;padding:22px 24px 20px;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ══ Header ══ */
+    .page-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;animation:fadeUp .4s both}
+    .page-back{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:8px;transition:var(--trans)}
+    .page-back svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+    .page-back:hover{background:var(--g050);color:var(--g700)}
+    .page-hdiv{width:1px;height:16px;background:var(--dim)}
+    .page-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text)}
+    .page-title em{font-style:italic;color:var(--g700)}
+    [data-theme="dark"] .page-title em{color:var(--g300)}
+    .page-tag{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;padding:4px 10px;border-radius:6px;border:1px solid var(--dim);color:var(--muted)}
+    .result-count{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;color:var(--muted);padding:4px 10px;border-radius:6px;background:var(--g050);border:1px solid var(--g100)}
+    [data-theme="dark"] .result-count{background:rgba(0,45,114,0.25);border-color:rgba(125,166,216,0.12)}
+
+    /* ══ Saldo resumen ══ */
+    .saldo-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;animation:fadeUp .4s .04s both}
+    .saldo-item{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:13px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);transition:var(--trans)}
+    [data-theme="dark"] .saldo-item{background:rgba(0,45,114,0.18);border-color:rgba(125,166,216,0.08)}
+    .saldo-item.featured{background:rgba(45,125,210,0.08);border-color:rgba(45,125,210,0.2)}
+    .si-label{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:300;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+    .si-val{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text);line-height:1}
+    .saldo-item.featured .si-val{color:var(--g700)}
+    [data-theme="dark"] .saldo-item.featured .si-val{color:var(--g300)}
+    .si-sub{font-size:10px;font-weight:300;color:var(--muted);margin-top:3px}
+
+    /* ══ Filtros ══ */
+    .filters-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:14px 18px;box-shadow:0 2px 14px rgba(0,0,0,0.05);margin-bottom:14px;animation:fadeUp .4s .06s both;transition:background .3s}
+    [data-theme="dark"] .filters-card{background:rgba(0,45,114,0.18);border-color:rgba(125,166,216,0.08)}
+    .filters-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+    .f-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px}
+    .f-label{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:300;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+    .f-group input,.f-group select{background:var(--g050);border:1px solid var(--g100);border-radius:9px;padding:8px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;outline:none;transition:var(--trans);width:100%}
+    [data-theme="dark"] .f-group input,[data-theme="dark"] .f-group select{background:rgba(0,45,114,0.25);border-color:rgba(125,166,216,0.15);color:var(--text)}
+    .f-group input:focus,.f-group select:focus{border-color:var(--g500);background:#fff;box-shadow:0 0 0 3px rgba(45,125,210,0.08)}
+    [data-theme="dark"] .f-group input:focus,[data-theme="dark"] .f-group select:focus{background:rgba(0,45,114,0.4);border-color:var(--g300)}
+    .f-group select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(45,125,210,0.6)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px;cursor:pointer}
+    .f-group.hidden{display:none}
+    .btn-buscar{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:400;color:#fff;background:var(--g700);transition:var(--trans);white-space:nowrap;align-self:flex-end}
+    .btn-buscar svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5}
+    .btn-buscar:hover{background:var(--g800);transform:translateY(-1px)}
+    .btn-limpiar{padding:8px 14px;border-radius:9px;border:1px solid var(--g100);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:300;color:var(--muted);transition:var(--trans);align-self:flex-end;white-space:nowrap}
+    .btn-limpiar:hover{border-color:rgba(228,0,43,0.3);color:var(--red)}
+
+    /* ══ Botones exportar ══ */
+    .export-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;animation:fadeUp .4s .08s both}
+    .btn-export{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid var(--g100);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:300;color:var(--muted);transition:var(--trans)}
+    [data-theme="dark"] .btn-export{border-color:rgba(125,166,216,0.15)}
+    .btn-export svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5}
+    .btn-export:hover{background:var(--g050);border-color:rgba(45,125,210,0.3);color:var(--g700)}
+    [data-theme="dark"] .btn-export:hover{background:rgba(0,45,114,0.3);color:var(--g300)}
+    .export-sep{width:1px;height:18px;background:var(--dim)}
+
+    /* ══ TABLA ══ */
+    .table-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);box-shadow:0 2px 14px rgba(0,0,0,0.05);overflow:hidden;animation:fadeUp .4s .1s both;transition:background .3s}
+    [data-theme="dark"] .table-card{background:rgba(0,45,114,0.18);border-color:rgba(125,166,216,0.08)}
+
+    .table-hdr{display:grid;grid-template-columns:130px 1fr 1fr 110px 60px 100px 90px 90px 80px;padding:10px 16px;border-bottom:1px solid var(--g100);gap:8px}
+    [data-theme="dark"] .table-hdr{border-bottom-color:rgba(125,166,216,0.1)}
+    .th{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .th.sortable{cursor:pointer;display:flex;align-items:center;gap:4px;user-select:none;transition:color .2s}
+    .th.sortable:hover{color:var(--g700)}
+    [data-theme="dark"] .th.sortable:hover{color:var(--g300)}
+    .th.sorted{color:var(--g700)}
+    [data-theme="dark"] .th.sorted{color:var(--g300)}
+    .th svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2;opacity:.45}
+
+    .table-body{max-height:calc(100vh - 440px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
+    .table-row{display:grid;grid-template-columns:130px 1fr 1fr 110px 60px 100px 90px 90px 80px;padding:11px 16px;border-bottom:1px solid rgba(0,0,0,0.04);gap:8px;align-items:center;cursor:pointer;transition:var(--trans)}
+    [data-theme="dark"] .table-row{border-bottom-color:rgba(125,166,216,0.05)}
+    .table-row:last-child{border-bottom:none}
+    .table-row:hover{background:rgba(45,125,210,0.05)}
+    [data-theme="dark"] .table-row:hover{background:rgba(45,125,210,0.1)}
+
+    .td{font-size:11.5px;font-weight:300;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .td.mono{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--g700)}
+    [data-theme="dark"] .td.mono{color:var(--g300)}
+    .td.muted{color:var(--muted)}
+    .td.center{text-align:center}
+
+    /* Badges */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:9.5px;font-weight:400;font-family:'DM Mono',monospace;white-space:nowrap}
+    .badge::before{content:'';width:4px;height:4px;border-radius:50%;flex-shrink:0}
+    .badge.pendiente{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(185,150,60,0.25)}.badge.pendiente::before{background:var(--gold)}
+    .badge.aprobada{background:rgba(45,125,210,0.1);color:var(--g700);border:1px solid rgba(45,125,210,0.22)}.badge.aprobada::before{background:var(--g500)}
+    [data-theme="dark"] .badge.aprobada{color:var(--g300)}
+    .badge.rechazada{background:var(--red-bg);color:var(--red);border:1px solid rgba(228,0,43,0.2)}.badge.rechazada::before{background:var(--red)}
+    .badge.cancelada{background:rgba(100,100,100,0.06);color:var(--muted);border:1px solid var(--dim)}.badge.cancelada::before{background:var(--muted)}
+    .badge-mod{font-size:9px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:4px;background:rgba(45,125,210,0.06);border:1px solid var(--g100);color:var(--muted)}
+
+    .btn-ver{padding:4px 10px;border-radius:7px;border:1px solid var(--g100);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:300;color:var(--g700);transition:var(--trans)}
+    [data-theme="dark"] .btn-ver{color:var(--g300);border-color:rgba(125,166,216,0.2)}
+    .btn-ver:hover{background:var(--g050);border-color:rgba(45,125,210,0.35)}
+
+    .empty-state{padding:40px 24px;text-align:center}
+    .empty-icon{width:44px;height:44px;border-radius:12px;background:var(--g050);border:1px solid var(--g100);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+    [data-theme="dark"] .empty-icon{background:rgba(0,45,114,0.3);border-color:rgba(125,166,216,0.12)}
+    .empty-icon svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.5}
+    .empty-title{font-family:'DM Serif Display',serif;font-size:16px;color:var(--text);margin-bottom:5px}
+    .empty-sub{font-size:11.5px;font-weight:300;color:var(--muted);line-height:1.6}
+
+    /* ══ MODAL DETALLE ══ */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,45,114,0.45);backdrop-filter:blur(8px);z-index:999;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--bone);border:1px solid rgba(255,255,255,0.7);border-radius:18px;max-width:680px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.15);animation:modalIn .3s cubic-bezier(.16,1,.3,1);margin:auto;overflow:hidden}
+    [data-theme="dark"] .modal{background:rgba(0,20,60,0.98);border-color:rgba(125,166,216,0.1)}
+    @keyframes modalIn{from{transform:scale(0.96);opacity:0}to{transform:scale(1);opacity:1}}
+
+    .modal-head{padding:18px 22px 16px;border-bottom:1px solid var(--g100);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    [data-theme="dark"] .modal-head{border-bottom-color:rgba(125,166,216,0.1)}
+    .m-num{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--g500);margin-bottom:3px}
+    .m-title{font-family:'DM Serif Display',serif;font-size:19px;color:var(--text)}
+    .m-close{width:28px;height:28px;border-radius:8px;border:1px solid var(--g100);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--trans);flex-shrink:0}
+    .m-close:hover{background:var(--red-bg);border-color:rgba(228,0,43,0.2)}
+    .m-close svg{width:13px;height:13px;stroke:var(--muted);fill:none;stroke-width:2}
+    [data-theme="dark"] .m-close{border-color:rgba(125,166,216,0.15)}
+
+    .modal-body{padding:18px 22px;max-height:68vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
+
+    .m-section{margin-bottom:18px}
+    .m-section:last-child{margin-bottom:0}
+    .m-sec-title{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:7px}
+    [data-theme="dark"] .m-sec-title{border-bottom-color:rgba(125,166,216,0.1)}
+    .m-sec-title svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.5}
+    .m-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .m-grid.three{grid-template-columns:1fr 1fr 1fr}
+    .m-item{display:flex;flex-direction:column;gap:2px}
+    .m-item.full{grid-column:1/-1}
+    .m-lbl{font-family:'DM Mono',monospace;font-size:8px;font-weight:300;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+    .m-val{font-size:12px;font-weight:300;color:var(--text);line-height:1.4}
+    .m-val.mono{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--g700)}
+    [data-theme="dark"] .m-val.mono{color:var(--g300)}
+    .m-val.muted{color:var(--muted);font-style:italic}
+
+    /* Saldo proyectado */
+    .saldo-impact{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--g050);border-radius:10px;border:1px solid var(--g100)}
+    [data-theme="dark"] .saldo-impact{background:rgba(0,45,114,0.25);border-color:rgba(125,166,216,0.12)}
+    .si-n{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);line-height:1}
+    .si-n.after{color:var(--g700)}
+    [data-theme="dark"] .si-n.after{color:var(--g300)}
+    .si-n.red{color:var(--red)}
+    .si-l{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+    .si-arrow{font-size:16px;color:var(--dim)}
+
+    /* Historial de cambios */
+    .hist-timeline{display:flex;flex-direction:column}
+    .ht-item{display:flex;gap:12px;padding-bottom:12px;position:relative}
+    .ht-item:last-child{padding-bottom:0}
+    .ht-item:not(:last-child)::before{content:'';position:absolute;left:10px;top:22px;bottom:0;width:1px;background:var(--g100)}
+    [data-theme="dark"] .ht-item:not(:last-child)::before{background:rgba(125,166,216,0.12)}
+    .ht-dot{width:22px;height:22px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1}
+    .ht-dot svg{width:9px;height:9px;fill:none;stroke-width:2.5;stroke-linecap:round}
+    .ht-dot.pendiente{border-color:var(--gold);background:var(--gold-bg)}.ht-dot.pendiente svg{stroke:var(--gold)}
+    .ht-dot.aprobada{border-color:var(--g500);background:rgba(45,125,210,0.1)}.ht-dot.aprobada svg{stroke:var(--g500)}
+    .ht-dot.rechazada{border-color:var(--red);background:var(--red-bg)}.ht-dot.rechazada svg{stroke:var(--red)}
+    .ht-dot.cancelada{border-color:var(--muted);background:rgba(100,100,100,0.06)}.ht-dot.cancelada svg{stroke:var(--muted)}
+    .ht-dot.modificada{border-color:var(--g500);background:rgba(45,125,210,0.08)}.ht-dot.modificada svg{stroke:var(--g500)}
+    .ht-estado{font-size:12px;font-weight:400;color:var(--text);margin-bottom:2px}
+    .ht-meta{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted)}
+    .ht-comment{font-size:11px;font-weight:300;color:var(--muted);margin-top:5px;padding:7px 11px;background:var(--g050);border-radius:8px;border-left:2px solid var(--g100);line-height:1.55}
+    [data-theme="dark"] .ht-comment{background:rgba(0,45,114,0.2);border-left-color:rgba(125,166,216,0.2)}
+
+    /* Modal info box */
+    .m-info-box{background:rgba(45,125,210,0.06);border:1px solid rgba(45,125,210,0.15);border-radius:9px;padding:9px 13px;font-size:11px;font-weight:300;color:var(--g700);display:flex;gap:7px;align-items:flex-start;margin-bottom:12px}
+    [data-theme="dark"] .m-info-box{color:var(--g300)}
+    .m-info-box svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0;margin-top:1px}
+
+    /* Modal footer */
+    .modal-foot{padding:12px 22px 16px;border-top:1px solid var(--g100);display:flex;align-items:center;gap:8px}
+    [data-theme="dark"] .modal-foot{border-top-color:rgba(125,166,216,0.1)}
+    .btn-close-m{margin-left:auto;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:300;color:var(--muted);background:var(--g050);transition:var(--trans)}
+    [data-theme="dark"] .btn-close-m{background:rgba(0,45,114,0.3)}
+    .btn-close-m:hover{background:var(--g100);color:var(--text)}
+  </style>
+</head>
+<body>
+<div class="bg"></div>
+</body>
+</html>
+
+
+<!-- ══ LAYOUT ══ -->
+<div class="layout">
+  <main class="main">
+
+    <div class="page-header">
+      <a class="page-back" href="../dashboard.html"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver</a>
+      <div class="page-hdiv"></div>
+      <div class="page-title">Historial <em>de Solicitudes</em></div>
+      <div class="result-count" id="resultCount">Cargando...</div>
+      <div class="page-tag">RQ-SVC-2026-05</div>
+    </div>
+
+    <!-- Saldo resumen por nombramiento -->
+    <div class="saldo-bar">
+      <div class="saldo-item featured">
+        <div class="si-label">Días disponibles</div>
+        <div class="si-val" id="sDisp">15</div>
+        <div class="si-sub">Propiedad — vigente</div>
+      </div>
+      <div class="saldo-item">
+        <div class="si-label">Días acumulados</div>
+        <div class="si-val" id="sAcum">20</div>
+        <div class="si-sub">Total del período</div>
+      </div>
+      <div class="saldo-item">
+        <div class="si-label">Días utilizados</div>
+        <div class="si-val" id="sUsados">5</div>
+        <div class="si-sub">Solicitudes aprobadas</div>
+      </div>
+      <div class="saldo-item">
+        <div class="si-label">Total solicitudes</div>
+        <div class="si-val" id="sTotal">6</div>
+        <div class="si-sub">En el historial</div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-card">
+      <div class="filters-row">
+        <div class="f-group">
+          <span class="f-label">N.° solicitud</span>
+          <input type="text" id="fNum" placeholder="SVC-2026-..."/>
+        </div>
+        <div class="f-group">
+          <span class="f-label">Estado</span>
+          <select id="fEstado">
+            <option value="">Todos</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Aprobada">Aprobada</option>
+            <option value="Rechazada">Rechazada</option>
+            <option value="Cancelada">Cancelada</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <span class="f-label">Año</span>
+          <input type="number" id="fYear" placeholder="2026" min="2020" max="2035"/>
+        </div>
+        <div class="f-group">
+          <span class="f-label">Nombramiento</span>
+          <select id="fNom" onchange="togglePeriodo()">
+            <option value="">Todos</option>
+            <option value="admin_propiedad">Adm. Propiedad</option>
+            <option value="admin_interino">Adm. Interino</option>
+            <option value="docente_propiedad">Docente Propiedad</option>
+            <option value="docente_interino">Docente Interino</option>
+          </select>
+        </div>
+        <div class="f-group hidden" id="fGroupPeriodo">
+          <span class="f-label">Período lectivo</span>
+          <select id="fPeriodo">
+            <option value="">Todos</option>
+            <option value="2026-I">2026 — I Sem.</option>
+            <option value="2026-II">2026 — II Sem.</option>
+            <option value="2025-II">2025 — II Sem.</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <span class="f-label">Desde</span>
+          <input type="date" id="fDesde"/>
+        </div>
+        <div class="f-group">
+          <span class="f-label">Hasta</span>
+          <input type="date" id="fHasta"/>
+        </div>
+        <button class="btn-buscar" onclick="filtrar()">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Buscar
+        </button>
+        <button class="btn-limpiar" onclick="limpiarFiltros()">Limpiar</button>
+      </div>
+    </div>
+
+    <!-- Barra exportar -->
+    <div class="export-bar">
+      <button class="btn-export" onclick="exportar('pdf')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</button>
+      <button class="btn-export" onclick="exportar('excel')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Excel</button>
+      <div class="export-sep"></div>
+      <button class="btn-export" onclick="window.print()"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
+    </div>
+
+    <!-- Tabla historial -->
+    <div class="table-card">
+      <div class="table-hdr">
+        <div class="th sortable" onclick="sortBy('num')">N.° Solicitud <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="th">Nombramiento</div>
+        <div class="th sortable" onclick="sortBy('periodo')">Período <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="th sortable" onclick="sortBy('creacion')">Fecha registro <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="th center">Días</div>
+        <div class="th">Estado</div>
+        <div class="th">Modalidad</div>
+        <div class="th">Gestor GIRH</div>
+        <div class="th center">Detalle</div>
+      </div>
+      <div class="table-body" id="tableBody"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ MODAL DETALLE ══ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="m-num" id="mNum">—</div>
+        <div class="m-title">Detalle completo</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="mEstadoBadge"></div>
+        <button class="m-close" onclick="cerrarModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+    </div>
+    <div class="modal-body">
+
+      <!-- Info modalidad docente interino -->
+      <div class="m-info-box" id="mInfoMod" style="display:none">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span id="mInfoModMsg">—</span>
+      </div>
+
+      <!-- Funcionario -->
+      <div class="m-section">
+        <div class="m-sec-title"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Funcionario</div>
+        <div class="m-grid three">
+          <div class="m-item"><span class="m-lbl">Nombre</span><span class="m-val" id="mNombre">—</span></div>
+          <div class="m-item"><span class="m-lbl">Cédula</span><span class="m-val mono" id="mCedula">—</span></div>
+          <div class="m-item"><span class="m-lbl">Correo</span><span class="m-val" id="mCorreo">—</span></div>
+          <div class="m-item"><span class="m-lbl">Nombramiento</span><span class="m-val" id="mNomLabel">—</span></div>
+          <div class="m-item" id="mItemPeriodo" style="display:none"><span class="m-lbl">Período lectivo</span><span class="m-val mono" id="mPeriodo">—</span></div>
+          <div class="m-item"><span class="m-lbl">Modalidad</span><span class="m-val" id="mModalidad">—</span></div>
+        </div>
+      </div>
+
+      <!-- Período solicitado -->
+      <div class="m-section">
+        <div class="m-sec-title"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Período solicitado</div>
+        <div class="m-grid three">
+          <div class="m-item"><span class="m-lbl">Fecha inicio</span><span class="m-val mono" id="mFechaI">—</span></div>
+          <div class="m-item"><span class="m-lbl">Fecha fin</span><span class="m-val mono" id="mFechaF">—</span></div>
+          <div class="m-item"><span class="m-lbl">Días hábiles</span><span class="m-val" id="mDias">—</span></div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="m-lbl" style="margin-bottom:7px">Impacto en saldo</div>
+          <div class="saldo-impact">
+            <div><div class="si-n" id="mSaldoA">—</div><div class="si-l">Saldo antes</div></div>
+            <div class="si-arrow">→</div>
+            <div><div class="si-n after" id="mSaldoD">—</div><div class="si-l">Saldo después</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Motivo -->
+      <div class="m-section">
+        <div class="m-sec-title"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Motivo</div>
+        <div class="m-val" id="mMotivo" style="font-size:12px;line-height:1.6">—</div>
+        <div class="m-item" id="mItemMotivoCan" style="margin-top:10px;display:none">
+          <span class="m-lbl">Motivo de cancelación</span>
+          <span class="m-val muted" id="mMotivoCan">—</span>
+        </div>
+      </div>
+
+      <!-- Resolución -->
+      <div class="m-section" id="mSecResolucion" style="display:none">
+        <div class="m-sec-title"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Resolución del GIRH</div>
+        <div class="m-grid">
+          <div class="m-item"><span class="m-lbl">Gestor GIRH</span><span class="m-val" id="mGirh">—</span></div>
+          <div class="m-item"><span class="m-lbl">Fecha resolución</span><span class="m-val mono" id="mFechaRes">—</span></div>
+          <div class="m-item full"><span class="m-lbl">Comentarios</span><span class="m-val" id="mComentarios">—</span></div>
+        </div>
+      </div>
+
+      <!-- Historial de cambios -->
+      <div class="m-section">
+        <div class="m-sec-title"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>Historial de cambios de estado</div>
+        <div class="hist-timeline" id="mHistorial"></div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-export" onclick="exportar('pdf')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</button>
+      <button class="btn-export" onclick="exportar('excel')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Excel</button>
+      <button class="btn-close-m" onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script src="/frontend/components/navbar.js"></script>
+<script src="/frontend/js/session.js"></script>
+
+<app-navbar></app-navbar>
+
+<script>
+  // ══ Historial completo simulado ══
+  const HISTORIAL = [
+    { num:'SVC-2026-0042', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2026-04-14', ff:'2026-04-18', dias:5, estado:'Pendiente', modalidad:'—', creacion:'2026-03-18 09:14', motivo:'Asuntos personales familiares.', motivoCan:null, saldoAntes:15, saldoDespues:10, girh:null, fRes:null, comentarios:null, periodo:null,
+      historial:[{estado:'Pendiente',fecha:'2026-03-18 09:14',usuario:'Yuliana Hernández',comentario:null}]},
+    { num:'SVC-2026-0031', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2026-03-03', ff:'2026-03-07', dias:5, estado:'Aprobada', modalidad:'—', creacion:'2026-02-20 14:32', motivo:'Vacaciones planificadas.', motivoCan:null, saldoAntes:20, saldoDespues:15, girh:'Lic. María Solís (GIRH)', fRes:'2026-02-22 10:05', comentarios:'Aprobado según saldo disponible.', periodo:null,
+      historial:[{estado:'Pendiente',fecha:'2026-02-20 14:32',usuario:'Yuliana Hernández',comentario:null},{estado:'Aprobada',fecha:'2026-02-22 10:05',usuario:'Lic. María Solís',comentario:'Aprobado según saldo disponible.'}]},
+    { num:'SVC-2026-0019', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2026-01-20', ff:'2026-01-23', dias:4, estado:'Rechazada', modalidad:'—', creacion:'2026-01-10 08:45', motivo:'Trámite personal.', motivoCan:null, saldoAntes:20, saldoDespues:20, girh:'Lic. María Solís (GIRH)', fRes:'2026-01-12 16:20', comentarios:'Traslape con período de cierre administrativo.', periodo:null,
+      historial:[{estado:'Pendiente',fecha:'2026-01-10 08:45',usuario:'Yuliana Hernández',comentario:null},{estado:'Rechazada',fecha:'2026-01-12 16:20',usuario:'Lic. María Solís',comentario:'Traslape con período de cierre administrativo.'}]},
+    { num:'SVC-2026-0008', nom:'docente_interino', nomLabel:'Docente / Docente-Adm. Interino', fi:'2026-02-10', ff:'2026-02-14', dias:5, estado:'Aprobada', modalidad:'Disfrute en tiempo', creacion:'2026-01-28 11:20', motivo:'—', motivoCan:null, saldoAntes:6, saldoDespues:1, girh:'Lic. María Solís (GIRH)', fRes:'2026-01-30 09:00', comentarios:'Aprobado. Período lectivo 2026-I.', periodo:'2026-I',
+      historial:[{estado:'Pendiente',fecha:'2026-01-28 11:20',usuario:'Yuliana Hernández',comentario:null},{estado:'Aprobada',fecha:'2026-01-30 09:00',usuario:'Lic. María Solís',comentario:'Aprobado para disfrute en tiempo.'}]},
+    { num:'SVC-2025-0088', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2025-11-10', ff:'2025-11-14', dias:5, estado:'Cancelada', modalidad:'—', creacion:'2025-10-25 10:00', motivo:'Vacaciones fin de año.', motivoCan:'Cambio de planes personales.', saldoAntes:18, saldoDespues:18, girh:'Lic. María Solís (GIRH)', fRes:'2025-10-27 09:00', comentarios:'Aprobado inicialmente.', periodo:null,
+      historial:[{estado:'Pendiente',fecha:'2025-10-25 10:00',usuario:'Yuliana Hernández',comentario:null},{estado:'Aprobada',fecha:'2025-10-27 09:00',usuario:'Lic. María Solís',comentario:'Aprobado inicialmente.'},{estado:'Cancelada',fecha:'2025-11-01 08:30',usuario:'Yuliana Hernández',comentario:'Cambio de planes personales.'}]},
+    { num:'SVC-2025-0061', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2025-08-04', ff:'2025-08-08', dias:5, estado:'Aprobada', modalidad:'—', creacion:'2025-07-20 09:30', motivo:'Vacaciones de verano.', motivoCan:null, saldoAntes:23, saldoDespues:18, girh:'Lic. María Solís (GIRH)', fRes:'2025-07-22 11:00', comentarios:'Aprobado sin observaciones.', periodo:null,
+      historial:[{estado:'Pendiente',fecha:'2025-07-20 09:30',usuario:'Yuliana Hernández',comentario:null},{estado:'Aprobada',fecha:'2025-07-22 11:00',usuario:'Lic. María Solís',comentario:'Aprobado sin observaciones.'}]},
+  ];
+
+  let filtered = [...HISTORIAL];
+  let sortField = 'creacion'; let sortAsc = false;
+  const NOM_SHORT = {admin_propiedad:'Adm. Propiedad',admin_interino:'Adm. Interino',docente_propiedad:'Docente Propiedad',docente_interino:'Docente Interino'};
+
+  // Init
+  document.getElementById('navDate').textContent = new Date().toLocaleDateString('es-CR',{weekday:'short',day:'numeric',month:'short'});
+  try { const f=JSON.parse(localStorage.getItem('funcionario')||'{}'); if(f.nombre){document.getElementById('navAvatar').textContent=f.nombre.charAt(0).toUpperCase();document.getElementById('navName').textContent=f.nombre;} } catch(e){}
+
+  renderTabla(filtered);
+  actualizarStats(filtered);
+
+  function actualizarStats(data) {
+    document.getElementById('sTotal').textContent = data.length;
+    const aprobadas = data.filter(s=>s.estado==='Aprobada');
+    const usados = aprobadas.reduce((a,s)=>a+s.dias,0);
+    document.getElementById('sUsados').textContent = usados;
+    document.getElementById('resultCount').textContent = `${data.length} solicitud${data.length!==1?'es':''}`;
+  }
+
+  function renderTabla(data) {
+    const body = document.getElementById('tableBody');
+    actualizarStats(data);
+    if(!data.length){
+      body.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg></div><div class="empty-title">Sin registros</div><div class="empty-sub">No se encontraron solicitudes con los filtros aplicados.</div></div>`;
+      return;
+    }
+    body.innerHTML = data.map(s=>`
+      <div class="table-row" onclick="verDetalle('${s.num}')">
+        <div class="td mono">${s.num}</div>
+        <div class="td">${NOM_SHORT[s.nom]}</div>
+        <div class="td">${fmt(s.fi)} — ${fmt(s.ff)}</div>
+        <div class="td muted">${s.creacion.split(' ')[0]}</div>
+        <div class="td center">${s.dias}</div>
+        <div class="td"><span class="badge ${s.estado.toLowerCase()}">${s.estado}</span></div>
+        <div class="td">${s.modalidad!=='—'?`<span class="badge-mod">${s.modalidad}</span>`:'<span style="color:var(--dim)">—</span>'}</div>
+        <div class="td muted" style="font-size:10.5px">${s.girh||'—'}</div>
+        <div class="td center"><button class="btn-ver" onclick="event.stopPropagation();verDetalle('${s.num}')">Ver</button></div>
+      </div>`).join('');
+  }
+
+  function filtrar() {
+    const num = document.getElementById('fNum').value.trim().toLowerCase();
+    const est = document.getElementById('fEstado').value;
+    const year = document.getElementById('fYear').value;
+    const nom = document.getElementById('fNom').value;
+    const periodo = document.getElementById('fPeriodo').value;
+    const desde = document.getElementById('fDesde').value;
+    const hasta = document.getElementById('fHasta').value;
+
+    filtered = HISTORIAL.filter(s=>{
+      if(num && !s.num.toLowerCase().includes(num)) return false;
+      if(est && s.estado!==est) return false;
+      if(year && !s.fi.startsWith(year)) return false;
+      if(nom && s.nom!==nom) return false;
+      if(periodo && s.periodo!==periodo) return false;
+      if(desde && s.fi<desde) return false;
+      if(hasta && s.fi>hasta) return false;
+      return true;
+    });
+    renderTabla(filtered);
+  }
+
+  function limpiarFiltros(){
+    ['fNum','fEstado','fYear','fNom','fPeriodo','fDesde','fHasta'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('fGroupPeriodo').classList.add('hidden');
+    filtered=[...HISTORIAL]; renderTabla(filtered);
+  }
+
+  function togglePeriodo(){
+    const val=document.getElementById('fNom').value;
+    document.getElementById('fGroupPeriodo').classList.toggle('hidden', val!=='docente_interino');
+  }
+
+  function sortBy(f){
+    if(sortField===f)sortAsc=!sortAsc; else{sortField=f;sortAsc=true;}
+    filtered.sort((a,b)=>{
+      let va,vb;
+      if(f==='num'){va=a.num;vb=b.num;}
+      else if(f==='creacion'){va=a.creacion;vb=b.creacion;}
+      else{va=a.fi;vb=b.fi;}
+      return sortAsc?(va<vb?-1:1):(va>vb?-1:1);
+    });
+    renderTabla(filtered);
+  }
+
+  function verDetalle(num) {
+    const s = HISTORIAL.find(x=>x.num===num);
+    if(!s) return;
+
+    document.getElementById('mNum').textContent = s.num;
+    document.getElementById('mEstadoBadge').innerHTML = `<span class="badge ${s.estado.toLowerCase()}">${s.estado}</span>`;
+    document.getElementById('mNombre').textContent = 'Yuliana Hernández López';
+    document.getElementById('mCedula').textContent = '1-1234-5678';
+    document.getElementById('mCorreo').textContent = 'yuliana@cuc.ac.cr';
+    document.getElementById('mNomLabel').textContent = s.nomLabel;
+    document.getElementById('mModalidad').textContent = s.modalidad!=='—' ? s.modalidad : 'No aplica';
+    document.getElementById('mFechaI').textContent = fmt(s.fi);
+    document.getElementById('mFechaF').textContent = fmt(s.ff);
+    document.getElementById('mDias').textContent = s.dias+' días hábiles';
+    document.getElementById('mSaldoA').textContent = s.saldoAntes+' días';
+    document.getElementById('mSaldoD').textContent = s.saldoDespues+' días';
+    document.getElementById('mMotivo').textContent = s.motivo||'Sin motivo especificado.';
+
+    // Período lectivo
+    const ip=document.getElementById('mItemPeriodo');
+    if(s.nom==='docente_interino'&&s.periodo){ip.style.display='flex';document.getElementById('mPeriodo').textContent=s.periodo;}else ip.style.display='none';
+
+    // Info modalidad docente interino
+    const iMod=document.getElementById('mInfoMod');
+    if(s.nom==='docente_interino'){
+      iMod.style.display='flex';
+      document.getElementById('mInfoModMsg').textContent = s.modalidad==='Disfrute en tiempo'
+        ? 'Esta solicitud corresponde a vacaciones para disfrute en tiempo.'
+        : 'Esta solicitud corresponde a vacaciones pendientes de liquidación en colones.';
+    } else iMod.style.display='none';
+
+    // Motivo cancelación
+    const imc=document.getElementById('mItemMotivoCan');
+    if(s.estado==='Cancelada'&&s.motivoCan){imc.style.display='flex';document.getElementById('mMotivoCan').textContent=s.motivoCan;}else imc.style.display='none';
+
+    // Resolución
+    const secRes=document.getElementById('mSecResolucion');
+    if(s.girh){
+      secRes.style.display='block';
+      document.getElementById('mGirh').textContent=s.girh;
+      document.getElementById('mFechaRes').textContent=s.fRes||'—';
+      document.getElementById('mComentarios').textContent=s.comentarios||'Sin comentarios.';
+    } else secRes.style.display='none';
+
+    // Historial cronológico
+    const dotCfg = {
+      Pendiente:{cls:'pendiente',icon:'<path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>'},
+      Aprobada:{cls:'aprobada',icon:'<path d="M9 11l3 3L22 4"/>'},
+      Rechazada:{cls:'rechazada',icon:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'},
+      Cancelada:{cls:'cancelada',icon:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'},
+      Modificada:{cls:'modificada',icon:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'},
+    };
+    document.getElementById('mHistorial').innerHTML = s.historial.map(h=>{
+      const cfg=dotCfg[h.estado]||dotCfg.Pendiente;
+      return `<div class="ht-item">
+        <div class="ht-dot ${cfg.cls}"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" fill="none">${cfg.icon}</svg></div>
+        <div>
+          <div class="ht-estado">${h.estado}</div>
+          <div class="ht-meta">${h.fecha} · ${h.usuario}</div>
+          ${h.comentario?`<div class="ht-comment">${h.comentario}</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+
+  function cerrarModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+  function exportar(tipo){ alert(`Documento ${tipo.toUpperCase()} exportado exitosamente.`); }
+  function fmt(s){ if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; }
+
+  function toggleGroup(id){ const g=document.getElementById('grp-'+id); const open=g.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(x=>x.classList.remove('open')); document.getElementById('userWrap').classList.remove('open'); if(!open)g.classList.add('open'); }
+  document.addEventListener('click',e=>{ if(!e.target.closest('.nav-group'))document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open')); if(!e.target.closest('.user-wrap'))document.getElementById('userWrap').classList.remove('open'); if(!e.target.closest('.modal')&&e.target.closest('.modal-overlay'))cerrarModal(); });
+  function toggleUserMenu(){ const w=document.getElementById('userWrap'); const o=w.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open')); w.classList.toggle('open',!o); }
+  function selectNomFromPill(el){ document.querySelectorAll('.ud-pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); document.getElementById('pillNomLabel').textContent=el.querySelector('.ud-pill-name').textContent; document.getElementById('userWrap').classList.remove('open'); }
+  function toggleTheme(){ const h=document.documentElement; const d=h.getAttribute('data-theme')==='dark'; h.setAttribute('data-theme',d?'light':'dark'); const i=document.getElementById('themeIcon'); i.innerHTML=d?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>':'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'; }
+  function logout(){ if(confirm('¿Cerrar sesión?'))window.location.href='../autenticacion/login.html'; }
+</script>
+</body>
+</html>

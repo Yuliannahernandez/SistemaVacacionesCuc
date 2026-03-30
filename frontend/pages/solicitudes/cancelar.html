@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SIGEVAC — Cancelar Solicitud</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  /* Paleta azul */
+  --g900:#001f52;
+  --g800:#002D72;
+  --g700:#1a5ba8;
+  --g500:#2d7dd2;
+  --g300:#7da6d8;
+  --g100:#ccddf0;
+  --g050:#e8f0fa;
+ 
+  --gold:#b8922a;--gold-bg:rgba(185,150,60,0.1);
+  --bone:#f4f6fb;--text:#001530;--muted:rgba(0,30,80,0.45);--dim:rgba(0,30,80,0.22);
+  --red:#E4002B;--red-bg:rgba(228,0,43,0.08);
+  --nav-h:56px;--radius:14px;--trans:all .2s cubic-bezier(.4,0,.2,1);
+  --glass:rgba(255,255,255,0.55);--glass-border:rgba(255,255,255,0.75);
+}
+[data-theme="dark"]{
+  --bone:#060d1a;--text:#ccddf0;--muted:rgba(125,166,216,0.45);--dim:rgba(125,166,216,0.22);
+  --g050:rgba(0,45,114,0.3);--g100:rgba(0,45,114,0.55);
+  --glass:rgba(0,45,114,0.22);--glass-border:rgba(125,166,216,0.1);
+  --red-bg:rgba(228,0,43,0.15);
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bone);color:var(--text);transition:background .3s,color .3s}
+body{overflow-x:hidden}
+ 
+.bg{position:fixed;inset:0;z-index:0;background:var(--bone);transition:background .3s}
+.bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 40% at 80% 5%,rgba(45,125,210,0.07) 0%,transparent 60%),radial-gradient(ellipse 30% 50% at 5% 95%,rgba(26,91,168,0.05) 0%,transparent 55%)}
+ 
+    /* ══ TOPNAV ══ */
+    .topnav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:200;display:flex;align-items:center;padding:0 20px;background:rgba(26,51,38,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.05)}
+    .nav-logo{display:flex;align-items:center;gap:10px;margin-right:20px;flex-shrink:0}
+    .logo-icon{width:29px;height:29px;border-radius:8px;background:linear-gradient(135deg,var(--g500),var(--g300));display:flex;align-items:center;justify-content:center}
+    .logo-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round}
+    .logo-text strong{font-family:'DM Mono',monospace;font-size:12px;font-weight:400;color:rgba(214,237,224,0.9);letter-spacing:.1em;display:block;line-height:1}
+    .logo-text small{font-size:8px;font-weight:300;color:rgba(140,201,163,0.3);letter-spacing:.18em;text-transform:uppercase}
+    .nav-vdiv{width:1px;height:18px;background:rgba(255,255,255,0.07);margin-right:16px;flex-shrink:0}
+    .nav-sep{width:1px;height:14px;background:rgba(255,255,255,0.07);margin:0 4px;flex-shrink:0}
+    .nav-links{display:flex;align-items:center;gap:1px;flex:1}
+    .nav-link{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.4);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap;flex-shrink:0}
+    .nav-link svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;flex-shrink:0}
+    .nav-link:hover{background:rgba(255,255,255,0.06);color:rgba(214,237,224,0.7)}
+    .nav-group{position:relative;flex-shrink:0}
+    .nav-group-btn{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.4);cursor:pointer;transition:var(--trans);white-space:nowrap;user-select:none}
+    .nav-group-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;flex-shrink:0}
+    .nav-chevron{margin-left:2px;transition:transform .2s;opacity:.5}
+    .nav-group-btn:hover{background:rgba(255,255,255,0.06);color:rgba(214,237,224,0.7)}
+    .nav-group.open .nav-group-btn{background:rgba(140,201,163,0.11);color:var(--g300)}
+    .nav-group.open .nav-chevron{transform:rotate(180deg)}
+    .nav-submenu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:rgba(22,44,32,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(140,201,163,0.1);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,0.25);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+    .nav-group.open .nav-submenu{opacity:1;transform:translateY(0);pointer-events:all}
+    .nav-sub-item{display:block;padding:8px 12px;border-radius:8px;font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.5);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap}
+    .nav-sub-item:hover{background:rgba(140,201,163,0.1);color:rgba(214,237,224,0.85)}
+    .nav-sub-item.active{background:rgba(140,201,163,0.14);color:var(--g300)}
+    .nav-right{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0}
+    .nav-date{font-size:9.5px;font-weight:300;color:rgba(140,201,163,0.3);font-family:'DM Mono',monospace;margin-right:6px}
+    .nav-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--trans)}
+    .nav-btn:hover{background:rgba(255,255,255,0.09)}
+    .nav-btn svg{width:13px;height:13px;stroke:rgba(140,201,163,0.5);fill:none;stroke-width:1.5;stroke-linecap:round}
+    .action-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:300;color:rgba(140,201,163,0.38);transition:var(--trans)}
+    .action-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+    .action-btn:hover{background:rgba(255,255,255,0.05);color:rgba(214,237,224,0.62)}
+    .action-btn.logout:hover{color:rgba(255,110,90,0.6)}
+    .user-wrap{position:relative;margin-left:3px}
+    .user-pill{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 5px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);cursor:pointer;transition:var(--trans)}
+    .user-pill:hover{background:rgba(255,255,255,0.08)}
+    .user-wrap.open .user-pill{background:rgba(140,201,163,0.1);border-color:rgba(140,201,163,0.15)}
+    .avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--g700),var(--g500));display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:500;color:#fff;flex-shrink:0}
+    .user-pill-name{font-size:11px;font-weight:300;color:rgba(214,237,224,0.62);line-height:1.1}
+    .user-pill-nom{font-size:8.5px;font-weight:300;color:rgba(140,201,163,0.35);letter-spacing:.04em}
+    .user-dropdown{position:absolute;top:calc(100% + 7px);right:0;width:210px;background:rgba(22,44,32,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(140,201,163,0.1);border-radius:14px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,0.28);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+    .user-wrap.open .user-dropdown{opacity:1;transform:translateY(0);pointer-events:all}
+    .ud-label{font-size:8px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(140,201,163,0.3);margin-bottom:8px;padding:0 4px}
+    .ud-pill{display:flex;flex-direction:column;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid transparent;cursor:pointer;transition:var(--trans);margin-bottom:4px}
+    .ud-pill:last-child{margin-bottom:0}
+    .ud-pill:hover{background:rgba(140,201,163,0.08)}
+    .ud-pill.active{background:rgba(74,140,101,0.15);border-color:rgba(140,201,163,0.18)}
+    .ud-pill-name{font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.55)}
+    .ud-pill.active .ud-pill-name{color:var(--g300)}
+    .ud-pill-sub{font-size:9px;font-weight:300;color:rgba(140,201,163,0.28);margin-top:1px}
+
+    /* ══ LAYOUT ══ */
+    .layout{position:relative;z-index:10;margin-top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden}
+    .main{height:100%;overflow-y:auto;overflow-x:hidden;padding:22px 24px 20px;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ══ Page header ══ */
+    .page-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;animation:fadeUp .4s both}
+    .page-back{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:8px;transition:var(--trans)}
+    .page-back svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+    .page-back:hover{background:var(--g050);color:var(--g700)}
+    .page-hdiv{width:1px;height:16px;background:var(--dim)}
+    .page-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text)}
+    .page-title em{font-style:italic;color:var(--red)}
+    .page-tag{margin-left:auto;font-family:'DM Mono',monospace;font-size:9px;font-weight:300;padding:4px 10px;border-radius:6px;border:1px solid var(--dim);color:var(--muted)}
+
+    /* ══ Card base ══ */
+    .glass-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:18px 22px;box-shadow:0 2px 14px rgba(0,0,0,0.05);transition:background .3s}
+    [data-theme="dark"] .glass-card{background:rgba(35,68,51,0.18);border-color:rgba(140,201,163,0.08)}
+
+    /* ══ PASO 1: Lista de solicitudes cancelables ══ */
+    .step-card{animation:fadeUp .4s .05s both}
+    .step-label{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .step-num-badge{width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:500;flex-shrink:0}
+
+    /* Lista de solicitudes cancelables */
+    .cancelable-list{display:flex;flex-direction:column;gap:7px}
+    .cancelable-item{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:11px;border:1px solid var(--g100);background:var(--g050);cursor:pointer;transition:var(--trans)}
+    [data-theme="dark"] .cancelable-item{background:rgba(35,68,51,0.2);border-color:rgba(140,201,163,0.12)}
+    .cancelable-item:hover{border-color:rgba(192,57,43,0.3);background:rgba(192,57,43,0.03)}
+    .cancelable-item.selected{border-color:var(--red-border);background:var(--red-bg);box-shadow:0 0 0 1px var(--red-border)}
+    .ci-radio{width:16px;height:16px;accent-color:var(--red);flex-shrink:0}
+    .ci-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--g700);font-weight:400;flex-shrink:0;min-width:110px}
+    [data-theme="dark"] .ci-num{color:var(--g300)}
+    .ci-info{flex:1}
+    .ci-periodo{font-size:12px;font-weight:300;color:var(--text)}
+    .ci-sub{font-size:10px;font-weight:300;color:var(--muted);margin-top:1px;font-family:'DM Mono',monospace}
+    .ci-dias{text-align:center;flex-shrink:0}
+    .ci-dias-n{font-family:'DM Serif Display',serif;font-size:18px;color:var(--g700);line-height:1}
+    [data-theme="dark"] .ci-dias-n{color:var(--g300)}
+    .ci-dias-l{font-size:8px;font-weight:300;color:var(--muted);font-family:'DM Mono',monospace}
+
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:9.5px;font-weight:400;font-family:'DM Mono',monospace;white-space:nowrap}
+    .badge::before{content:'';width:4px;height:4px;border-radius:50%;flex-shrink:0}
+    .badge.pendiente{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(185,150,60,0.25)}
+    .badge.pendiente::before{background:var(--gold)}
+    .badge.aprobada{background:rgba(74,140,101,0.1);color:var(--g700);border:1px solid rgba(74,140,101,0.22)}
+    [data-theme="dark"] .badge.aprobada{color:var(--g300)}
+    .badge.aprobada::before{background:var(--g500)}
+
+    .no-items{padding:24px;text-align:center;color:var(--muted);font-size:12px;font-weight:300}
+    .no-items svg{width:28px;height:28px;stroke:var(--dim);fill:none;stroke-width:1.5;display:block;margin:0 auto 10px}
+
+    /* ══ PASO 2: Panel de cancelación ══ */
+    .cancel-layout{display:grid;grid-template-columns:1fr 300px;gap:16px;animation:fadeUp .4s .08s both}
+
+    /* Detalle de la solicitud seleccionada */
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+    .detail-grid.three{grid-template-columns:1fr 1fr 1fr}
+    .d-item{display:flex;flex-direction:column;gap:3px}
+    .d-item.full{grid-column:1/-1}
+    .d-lbl{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:300;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+    .d-val{font-size:12.5px;font-weight:300;color:var(--text)}
+    .d-val.mono{font-family:'DM Mono',monospace;font-size:11px;color:var(--g700)}
+    [data-theme="dark"] .d-val.mono{color:var(--g300)}
+    .d-val.muted{color:var(--muted);font-style:italic}
+
+    /* Impacto saldo */
+    .impacto-box{background:var(--g050);border:1px solid var(--g100);border-radius:12px;padding:14px 18px;margin-bottom:14px}
+    [data-theme="dark"] .impacto-box{background:rgba(35,68,51,0.25);border-color:rgba(140,201,163,0.12)}
+    .impacto-title{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .impacto-row{display:flex;align-items:center;gap:10px}
+    .impacto-n{font-family:'DM Serif Display',serif;font-size:28px;line-height:1;color:var(--text)}
+    .impacto-n.after{color:var(--g700)}
+    [data-theme="dark"] .impacto-n.after{color:var(--g300)}
+    .impacto-lbl{font-size:9px;font-weight:300;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+    .impacto-arrow{font-size:18px;color:var(--dim)}
+    .impacto-plus{font-size:11px;font-weight:300;color:var(--g500);font-family:'DM Mono',monospace;margin-top:2px}
+
+    /* Alerta GIRH (solo si aprobada) */
+    .alert-girh{background:var(--gold-bg);border:1px solid rgba(185,150,60,0.25);border-radius:10px;padding:12px 15px;margin-bottom:14px;display:none;gap:10px;align-items:flex-start}
+    .alert-girh.show{display:flex}
+    .alert-girh svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:1.5;flex-shrink:0;margin-top:2px}
+    .alert-girh-text{font-size:11.5px;font-weight:300;color:#8a6800;line-height:1.6}
+    [data-theme="dark"] .alert-girh-text{color:var(--gold)}
+    .alert-girh-text strong{font-weight:500}
+
+    /* Alerta irreversible */
+    .alert-irrev{background:var(--red-bg);border:1px solid var(--red-border);border-radius:10px;padding:12px 15px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start}
+    .alert-irrev svg{width:14px;height:14px;stroke:var(--red);fill:none;stroke-width:1.5;flex-shrink:0;margin-top:2px}
+    .alert-irrev-text{font-size:11.5px;font-weight:300;color:var(--red);line-height:1.6}
+    .alert-irrev-text strong{font-weight:500}
+
+    /* Motivo de cancelación */
+    .section-label{font-size:9px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--g700);margin-bottom:13px;padding-bottom:7px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:8px}
+    [data-theme="dark"] .section-label{color:var(--g300);border-bottom-color:rgba(140,201,163,0.12)}
+    .section-label svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+    .field{display:flex;flex-direction:column;gap:5px}
+    .field label{font-size:9.5px;font-weight:400;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-family:'DM Mono',monospace}
+    .field textarea{background:var(--g050);border:1px solid var(--g100);border-radius:10px;padding:10px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:300;outline:none;transition:var(--trans);width:100%;resize:none;height:82px;line-height:1.6}
+    [data-theme="dark"] .field textarea{background:rgba(35,68,51,0.25);border-color:rgba(140,201,163,0.15);color:var(--text)}
+    .field textarea:focus{border-color:var(--g500);background:#fff;box-shadow:0 0 0 3px rgba(74,140,101,0.08)}
+    [data-theme="dark"] .field textarea:focus{background:rgba(35,68,51,0.4);border-color:var(--g300)}
+    .field .hint{font-size:9.5px;font-weight:300;color:var(--dim);font-family:'DM Mono',monospace}
+    .field .err{font-size:9.5px;color:var(--red);display:none;font-family:'DM Mono',monospace}
+    .field.has-error textarea{border-color:var(--red)}
+    .field.has-error .err{display:block}
+
+    /* Botones */
+    .form-actions{display:flex;gap:9px;margin-top:20px;padding-top:16px;border-top:1px solid var(--g100)}
+    [data-theme="dark"] .form-actions{border-top-color:rgba(140,201,163,0.1)}
+    .btn-cancel-action{flex:1;padding:11px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--red);transition:var(--trans);box-shadow:0 3px 12px rgba(192,57,43,0.25)}
+    .btn-cancel-action:hover{background:#a93226;transform:translateY(-1px);box-shadow:0 5px 16px rgba(192,57,43,0.32)}
+    .btn-cancel-action:disabled{background:var(--dim);box-shadow:none;cursor:not-allowed;transform:none}
+    .btn-secondary{padding:11px 18px;border-radius:10px;border:1px solid var(--g100);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:300;color:var(--muted);background:transparent;transition:var(--trans)}
+    .btn-secondary:hover{border-color:rgba(74,140,101,0.35);color:var(--g700)}
+
+    /* ══ Panel lateral ══ */
+    .side-panel{display:flex;flex-direction:column;gap:14px}
+    .side-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:16px 18px;box-shadow:0 2px 12px rgba(0,0,0,0.05);transition:background .3s}
+    [data-theme="dark"] .side-card{background:rgba(35,68,51,0.18);border-color:rgba(140,201,163,0.08)}
+    .side-lbl{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:13px}
+
+    /* Reglas de cancelación */
+    .rules-list{display:flex;flex-direction:column;gap:7px}
+    .rule-item{display:flex;align-items:flex-start;gap:8px}
+    .rule-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px}
+    .rule-dot.green{background:var(--g500)}
+    .rule-dot.red{background:var(--red)}
+    .rule-dot.gold{background:var(--gold)}
+    .rule-text{font-size:11px;font-weight:300;color:var(--muted);line-height:1.55}
+    .rule-text strong{color:var(--text);font-weight:400}
+
+    /* Historial */
+    .hist-list{display:flex;flex-direction:column}
+    .hist-item{display:flex;gap:10px;padding-bottom:10px;position:relative}
+    .hist-item:last-child{padding-bottom:0}
+    .hist-item:not(:last-child)::before{content:'';position:absolute;left:8px;top:18px;bottom:0;width:1px;background:var(--g100)}
+    [data-theme="dark"] .hist-item:not(:last-child)::before{background:rgba(140,201,163,0.12)}
+    .hist-dot{width:18px;height:18px;border-radius:50%;border:2px solid;background:var(--bone);display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1}
+    .hist-dot.pendiente{border-color:var(--gold);background:var(--gold-bg)}
+    .hist-dot.pendiente svg{stroke:var(--gold)}
+    .hist-dot.aprobada{border-color:var(--g500);background:rgba(74,140,101,0.1)}
+    .hist-dot.aprobada svg{stroke:var(--g500)}
+    .hist-dot svg{width:8px;height:8px;fill:none;stroke-width:2}
+    .hist-t{font-size:10.5px;font-weight:300;color:var(--text)}
+    .hist-m{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--muted);margin-top:1px}
+
+    /* ══ MODAL CONFIRMACIÓN ══ */
+    .modal-overlay{position:fixed;inset:0;background:rgba(26,51,38,0.45);backdrop-filter:blur(8px);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--bone);border:1px solid rgba(255,255,255,0.7);border-radius:18px;padding:26px 28px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.15);animation:modalIn .3s cubic-bezier(.16,1,.3,1)}
+    [data-theme="dark"] .modal{background:rgba(18,38,24,0.98);border-color:rgba(140,201,163,0.1)}
+    @keyframes modalIn{from{transform:scale(0.95);opacity:0}to{transform:scale(1);opacity:1}}
+    .modal-icon-red{width:44px;height:44px;border-radius:12px;background:var(--red-bg);border:1px solid var(--red-border);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+    .modal-icon-red svg{width:20px;height:20px;stroke:var(--red);fill:none;stroke-width:1.5;stroke-linecap:round}
+    .modal-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:6px}
+    .modal-body-text{font-size:11.5px;font-weight:300;color:var(--muted);line-height:1.7;margin-bottom:16px}
+    .modal-sum{background:var(--g050);border-radius:10px;padding:13px 15px;margin-bottom:14px}
+    [data-theme="dark"] .modal-sum{background:rgba(35,68,51,0.3)}
+    .modal-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11.5px}
+    .ml{font-weight:300;color:var(--muted)}
+    .mr{font-weight:400;color:var(--text)}
+    .mr.green{color:var(--g700)}
+    [data-theme="dark"] .mr.green{color:var(--g300)}
+    .mr.red{color:var(--red)}
+
+    /* Advertencias en modal */
+    .modal-adv-irrev{background:var(--red-bg);border:1px solid var(--red-border);border-radius:9px;padding:10px 13px;font-size:11px;font-weight:300;color:var(--red);margin-bottom:10px;display:flex;gap:7px;align-items:flex-start}
+    .modal-adv-irrev svg{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.5;margin-top:1px}
+    .modal-adv-girh{background:var(--gold-bg);border:1px solid rgba(185,150,60,0.2);border-radius:9px;padding:10px 13px;font-size:11px;font-weight:300;color:#8a6800;margin-bottom:14px;display:none;gap:7px;align-items:flex-start}
+    [data-theme="dark"] .modal-adv-girh{color:var(--gold)}
+    .modal-adv-girh.show{display:flex}
+    .modal-adv-girh svg{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.5;margin-top:1px}
+    .modal-actions{display:flex;gap:9px}
+    .btn-confirm-cancel{flex:2;padding:11px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--red);transition:var(--trans)}
+    .btn-confirm-cancel:hover{background:#a93226}
+    .btn-confirm-cancel:disabled{background:var(--dim);cursor:not-allowed}
+  </style>
+</head>
+<body>
+<div class="bg"></div>
+
+
+
+<!-- ══ LAYOUT ══ -->
+<div class="layout">
+  <main class="main">
+
+    <div class="page-header">
+      <a class="page-back" href="consultar.html"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver</a>
+      <div class="page-hdiv"></div>
+      <div class="page-title">Cancelar <em>Solicitud de Vacaciones</em></div>
+      <div class="page-tag">RQ-SVC-2026-04</div>
+    </div>
+
+    <!-- PASO 1 -->
+    <div class="glass-card step-card" style="margin-bottom:16px">
+      <div class="step-label">
+        <div class="step-num-badge">1</div>
+        Seleccionar solicitud a cancelar
+        <span style="font-size:10px;color:var(--muted);font-weight:200;margin-left:4px">— Estado Pendiente o Aprobada · Fecha de inicio no pasada</span>
+      </div>
+      <div class="cancelable-list" id="cancelableList"></div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div id="stepCancelacion" style="display:none">
+      <div class="cancel-layout">
+
+        <!-- Panel izquierdo -->
+        <div class="glass-card">
+
+          <!-- Detalle de solicitud -->
+          <div style="margin-bottom:20px">
+            <div class="section-label">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Detalle de la solicitud seleccionada
+            </div>
+            <div class="detail-grid three">
+              <div class="d-item"><span class="d-lbl">N.° solicitud</span><span class="d-val mono" id="dNum">—</span></div>
+              <div class="d-item"><span class="d-lbl">Estado</span><span class="d-val" id="dEstado">—</span></div>
+              <div class="d-item"><span class="d-lbl">Nombramiento</span><span class="d-val" id="dNom">—</span></div>
+              <div class="d-item"><span class="d-lbl">Fecha inicio</span><span class="d-val mono" id="dFechaI">—</span></div>
+              <div class="d-item"><span class="d-lbl">Fecha fin</span><span class="d-val mono" id="dFechaF">—</span></div>
+              <div class="d-item"><span class="d-lbl">Días hábiles</span><span class="d-val" id="dDias">—</span></div>
+              <div class="d-item" id="dItemAprobador" style="display:none"><span class="d-lbl">Aprobado por</span><span class="d-val" id="dAprobador">—</span></div>
+              <div class="d-item full"><span class="d-lbl">Motivo original</span><span class="d-val muted" id="dMotivo">—</span></div>
+            </div>
+          </div>
+
+          <!-- Impacto en saldo -->
+          <div class="impacto-box">
+            <div class="impacto-title">Impacto de la cancelación — MSG-CAN-INFO-005</div>
+            <div class="impacto-row">
+              <div>
+                <div class="impacto-n" id="iSaldoAntes">—</div>
+                <div class="impacto-lbl">Saldo actual</div>
+              </div>
+              <div class="impacto-arrow">→</div>
+              <div>
+                <div class="impacto-n after" id="iSaldoDespues">—</div>
+                <div class="impacto-lbl">Saldo después</div>
+                <div class="impacto-plus" id="iPlus">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alerta GIRH si es Aprobada -->
+          <div class="alert-girh" id="alertGirh">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="alert-girh-text"><strong>MSG-CAN-ADV-003:</strong> Esta solicitud ya fue aprobada por el Gestor GIRH. Al cancelarla, el GIRH deberá actualizar el registro y control de vacaciones manualmente (PA-GIRH-10 §5.1.5.1 y §5.1.5.2).</div>
+          </div>
+
+          <!-- Alerta irreversible -->
+          <div class="alert-irrev">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="alert-irrev-text"><strong>MSG-CAN-ADV-001:</strong> Esta acción no se puede deshacer. Una vez confirmada, la cancelación es irreversible desde el sistema.</div>
+          </div>
+
+          <!-- Motivo de cancelación -->
+          <div class="section-label" style="margin-bottom:12px">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Motivo de cancelación
+            <span style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;font-weight:200;margin-left:4px">(opcional)</span>
+          </div>
+          <div class="field" id="fieldMotivo">
+            <label>Motivo</label>
+            <textarea id="motivo" placeholder="Describa el motivo de la cancelación..." oninput="contarChar()"></textarea>
+            <span class="hint" id="charCount">0 / 500 caracteres</span>
+            <span class="err" id="errMotivo">El motivo excede 500 caracteres</span>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-secondary" onclick="volverLista()">Volver a la lista</button>
+            <button class="btn-cancel-action" onclick="validarCancelar()">
+              Confirmar cancelación
+            </button>
+          </div>
+        </div>
+
+        <!-- Panel lateral -->
+        <div class="side-panel">
+
+          <div class="side-card">
+            <div class="side-lbl">Reglas de cancelación</div>
+            <div class="rules-list">
+              <div class="rule-item"><div class="rule-dot green"></div><div class="rule-text"><strong>V5 — Estado válido:</strong> Solo Pendiente o Aprobada</div></div>
+              <div class="rule-item"><div class="rule-dot green"></div><div class="rule-text"><strong>V6 — Fecha no pasada:</strong> No se puede cancelar con efecto retroactivo</div></div>
+              <div class="rule-item"><div class="rule-dot green"></div><div class="rule-text"><strong>V8 — Restauración:</strong> Días devueltos al saldo según tipo de nombramiento</div></div>
+              <div class="rule-item"><div class="rule-dot gold"></div><div class="rule-text"><strong>V9 — Si Aprobada:</strong> El GIRH debe actualizar el registro de control manualmente</div></div>
+              <div class="rule-item"><div class="rule-dot red"></div><div class="rule-text"><strong>V10 — Irreversible:</strong> No puede deshacerse desde el sistema</div></div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <div class="side-lbl">Historial de la solicitud</div>
+            <div class="hist-list" id="histList"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ MODAL CONFIRMACIÓN ══ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-icon-red">
+      <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+    </div>
+    <div class="modal-title">Confirmar cancelación</div>
+    <div class="modal-body-text">Esta acción es <strong>irreversible</strong>. Una vez confirmada no puede deshacerse desde el sistema.</div>
+
+    <div class="modal-sum">
+      <div class="modal-row"><span class="ml">N.° solicitud</span><span class="mr" id="mNum">—</span></div>
+      <div class="modal-row"><span class="ml">Estado previo</span><span class="mr" id="mEstado">—</span></div>
+      <div class="modal-row"><span class="ml">Período</span><span class="mr" id="mPeriodo">—</span></div>
+      <div class="modal-row"><span class="ml">Días a restaurar</span><span class="mr green" id="mDias">—</span></div>
+      <div class="modal-row"><span class="ml">Saldo después</span><span class="mr green" id="mSaldoPost">—</span></div>
+    </div>
+
+    <div class="modal-adv-irrev">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Esta acción no se puede deshacer. ¿Está seguro?
+    </div>
+
+    <div class="modal-adv-girh" id="mAdvGirh">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Solicitud ya aprobada. El GIRH deberá actualizar el registro de control manualmente.
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" style="flex:1" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-confirm-cancel" id="btnConfirmar" onclick="confirmar()">Sí, cancelar solicitud</button>
+    </div>
+  </div>
+</div>
+
+<script src="/frontend/components/navbar.js"></script>
+<script src="/frontend/js/session.js"></script>
+
+<app-navbar></app-navbar>
+
+<script>
+  // ══ Solicitudes cancelables (Pendiente o Aprobada con fecha futura) ══
+  const CANCELABLES = [
+    { num:'SVC-2026-0042', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2026-04-14', ff:'2026-04-18', dias:5, estado:'Pendiente', saldo:15, aprobador:null, motivo:'Asuntos personales familiares.', periodo:null,
+      historial:[{estado:'Pendiente',fecha:'2026-03-18 09:14',usuario:'Yuliana Hernández'}]},
+    { num:'SVC-2026-0031', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2026-04-28', ff:'2026-05-02', dias:5, estado:'Aprobada', saldo:15, aprobador:'Lic. María Solís (GIRH)', motivo:'Vacaciones planificadas.', periodo:null,
+      historial:[{estado:'Pendiente',fecha:'2026-03-10 14:32',usuario:'Yuliana Hernández'},{estado:'Aprobada',fecha:'2026-03-12 10:05',usuario:'Lic. María Solís'}]},
+    { num:'SVC-2026-0055', nom:'docente_interino', nomLabel:'Docente / Docente-Adm. Interino', fi:'2026-05-05', ff:'2026-05-07', dias:3, estado:'Pendiente', saldo:6, aprobador:null, motivo:'Trámites personales.', periodo:'2026-I',
+      historial:[{estado:'Pendiente',fecha:'2026-03-20 11:00',usuario:'Yuliana Hernández'}]},
+  ];
+
+  let solicitudActual = null;
+
+  document.getElementById('navDate').textContent = new Date().toLocaleDateString('es-CR',{weekday:'short',day:'numeric',month:'short'});
+  try { const f=JSON.parse(localStorage.getItem('funcionario')||'{}'); if(f.nombre){document.getElementById('navAvatar').textContent=f.nombre.charAt(0).toUpperCase();document.getElementById('navName').textContent=f.nombre;} } catch(e){}
+
+  // ══ Renderizar lista ══
+  function renderLista() {
+    const list = document.getElementById('cancelableList');
+    if(!CANCELABLES.length){
+      list.innerHTML=`<div class="no-items"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="8.01" y2="15"/></svg>No tiene solicitudes disponibles para cancelar.</div>`;
+      return;
+    }
+    list.innerHTML = CANCELABLES.map(s=>`
+      <div class="cancelable-item" id="ci-${s.num}" onclick="seleccionar('${s.num}')">
+        <input type="radio" name="solCancelable" class="ci-radio" value="${s.num}"/>
+        <div class="ci-info">
+          <div class="ci-num">${s.num}</div>
+          <div class="ci-periodo">${fmt(s.fi)} — ${fmt(s.ff)}</div>
+          <div class="ci-sub">${s.nomLabel}${s.periodo?' · '+s.periodo:''}</div>
+        </div>
+        <div class="ci-dias">
+          <div class="ci-dias-n">${s.dias}</div>
+          <div class="ci-dias-l">días</div>
+        </div>
+        <span class="badge ${s.estado.toLowerCase()}">${s.estado}</span>
+      </div>`).join('');
+  }
+  renderLista();
+
+  function seleccionar(num) {
+    solicitudActual = CANCELABLES.find(s=>s.num===num);
+    if(!solicitudActual) return;
+
+    // Marcar seleccionada
+    document.querySelectorAll('.cancelable-item').forEach(el=>el.classList.remove('selected'));
+    document.getElementById('ci-'+num).classList.add('selected');
+    document.querySelector(`input[value="${num}"]`).checked = true;
+
+    // Poblar detalle
+    document.getElementById('dNum').textContent = solicitudActual.num;
+    document.getElementById('dEstado').innerHTML = `<span class="badge ${solicitudActual.estado.toLowerCase()}">${solicitudActual.estado}</span>`;
+    document.getElementById('dNom').textContent = solicitudActual.nomLabel;
+    document.getElementById('dFechaI').textContent = fmt(solicitudActual.fi);
+    document.getElementById('dFechaF').textContent = fmt(solicitudActual.ff);
+    document.getElementById('dDias').textContent = solicitudActual.dias+' días hábiles';
+    document.getElementById('dMotivo').textContent = solicitudActual.motivo||'Sin motivo especificado';
+
+    // Aprobador (solo si Aprobada)
+    const itemAprobador = document.getElementById('dItemAprobador');
+    if(solicitudActual.estado==='Aprobada'&&solicitudActual.aprobador){
+      itemAprobador.style.display='flex';
+      document.getElementById('dAprobador').textContent = solicitudActual.aprobador;
+    } else itemAprobador.style.display='none';
+
+    // Impacto saldo
+    const saldoActual = solicitudActual.saldo;
+    const saldoDespues = saldoActual + solicitudActual.dias;
+    document.getElementById('iSaldoAntes').textContent = saldoActual+' días';
+    document.getElementById('iSaldoDespues').textContent = saldoDespues+' días';
+    document.getElementById('iPlus').textContent = `+${solicitudActual.dias} días a restaurar`;
+
+    // Alerta GIRH
+    document.getElementById('alertGirh').classList.toggle('show', solicitudActual.estado==='Aprobada');
+
+    // Historial
+    const dotMap = {Pendiente:{cls:'pendiente',icon:'<path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>'},Aprobada:{cls:'aprobada',icon:'<path d="M9 11l3 3L22 4"/>'}};
+    document.getElementById('histList').innerHTML = solicitudActual.historial.map(h=>{
+      const d=dotMap[h.estado]||{cls:'pendiente',icon:''};
+      return `<div class="hist-item"><div class="hist-dot ${d.cls}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" fill="none">${d.icon}</svg></div><div><div class="hist-t">${h.estado}</div><div class="hist-m">${h.fecha} · ${h.usuario}</div></div></div>`;
+    }).join('');
+
+    document.getElementById('stepCancelacion').style.display='block';
+    setTimeout(()=>document.getElementById('stepCancelacion').scrollIntoView({behavior:'smooth',block:'start'}), 50);
+  }
+
+  function contarChar(){
+    const v=document.getElementById('motivo').value;
+    document.getElementById('charCount').textContent=`${v.length} / 500 caracteres`;
+    if(v.length>500){ document.getElementById('fieldMotivo').classList.add('has-error'); document.getElementById('errMotivo').style.display='block'; }
+    else { document.getElementById('fieldMotivo').classList.remove('has-error'); document.getElementById('errMotivo').style.display='none'; }
+  }
+
+  function validarCancelar(){
+    if(!solicitudActual) return;
+    if(document.getElementById('motivo').value.length>500) return;
+
+    const saldoActual = solicitudActual.saldo;
+    const saldoDespues = saldoActual + solicitudActual.dias;
+
+    document.getElementById('mNum').textContent = solicitudActual.num;
+    document.getElementById('mEstado').innerHTML = `<span class="badge ${solicitudActual.estado.toLowerCase()}" style="font-size:9px">${solicitudActual.estado}</span>`;
+    document.getElementById('mPeriodo').textContent = `${fmt(solicitudActual.fi)} — ${fmt(solicitudActual.ff)}`;
+    document.getElementById('mDias').textContent = `+${solicitudActual.dias} días`;
+    document.getElementById('mSaldoPost').textContent = `${saldoDespues} días disponibles`;
+    document.getElementById('mAdvGirh').classList.toggle('show', solicitudActual.estado==='Aprobada');
+
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+
+  function cerrarModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+
+  function confirmar(){
+    const btn = document.getElementById('btnConfirmar');
+    btn.textContent='Procesando...'; btn.disabled=true;
+    setTimeout(()=>{
+      cerrarModal(); btn.textContent='Sí, cancelar solicitud'; btn.disabled=false;
+      const msg = solicitudActual.estado==='Aprobada'
+        ? ` MSG-CAN-002: Solicitud aprobada cancelada exitosamente. N.° ${solicitudActual.num}. ${solicitudActual.dias} días restaurados. GIRH notificado para actualizar registro.`
+        : ` MSG-CAN-001: Solicitud cancelada exitosamente. N.° ${solicitudActual.num}. ${solicitudActual.dias} días restaurados al saldo.`;
+      alert(msg);
+      volverLista();
+    }, 1400);
+  }
+
+  function volverLista(){
+    solicitudActual=null;
+    document.getElementById('stepCancelacion').style.display='none';
+    document.querySelectorAll('.cancelable-item').forEach(el=>el.classList.remove('selected'));
+    document.querySelectorAll('input[name="solCancelable"]').forEach(r=>r.checked=false);
+    document.getElementById('motivo').value='';
+    document.getElementById('charCount').textContent='0 / 500 caracteres';
+  }
+
+  function fmt(s){ if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; }
+
+  function toggleGroup(id){ const g=document.getElementById('grp-'+id); const open=g.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(x=>x.classList.remove('open')); document.getElementById('userWrap').classList.remove('open'); if(!open)g.classList.add('open'); }
+  document.addEventListener('click',e=>{ if(!e.target.closest('.nav-group'))document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open')); if(!e.target.closest('.user-wrap'))document.getElementById('userWrap').classList.remove('open'); if(!e.target.closest('.modal')&&e.target.closest('.modal-overlay'))cerrarModal(); });
+  function toggleUserMenu(){ const w=document.getElementById('userWrap'); const o=w.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open')); w.classList.toggle('open',!o); }
+  function selectNomFromPill(el){ document.querySelectorAll('.ud-pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); document.getElementById('pillNomLabel').textContent=el.querySelector('.ud-pill-name').textContent; document.getElementById('userWrap').classList.remove('open'); }
+  function toggleTheme(){ const h=document.documentElement; const d=h.getAttribute('data-theme')==='dark'; h.setAttribute('data-theme',d?'light':'dark'); const i=document.getElementById('themeIcon'); i.innerHTML=d?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>':'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'; }
+  function logout(){ if(confirm('¿Cerrar sesión?'))window.location.href='../autenticacion/login.html'; }
+</script>
+</body>
+</html>
