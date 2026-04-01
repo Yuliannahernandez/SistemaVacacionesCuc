@@ -33,6 +33,9 @@ app.use('/api/solicitudes', solicitudesRoutes);
 const aprobacionRoutes = require('./src/routes/aprobacion.routes');
 app.use('/api/aprobacion', aprobacionRoutes);
 
+const registroRoutes = require('./src/routes/registro-funcionario.routes');
+app.use('/api/registro', registroRoutes);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
