@@ -1488,12 +1488,6 @@
         <div class="step-num">5</div>
         <div class="step-text">Acceso al Sistema</div>
       </div>
-      <div class="step-item" id="step-6" onclick="scrollToSection('s6')">
-        <div class="step-num">6</div>
-        <div class="step-text">Vacaciones y Estado</div>
-      </div>
-
-
     </aside>
 
     <!-- Form main -->
@@ -2427,7 +2421,7 @@
           else { step.classList.remove('active', 'done'); }
         });
       });
-    }, { threshold: 0.3, rootMargin: '-60px 0px -40% 0px' });
+    }, { threshold: 0.1, rootMargin: '-60px 0px -15% 0px' });
     _sids.forEach(function (id) { var el = document.getElementById(id); if (el) _obs.observe(el); });
 
     document.addEventListener('click', function (e) {
