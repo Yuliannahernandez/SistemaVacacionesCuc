@@ -209,6 +209,8 @@ class AppNavbar extends HTMLElement {
     this._markActiveGroup();
 
     document.dispatchEvent(new CustomEvent('navbar-ready'));
+
+    this._applyRolUI();
   }
 
   _updateDate() {
@@ -234,6 +236,45 @@ class AppNavbar extends HTMLElement {
       }
     }
   }
+  _applyRolUI() {
+  const funcionario = JSON.parse(localStorage.getItem('funcionario') || '{}');
+  const nombre = funcionario.nombre || 'Usuario';
+  const rol    = (funcionario.rol || '').toLowerCase();
+
+  // Nombre e iniciales en el avatar
+  const primerNombre = nombre.split(' ')[0];
+  const iniciales    = nombre.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
+
+  const navName   = this.querySelector('#navName');
+  const navAvatar = this.querySelector('#navAvatar');
+  if (navName)   navName.textContent   = primerNombre;
+  if (navAvatar) navAvatar.textContent = iniciales || '?';
+
+  // Roles sin nombramiento
+  const ROLES_ADMIN = ['rrhh', 'jefe', 'admin'];
+  if (ROLES_ADMIN.includes(rol)) {
+    // Ocultar el label de nombramiento en el pill
+    const pillNom = this.querySelector('#pillNomLabel');
+    if (pillNom) pillNom.style.display = 'none';
+
+    // Ocultar todo el dropdown de nombramientos
+    const dropdown = this.querySelector('.user-dropdown');
+    if (dropdown) dropdown.style.display = 'none';
+
+    // Mostrar el rol en su lugar dentro del pill
+    const pillText = this.querySelector('.user-pill-text');
+    if (pillText) {
+      const rolBadge = document.createElement('span');
+      rolBadge.style.cssText = 'font-size:8px;font-weight:400;color:rgba(125,166,216,0.45);letter-spacing:.1em;text-transform:uppercase;font-family:"DM Mono",monospace;';
+      rolBadge.textContent = rol === 'rrhh' ? 'RRHH' : rol.charAt(0).toUpperCase() + rol.slice(1);
+      pillText.appendChild(rolBadge);
+    }
+
+    // Deshabilitar el click del pill (no tiene dropdown que abrir)
+    const pill = this.querySelector('.user-pill');
+    if (pill) pill.style.cursor = 'default';
+  }
+}
 }
 
 customElements.define('app-navbar', AppNavbar);
