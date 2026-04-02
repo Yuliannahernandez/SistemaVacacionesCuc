@@ -1910,10 +1910,7 @@
 
 <app-navbar></app-navbar>
 
-  <script>
-    // Wizard 2 pasos + múltiples nombramientos + todas las validaciones V1-V10
-
-
+ <script>
     // SIGEVAC — registrar.html — RQ-SVC-2026-1
     // Funciones globales directas. Sin IIFE. Sin dependencias externas.
 
@@ -1949,7 +1946,7 @@
       if (er) er.classList.remove('show');
     }
 
-    // ─── Modal confirmación (Paso 12) ─────────────────────────────────────────
+    // ─── Modal confirmación ────────────────────────────────────────────────────
     function showModal(msg) {
       var m = document.getElementById('modalMsg');
       if (m) m.textContent = msg || 'El funcionario puede revisar su correo electrónico para obtener sus credenciales de acceso.';
@@ -1962,37 +1959,119 @@
       resetForm();
     }
 
+    // ─── Catálogos en memoria ─────────────────────────────────────────────────
+    var _tiposNombramiento = [];
+    var _periodosLectivos  = [];
+
+    // ─── cargarDepartamentos ──────────────────────────────────────────────────
+    function cargarDepartamentos() {
+      return fetch(API_BASE + '/api/catalogos/departamentos')
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (lista) {
+          var sel = document.getElementById('id_departamento');
+          if (!sel) return;
+          sel.innerHTML = '<option value="">— Seleccionar —</option>';
+          lista.forEach(function (d) {
+            var opt = document.createElement('option');
+            opt.value       = d.id_departamento;
+            opt.textContent = d.nombre_departamento;
+            sel.appendChild(opt);
+          });
+        })
+        .catch(function () {
+          console.warn('[SIGEVAC] No se pudieron cargar los departamentos.');
+        });
+    }
+
+    // ─── cargarCargos ─────────────────────────────────────────────────────────
+    function cargarCargos() {
+      return fetch(API_BASE + '/api/catalogos/cargos')
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (lista) {
+          var sel = document.getElementById('id_cargo');
+          if (!sel) return;
+          sel.innerHTML = '<option value="">— Seleccionar —</option>';
+          lista.forEach(function (c) {
+            var opt = document.createElement('option');
+            opt.value       = c.id_cargo;
+            opt.textContent = c.nombre_cargo;
+            sel.appendChild(opt);
+          });
+        })
+        .catch(function () {
+          console.warn('[SIGEVAC] No se pudieron cargar los cargos.');
+        });
+    }
+
+    // ─── cargarTiposNombramiento ──────────────────────────────────────────────
+    function cargarTiposNombramiento() {
+      return fetch(API_BASE + '/api/catalogos/tipos-nombramiento')
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (lista) {
+          _tiposNombramiento = lista;
+        })
+        .catch(function () {
+          console.warn('[SIGEVAC] No se pudieron cargar los tipos de nombramiento.');
+        });
+    }
+
+    // ─── cargarPeriodosLectivos ───────────────────────────────────────────────
+    function cargarPeriodosLectivos() {
+      return fetch(API_BASE + '/api/catalogos/periodos-lectivos')
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (lista) {
+          _periodosLectivos = lista;
+        })
+        .catch(function () {
+          console.warn('[SIGEVAC] No se pudieron cargar los períodos lectivos.');
+        });
+    }
+
     // ─── Tabla de nombramientos múltiples ─────────────────────────────────────
     var _nomRowId = 0;
 
     function addNomRow() {
-      var id = ++_nomRowId;
+      var id    = ++_nomRowId;
       var tbody = document.getElementById('nomBody');
-      var tr = document.createElement('tr');
-      tr.id = 'nom-row-' + id;
+      var tr    = document.createElement('tr');
+      tr.id     = 'nom-row-' + id;
+
+      // Opciones de tipo desde memoria (cargadas al inicio)
+      var opcionesTipo = '<option value="">— Seleccionar —</option>';
+      _tiposNombramiento.forEach(function (t) {
+        opcionesTipo += '<option value="' + t.id_tipo_nombramiento + '">' + t.nombre_tipo + '</option>';
+      });
+
+      // Opciones de período desde memoria (cargadas al inicio)
+      var opcionesPeriodo = '<option value="">— Sin período —</option>';
+      _periodosLectivos.forEach(function (p) {
+        var label = p.nombre_periodo + ' — ' + p.anio;
+        if (p.estado === 'activo') label += ' ✓';
+        opcionesPeriodo += '<option value="' + p.id_periodo_lectivo + '">' + label + '</option>';
+      });
+
+      var esPrimero = (_nomRowId === 1);
+
       tr.innerHTML =
         '<td>' +
-        '<select id="nom-tipo-' + id + '" style="min-width:160px">' +
-        '<option value="">— Seleccionar —</option>' +
-        '<option value="1">Administrativo en Propiedad</option>' +
-        '<option value="2">Administrativo Interino</option>' +
-        '<option value="3">Docente en Propiedad</option>' +
-        '<option value="4">Docente / Doc.-Adm. Interino</option>' +
-        '</select>' +
+          '<select id="nom-tipo-' + id + '" style="min-width:200px">' +
+            opcionesTipo +
+          '</select>' +
         '</td>' +
         '<td><input type="text" id="nom-num-' + id + '" placeholder="NOM-2026-0001" maxlength="50" style="min-width:130px"></td>' +
         '<td><input type="date" id="nom-fecha-' + id + '" style="min-width:130px"></td>' +
         '<td><input type="date" id="nom-fin-' + id + '" style="min-width:130px"></td>' +
         '<td>' +
-        '<select id="nom-periodo-' + id + '" style="min-width:110px">' +
-        '<option value="">— Sin período —</option>' +
-        '</select>' +
+          '<select id="nom-periodo-' + id + '" style="min-width:160px">' +
+            opcionesPeriodo +
+          '</select>' +
         '</td>' +
         '<td>' +
-        (_nomRowId > 1
-          ? '<button type="button" class="btn-remove-row" onclick="removeNomRow(' + id + ')">Eliminar</button>'
-          : '<span style="font-size:9px;color:var(--dim)">principal</span>') +
+          (esPrimero
+            ? '<span style="font-size:9px;color:var(--dim)">principal</span>'
+            : '<button type="button" class="btn-remove-row" onclick="removeNomRow(' + id + ')">Eliminar</button>') +
         '</td>';
+
       tbody.appendChild(tr);
     }
 
@@ -2005,28 +2084,27 @@
       var rows = [];
       document.querySelectorAll('#nomBody tr').forEach(function (tr) {
         var idStr = tr.id.replace('nom-row-', '');
-        var tipo = document.getElementById('nom-tipo-' + idStr);
-        var num = document.getElementById('nom-num-' + idStr);
-        var fecha = document.getElementById('nom-fecha-' + idStr);
-        var fin = document.getElementById('nom-fin-' + idStr);
-        var per = document.getElementById('nom-periodo-' + idStr);
+        var tipo  = document.getElementById('nom-tipo-'   + idStr);
+        var num   = document.getElementById('nom-num-'    + idStr);
+        var fecha = document.getElementById('nom-fecha-'  + idStr);
+        var fin   = document.getElementById('nom-fin-'    + idStr);
+        var per   = document.getElementById('nom-periodo-'+ idStr);
         if (!tipo) return;
         rows.push({
-          id_tipo_nombramiento: parseInt(tipo.value) || null,
-          numero_nombramiento: num ? num.value.trim() || null : null,
-          fecha_nombramiento: fecha ? fecha.value || null : null,
-          fecha_fin_nombramiento: fin ? fin.value || null : null,
-          id_periodo_lectivo: per ? parseInt(per.value) || null : null
+          id_tipo_nombramiento:  parseInt(tipo.value) || null,
+          numero_nombramiento:   num   ? num.value.trim() || null   : null,
+          fecha_nombramiento:    fecha ? fecha.value || null         : null,
+          fecha_fin_nombramiento:fin   ? fin.value   || null         : null,
+          id_periodo_lectivo:    per   ? parseInt(per.value) || null : null
         });
       });
       return rows;
     }
 
     function validateNombramientos() {
-      var rows = getNomData();
+      var rows  = getNomData();
       var errEl = document.getElementById('err-nombramientos');
 
-      // Al menos 1 fila con tipo seleccionado
       if (rows.length === 0 || !rows[0].id_tipo_nombramiento) {
         if (errEl) {
           errEl.textContent = 'MSG-REG-ERR-008: Debe agregar al menos un nombramiento con tipo seleccionado.';
@@ -2037,17 +2115,12 @@
         return false;
       }
 
-      // Todas las filas agregadas deben tener tipo
       var todasValidas = true;
       document.querySelectorAll('#nomBody tr').forEach(function (tr) {
         var idStr = tr.id.replace('nom-row-', '');
-        var sel = document.getElementById('nom-tipo-' + idStr);
-        if (sel && !sel.value) {
-          sel.classList.add('error');
-          todasValidas = false;
-        } else if (sel) {
-          sel.classList.remove('error');
-        }
+        var sel   = document.getElementById('nom-tipo-' + idStr);
+        if (sel && !sel.value) { sel.classList.add('error'); todasValidas = false; }
+        else if (sel)            sel.classList.remove('error');
       });
 
       if (!todasValidas) {
@@ -2074,14 +2147,12 @@
       document.getElementById('wi-1').classList.remove('wi-active');
       document.getElementById('wi-1').classList.add('wi-done');
       document.getElementById('wi-2').classList.add('wi-active');
-      // Sidebar
       document.getElementById('step-1').classList.remove('active');
       document.getElementById('step-1').classList.add('done');
       document.getElementById('step-2').classList.add('active');
-      // Botones
       document.getElementById('btnSiguiente').style.display = 'none';
-      document.getElementById('btnAtras').style.display = '';
-      document.getElementById('btnPreview').style.display = '';
+      document.getElementById('btnAtras').style.display     = '';
+      document.getElementById('btnPreview').style.display   = '';
       document.getElementById('btnFinalizar').style.display = '';
       var fm = document.getElementById('formMain'); if (fm) fm.scrollTop = 0;
       showToast('MSG-REG-INFO-001: Cargando formulario de registro...', 'ok');
@@ -2098,8 +2169,8 @@
       document.getElementById('step-1').classList.remove('done');
       document.getElementById('step-1').classList.add('active');
       document.getElementById('btnSiguiente').style.display = '';
-      document.getElementById('btnAtras').style.display = 'none';
-      document.getElementById('btnPreview').style.display = 'none';
+      document.getElementById('btnAtras').style.display     = 'none';
+      document.getElementById('btnPreview').style.display   = 'none';
       document.getElementById('btnFinalizar').style.display = 'none';
       var fm = document.getElementById('formMain'); if (fm) fm.scrollTop = 0;
     }
@@ -2108,14 +2179,13 @@
     function validateStep1() {
       var ok = true;
 
-      // V1 — Campos obligatorios paso 1
       [
-        { f: 'cedula', e: 'err-cedula' },
-        { f: 'nombre', e: 'err-nombre' },
-        { f: 'apellido1', e: 'err-apellido1' },
-        { f: 'email', e: 'err-email' },
-        { f: 'telefono', e: 'err-telefono' },
-        { f: 'fecha_nacimiento', e: 'err-fnac' }
+        { f: 'cedula',           e: 'err-cedula'   },
+        { f: 'nombre',           e: 'err-nombre'   },
+        { f: 'apellido1',        e: 'err-apellido1'},
+        { f: 'email',            e: 'err-email'    },
+        { f: 'telefono',         e: 'err-telefono' },
+        { f: 'fecha_nacimiento', e: 'err-fnac'     }
       ].forEach(function (r) {
         var el = document.getElementById(r.f);
         if (!el || el.value.trim() === '') {
@@ -2149,7 +2219,7 @@
         } else { clearErr('email', 'err-email'); }
       }
 
-      // V5 — Teléfono obligatorio, solo números
+      // V5 — Teléfono solo números
       var tel = document.getElementById('telefono');
       if (tel && tel.value.trim() !== '') {
         if (!/^\d+$/.test(tel.value.trim())) {
@@ -2157,13 +2227,13 @@
         } else { clearErr('telefono', 'err-telefono'); }
       }
 
-      // V6 — Fecha nacimiento: mayor de 18 años
+      // V6 — Mayor de 18 años
       var fn = document.getElementById('fecha_nacimiento');
       if (fn && fn.value) {
-        var hoy = new Date();
+        var hoy  = new Date();
         var fnac = new Date(fn.value);
         var edad = hoy.getFullYear() - fnac.getFullYear();
-        var mm = hoy.getMonth() - fnac.getMonth();
+        var mm   = hoy.getMonth() - fnac.getMonth();
         if (mm < 0 || (mm === 0 && hoy.getDate() < fnac.getDate())) edad--;
         if (edad < 18) {
           setErr('fecha_nacimiento', 'err-fnac', 'MSG-REG-ERR-007: La fecha de nacimiento del funcionario debe corresponder a una persona mayor de 18 años.'); ok = false;
@@ -2177,16 +2247,15 @@
     function validateStep2() {
       var ok = true;
 
-      // V1 — Campos obligatorios paso 2
       [
-        { f: 'id_departamento', e: 'err-depto' },
-        { f: 'id_cargo', e: 'err-cargo' },
-        { f: 'tipo_funcionario', e: 'err-tipo' },
-        { f: 'condicion', e: 'err-condicion' },
-        { f: 'codigo_administrativo', e: 'err-codadmin' },
-        { f: 'fecha_ingreso_sector_publico', e: 'err-fsp' },
-        { f: 'fecha_ingreso', e: 'err-finicio' },
-        { f: 'usuario', e: 'err-usuario' }
+        { f: 'id_departamento',            e: 'err-depto'    },
+        { f: 'id_cargo',                   e: 'err-cargo'    },
+        { f: 'tipo_funcionario',            e: 'err-tipo'     },
+        { f: 'condicion',                  e: 'err-condicion'},
+        { f: 'codigo_administrativo',      e: 'err-codadmin' },
+        { f: 'fecha_ingreso_sector_publico',e: 'err-fsp'     },
+        { f: 'fecha_ingreso',              e: 'err-finicio'  },
+        { f: 'usuario',                    e: 'err-usuario'  }
       ].forEach(function (r) {
         var el = document.getElementById(r.f);
         if (!el || el.value === '' || el.value === null) {
@@ -2195,7 +2264,7 @@
         } else { clearErr(r.f, r.e); }
       });
 
-      // V7 — Al menos 1 nombramiento con tipo seleccionado
+      // V7 — Al menos 1 nombramiento
       if (!validateNombramientos()) ok = false;
 
       // V8 — Fechas de ingreso ≤ hoy
@@ -2236,31 +2305,31 @@
     function collectData() {
       function g(id) { var el = document.getElementById(id); return el ? el.value : ''; }
       return {
-        cedula: g('cedula').trim().replace(/-/g, ''),
-        nombre: g('nombre').trim(),
-        apellido1: g('apellido1').trim(),
-        apellido2: g('apellido2').trim() || null,
-        email: g('email').trim(),
-        telefono: g('telefono').trim(),
-        fecha_nacimiento: g('fecha_nacimiento') || null,
-        id_departamento: parseInt(g('id_departamento')) || null,
-        id_cargo: parseInt(g('id_cargo')) || null,
-        tipo_funcionario: g('tipo_funcionario') || null,
-        condicion: g('condicion') || null,
-        id_supervisor: parseInt(g('id_supervisor')) || null,
-        codigo_administrativo: parseInt(g('codigo_administrativo')) || null,
-        fecha_ingreso: g('fecha_ingreso') || null,
+        cedula:                       g('cedula').trim().replace(/-/g, ''),
+        nombre:                       g('nombre').trim(),
+        apellido1:                    g('apellido1').trim(),
+        apellido2:                    g('apellido2').trim() || null,
+        email:                        g('email').trim(),
+        telefono:                     g('telefono').trim(),
+        fecha_nacimiento:             g('fecha_nacimiento') || null,
+        id_departamento:              parseInt(g('id_departamento')) || null,
+        id_cargo:                     parseInt(g('id_cargo')) || null,
+        tipo_funcionario:             g('tipo_funcionario') || null,
+        condicion:                    g('condicion') || null,
+        id_supervisor:                parseInt(g('id_supervisor')) || null,
+        codigo_administrativo:        parseInt(g('codigo_administrativo')) || null,
+        fecha_ingreso:                g('fecha_ingreso') || null,
         fecha_ingreso_sector_publico: g('fecha_ingreso_sector_publico') || null,
-        en_periodo_prueba: parseInt(g('en_periodo_prueba')) || 0,
-        fecha_fin_periodo_prueba: g('fecha_fin_periodo_prueba') || null,
-        dias_vacaciones_acumulados: parseFloat(g('dias_vacaciones_acumulados')) || 0,
-        dias_vacaciones_disponibles: parseFloat(g('dias_vacaciones_disponibles')) || 0,
-        estado_contrato: g('estado_contrato') || 'activo',
-        usuario: g('usuario').trim(),
-        role: g('role') || 'funcionario',
-        estado: g('estado') || 'activo',
-        historial_nombramientos: g('historial_nombramientos').trim() || null,
-        nombramientos: getNomData()  // array de múltiples nombramientos
+        en_periodo_prueba:            parseInt(g('en_periodo_prueba')) || 0,
+        fecha_fin_periodo_prueba:     g('fecha_fin_periodo_prueba') || null,
+        dias_vacaciones_acumulados:   parseFloat(g('dias_vacaciones_acumulados')) || 0,
+        dias_vacaciones_disponibles:  parseFloat(g('dias_vacaciones_disponibles')) || 0,
+        estado_contrato:              g('estado_contrato') || 'activo',
+        usuario:                      g('usuario').trim(),
+        role:                         g('role') || 'funcionario',
+        estado:                       g('estado') || 'activo',
+        historial_nombramientos:      g('historial_nombramientos').trim() || null,
+        nombramientos:                getNomData()
       };
     }
 
@@ -2271,7 +2340,7 @@
         return;
       }
       var data = collectData();
-      var btn = document.getElementById('btnFinalizar');
+      var btn  = document.getElementById('btnFinalizar');
       var orig = btn ? btn.innerHTML : '';
       if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
       showToast('MSG-REG-INFO-002: Guardando datos del funcionario...', 'ok');
@@ -2286,12 +2355,12 @@
           if (r.ok) {
             showModal(r.json.mensaje || 'El usuario fue creado exitosamente. El funcionario puede revisar su correo electrónico para obtener sus credenciales de acceso.');
           } else {
-            var msg = r.json.error || 'Error desconocido.';
+            var msg    = r.json.error  || 'Error desconocido.';
             var codigo = r.json.codigo || '';
             showToast(msg, 'err');
-            if (codigo === 'MSG-REG-ERR-DUP-CED') { wizardBack(); setTimeout(function () { setErr('cedula', 'err-cedula', msg); }, 80); }
-            if (codigo === 'MSG-REG-ERR-DUP-EMAIL') { wizardBack(); setTimeout(function () { setErr('email', 'err-email', msg); }, 80); }
-            if (codigo === 'MSG-REG-ERR-DUP-USR') { setErr('usuario', 'err-usuario', msg); }
+            if (codigo === 'MSG-REG-ERR-DUP-CED')   { wizardBack(); setTimeout(function () { setErr('cedula',  'err-cedula',  msg); }, 80); }
+            if (codigo === 'MSG-REG-ERR-DUP-EMAIL')  { wizardBack(); setTimeout(function () { setErr('email',   'err-email',   msg); }, 80); }
+            if (codigo === 'MSG-REG-ERR-DUP-USR')    { setErr('usuario', 'err-usuario', msg); }
           }
         })
         .catch(function (err) {
@@ -2315,10 +2384,10 @@
       addNomRow();
       // Reset chips
       var ep = document.getElementById('en_periodo_prueba'); if (ep) ep.value = '0';
-      var ro = document.getElementById('role'); if (ro) ro.value = 'funcionario';
-      var ec = document.getElementById('estado_contrato'); if (ec) ec.value = 'activo';
+      var ro = document.getElementById('role');              if (ro) ro.value = 'funcionario';
+      var ec = document.getElementById('estado_contrato');   if (ec) ec.value = 'activo';
       selectPrueba(0);
-      document.querySelectorAll('#roleGroup    .badge-chip').forEach(function (c, i) { c.classList.toggle('sel', i === 0); });
+      document.querySelectorAll('#roleGroup     .badge-chip').forEach(function (c, i) { c.classList.toggle('sel', i === 0); });
       document.querySelectorAll('#contratoGroup .badge-chip').forEach(function (c, i) { c.classList.toggle('sel', i === 0); });
       // Volver a paso 1
       if (_wizardStep === 2) wizardBack();
@@ -2329,11 +2398,11 @@
     // ─── previewJSON ──────────────────────────────────────────────────────────
     function previewJSON() {
       var data = collectData();
-      var win = window.open('', '_blank', 'width=640,height=700');
+      var win  = window.open('', '_blank', 'width=640,height=700');
       if (win) win.document.write('<pre style="background:#0f1a12;color:#8cc9a3;padding:20px;font-size:12px;font-family:monospace">' + JSON.stringify(data, null, 2) + '</pre>');
     }
 
-    // ─── autoFillUsuario (Sección 7: usuario = cédula) ───────────────────────
+    // ─── autoFillUsuario (usuario = cédula) ───────────────────────────────────
     function autoFillUsuario() {
       var ced = document.getElementById('cedula');
       var usr = document.getElementById('usuario');
@@ -2343,46 +2412,46 @@
 
     // ─── updatePreview ────────────────────────────────────────────────────────
     function updatePreview() {
-      var n = (document.getElementById('nombre') || {}).value || '';
-      var a1 = (document.getElementById('apellido1') || {}).value || '';
-      var a2 = (document.getElementById('apellido2') || {}).value || '';
-      var ced = (document.getElementById('cedula') || {}).value || '';
+      var n   = (document.getElementById('nombre')    || {}).value || '';
+      var a1  = (document.getElementById('apellido1') || {}).value || '';
+      var a2  = (document.getElementById('apellido2') || {}).value || '';
+      var ced = (document.getElementById('cedula')    || {}).value || '';
       var dep = document.getElementById('id_departamento');
       var car = document.getElementById('id_cargo');
       var depTxt = dep && dep.selectedIndex >= 0 ? dep.options[dep.selectedIndex].text : '—';
       var carTxt = car && car.selectedIndex >= 0 ? car.options[car.selectedIndex].text : '—';
-      var full = [n.trim(), a1.trim(), a2.trim()].filter(Boolean).join(' ') || 'Nombre del Funcionario';
-      var ini = [n.trim(), a1.trim()].filter(Boolean).map(function (s) { return s[0].toUpperCase(); }).join('') || '?';
+      var full   = [n.trim(), a1.trim(), a2.trim()].filter(Boolean).join(' ') || 'Nombre del Funcionario';
+      var ini    = [n.trim(), a1.trim()].filter(Boolean).map(function (s) { return s[0].toUpperCase(); }).join('') || '?';
       var circle = document.getElementById('avCircle');
       var avName = document.getElementById('avName');
-      var avSub = document.getElementById('avSub');
+      var avSub  = document.getElementById('avSub');
       if (circle) circle.textContent = ini;
       if (avName) avName.textContent = full;
-      if (avSub) avSub.textContent = [ced || 'Cédula', carTxt, depTxt].filter(function (s) { return s && s !== '—'; }).join(' · ');
+      if (avSub)  avSub.textContent  = [ced || 'Cédula', carTxt, depTxt].filter(function (s) { return s && s !== '—'; }).join(' · ');
     }
 
     // ─── updateProgress ───────────────────────────────────────────────────────
     function updateProgress() {
       var ids = ['cedula', 'nombre', 'apellido1', 'email', 'telefono', 'fecha_nacimiento',
-        'id_departamento', 'id_cargo', 'fecha_ingreso', 'usuario'];
+                 'id_departamento', 'id_cargo', 'fecha_ingreso', 'usuario'];
       var filled = ids.filter(function (id) {
         var el = document.getElementById(id);
         return el && el.value.trim() !== '' && el.value !== '';
       }).length;
       var pf = document.getElementById('progressFill');
       var pl = document.getElementById('progressLabel');
-      if (pf) pf.style.width = Math.round(filled / ids.length * 100) + '%';
-      if (pl) pl.textContent = filled + ' / ' + ids.length + ' campos clave';
+      if (pf) pf.style.width    = Math.round(filled / ids.length * 100) + '%';
+      if (pl) pl.textContent    = filled + ' / ' + ids.length + ' campos clave';
     }
 
-    // ─── toggleInterino (no aplica en tabla, se mantiene por compatibilidad) ──
+    // ─── toggleInterino (compatibilidad) ──────────────────────────────────────
     function toggleInterino() { }
 
     // ─── selectPrueba ─────────────────────────────────────────────────────────
     function selectPrueba(val) {
       var hidden = document.getElementById('en_periodo_prueba'); if (hidden) hidden.value = val;
-      var no = document.getElementById('pp-no');
-      var si = document.getElementById('pp-si');
+      var no  = document.getElementById('pp-no');
+      var si  = document.getElementById('pp-si');
       if (no) no.classList.toggle('active', val === 0);
       if (si) si.classList.toggle('active', val === 1);
       var fin = document.getElementById('field-fin-prueba');
@@ -2409,7 +2478,7 @@
 
     // ─── toggleGroup / toggleTheme ────────────────────────────────────────────
     function toggleGroup(id) {
-      var grp = document.getElementById('grp-' + id); if (!grp) return;
+      var grp  = document.getElementById('grp-' + id); if (!grp) return;
       var open = grp.classList.contains('open');
       document.querySelectorAll('.nav-group').forEach(function (g) { g.classList.remove('open'); });
       if (!open) grp.classList.add('open');
@@ -2421,15 +2490,15 @@
 
     // ─── Scroll observer sidebar ──────────────────────────────────────────────
     var _sids = ['s1', 's2', 's3', 's4', 's5', 's6'];
-    var _obs = new IntersectionObserver(function (entries) {
+    var _obs  = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
         var idx = _sids.indexOf(e.target.id) + 1;
         _sids.forEach(function (_, i) {
           var step = document.getElementById('step-' + (i + 1)); if (!step) return;
-          if (i + 1 < idx) { step.classList.add('done'); step.classList.remove('active'); }
-          else if (i + 1 === idx) { step.classList.add('active'); step.classList.remove('done'); }
-          else { step.classList.remove('active', 'done'); }
+          if      (i + 1 < idx) { step.classList.add('done');   step.classList.remove('active'); }
+          else if (i + 1 === idx){ step.classList.add('active'); step.classList.remove('done');   }
+          else                   { step.classList.remove('active', 'done'); }
         });
       });
     }, { threshold: 0.3, rootMargin: '-60px 0px -40% 0px' });
@@ -2440,7 +2509,7 @@
         document.querySelectorAll('.nav-group').forEach(function (g) { g.classList.remove('open'); });
     });
     document.querySelectorAll('input, select, textarea').forEach(function (el) {
-      el.addEventListener('input', function () { updateProgress(); updatePreview(); });
+      el.addEventListener('input',  function () { updateProgress(); updatePreview(); });
       el.addEventListener('change', function () { updateProgress(); updatePreview(); });
     });
 
@@ -2450,16 +2519,16 @@
 
     // ─── Protección de sesión (inline) ────────────────────────────────────────
     (function () {
-      var LOGIN_URL = '/frontend/pages/autenticacion/login.html';
+      var LOGIN_URL      = '/frontend/pages/autenticacion/login.html';
       var INACTIVIDAD_MS = 10 * 60 * 1000;
 
       function getSesion() {
         try {
           return {
-            funcionario: JSON.parse(localStorage.getItem('funcionario') || 'null'),
+            funcionario:      JSON.parse(localStorage.getItem('funcionario')      || 'null'),
             tipoNombramiento: JSON.parse(localStorage.getItem('tipoNombramiento') || 'null'),
-            sessionToken: localStorage.getItem('sessionToken'),
-            sessionExpiry: parseInt(localStorage.getItem('sessionExpiry') || '0', 10)
+            sessionToken:     localStorage.getItem('sessionToken'),
+            sessionExpiry:    parseInt(localStorage.getItem('sessionExpiry') || '0', 10)
           };
         } catch { return null; }
       }
@@ -2477,9 +2546,9 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             id_funcionario: sesion.funcionario ? sesion.funcionario.id_funcionario : null,
-            usuario: sesion.funcionario ? sesion.funcionario.usuario : null,
-            sessionToken: sesion.sessionToken,
-            motivo: motivo || 'manual'
+            usuario:        sesion.funcionario ? sesion.funcionario.usuario        : null,
+            sessionToken:   sesion.sessionToken,
+            motivo:         motivo || 'manual'
           })
         }).catch(function () { }).finally(function () {
           limpiarSesion();
@@ -2487,7 +2556,6 @@
         });
       }
 
-      // Exponer para el botón cerrar sesión
       window.logout = function () { cerrarSesion('manual'); };
 
       var timerInac = null;
@@ -2500,7 +2568,6 @@
       ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click']
         .forEach(function (ev) { document.addEventListener(ev, reiniciarTimer, { passive: true }); });
 
-      // Validar al cargar
       var sesion = getSesion();
       if (!sesion || !sesion.funcionario || !sesion.sessionToken) {
         limpiarSesion();
@@ -2508,14 +2575,13 @@
       } else if (Date.now() > sesion.sessionExpiry) {
         cerrarSesion('inactividad');
       } else {
-        // Poblar navbar con datos del usuario
-        var f = sesion.funcionario;
+        var f        = sesion.funcionario;
         var iniciales = [f.nombre, f.apellido1].filter(Boolean).map(function (s) { return s[0].toUpperCase(); }).join('');
-        var avatarEl = document.getElementById('navAvatar');
-        var nameEl = document.getElementById('navName');
+        var avatarEl  = document.getElementById('navAvatar');
+        var nameEl    = document.getElementById('navName');
         var pillNomEl = document.getElementById('pillNomLabel');
-        if (avatarEl) avatarEl.textContent = iniciales || '?';
-        if (nameEl) nameEl.textContent = f.nombre || 'Usuario';
+        if (avatarEl)  avatarEl.textContent  = iniciales || '?';
+        if (nameEl)    nameEl.textContent    = f.nombre  || 'Usuario';
         if (pillNomEl) pillNomEl.textContent = sesion.tipoNombramiento ? sesion.tipoNombramiento.nombre_tipo : (f.rol || '');
         reiniciarTimer();
       }
@@ -2530,7 +2596,7 @@
           sel.innerHTML = '<option value="">— Sin supervisor —</option>';
           lista.forEach(function (f) {
             var opt = document.createElement('option');
-            opt.value = f.id_funcionario;
+            opt.value       = f.id_funcionario;
             opt.textContent = f.nombre + ' ' + f.apellido1 + ' — ' + (f.nombre_departamento || f.id_departamento);
             sel.appendChild(opt);
           });
@@ -2538,13 +2604,26 @@
         .catch(function () { });
     }
 
-    // ─── Init ─────────────────────────────────────────────────────────────────
-    updatePreview();
-    updateProgress();
-    selectPrueba(0);
-    addNomRow();         // fila inicial de nombramiento
-    cargarSupervisores();
+    // ─── Init — catálogos primero, luego formulario ───────────────────────────
+    Promise.all([
+      cargarDepartamentos(),
+      cargarCargos(),
+      cargarTiposNombramiento(),
+      cargarPeriodosLectivos()
+    ]).then(function () {
+      addNomRow();
+      cargarSupervisores();
+      updatePreview();
+      updateProgress();
+      selectPrueba(0);
+    }).catch(function () {
+      // Fallback: inicia el formulario aunque fallen los catálogos
+      addNomRow();
+      updatePreview();
+      updateProgress();
+      selectPrueba(0);
+    });
+
   </script>
 </body>
-
 </html>
