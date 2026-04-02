@@ -50,7 +50,7 @@ class AppNavbar extends HTMLElement {
         .user-pill-text{display:flex;flex-direction:column}
         .user-pill-name{font-size:11px;font-weight:300;color:rgba(204,220,240,0.62);line-height:1.1}
         .user-pill-nom{font-size:8.5px;font-weight:300;color:rgba(125,166,216,0.35);letter-spacing:.04em}
-        .user-dropdown{position:absolute;top:calc(100% + 7px);right:0;min-width:210px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:14px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,0.28);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+        .user-dropdown{position:absolute;top:calc(100% + 7px);right:0;min-width:220px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:14px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,0.28);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
         .user-wrap.open .user-dropdown{opacity:1;transform:translateY(0);pointer-events:all}
         .ud-label{font-size:8px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(125,166,216,0.3);margin-bottom:8px;padding:0 4px;font-family:'DM Mono',monospace}
         .ud-pill{display:flex;flex-direction:column;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid transparent;cursor:pointer;transition:all .2s;margin-bottom:4px}
@@ -60,6 +60,12 @@ class AppNavbar extends HTMLElement {
         .ud-pill-name{font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.55)}
         .ud-pill.active .ud-pill-name{color:#7da6d8}
         .ud-pill-sub{font-size:9px;font-weight:300;color:rgba(125,166,216,0.28);margin-top:1px}
+        /* Badge de número de nombramiento */
+        .ud-pill-num{font-size:8px;font-weight:400;color:rgba(125,166,216,0.25);font-family:'DM Mono',monospace;margin-top:2px;letter-spacing:.06em}
+        /* Indicador de loading en pill */
+        .pill-loading{opacity:.5;pointer-events:none}
+        @keyframes pill-spin{to{transform:rotate(360deg)}}
+        .pill-spinner{display:inline-block;width:8px;height:8px;border:1.5px solid rgba(125,166,216,0.3);border-top-color:#7da6d8;border-radius:50%;animation:pill-spin .6s linear infinite;margin-left:4px;vertical-align:middle}
       `;
       document.head.appendChild(style);
     }
@@ -174,31 +180,13 @@ class AppNavbar extends HTMLElement {
         </div>
         <div class="user-wrap" id="userWrap">
           <div class="user-pill" onclick="toggleUserMenu()">
-            <div class="avatar" id="navAvatar">Y</div>
+            <div class="avatar" id="navAvatar">?</div>
             <div class="user-pill-text">
-              <span class="user-pill-name" id="navName">Yuliana</span>
-              <span class="user-pill-nom" id="pillNomLabel">Propiedad</span>
+              <span class="user-pill-name" id="navName">Usuario</span>
+              <span class="user-pill-nom" id="pillNomLabel">—</span>
             </div>
           </div>
-          <div class="user-dropdown">
-            <div class="ud-label">Nombramiento</div>
-            <div class="ud-pill active" data-nom="propiedad" onclick="selectNomFromPill(this)">
-              <span class="ud-pill-name">Propiedad</span>
-              <span class="ud-pill-sub">Administrativo</span>
-            </div>
-            <div class="ud-pill" data-nom="interino" onclick="selectNomFromPill(this)">
-              <span class="ud-pill-name">Interino</span>
-              <span class="ud-pill-sub">Docente</span>
-            </div>
-            <div class="ud-pill" data-nom="interino_adm" onclick="selectNomFromPill(this)">
-              <span class="ud-pill-name">Interino</span>
-              <span class="ud-pill-sub">Administrativo</span>
-            </div>
-            <div class="ud-pill" data-nom="propiedad_doc" onclick="selectNomFromPill(this)">
-              <span class="ud-pill-name">Propiedad</span>
-              <span class="ud-pill-sub">Docente</span>
-            </div>
-          </div>
+          <div class="user-dropdown" id="userDropdown"></div>
         </div>
       </div>
     </nav>
@@ -207,10 +195,9 @@ class AppNavbar extends HTMLElement {
     this._updateDate();
     setInterval(() => this._updateDate(), 60000);
     this._markActiveGroup();
+    this._applyRolUI();
 
     document.dispatchEvent(new CustomEvent('navbar-ready'));
-
-    this._applyRolUI();
   }
 
   _updateDate() {
@@ -232,54 +219,183 @@ class AppNavbar extends HTMLElement {
       const btn = this.querySelector(`#grp-${key} .nav-group-btn`);
       if (btn && isActive) {
         btn.style.background = 'rgba(125,166,216,0.11)';
-        btn.style.color = 'var(--g300)';
+        btn.style.color = '#7da6d8';
       }
     }
   }
+
   _applyRolUI() {
-  const funcionario = JSON.parse(localStorage.getItem('funcionario') || '{}');
-  const nombre = funcionario.nombre || 'Usuario';
-  const rol    = (funcionario.rol || '').toLowerCase();
+    const funcionario = JSON.parse(localStorage.getItem('funcionario') || '{}');
+    const nombre = funcionario.nombre || 'Usuario';
+    const rol    = (funcionario.rol   || '').toLowerCase();
 
-  // Nombre e iniciales en el avatar
-  const primerNombre = nombre.split(' ')[0];
-  const iniciales    = nombre.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
+    // ── Normalizar array de nombramientos ─────────────────────────────────
+    // Soporta: array directo, objeto con clave 'data', 'nombramientos', o 'rows'
+    let raw = null;
+    try { raw = JSON.parse(localStorage.getItem('nombramientos') || 'null'); } catch(e) {}
 
-  const navName   = this.querySelector('#navName');
-  const navAvatar = this.querySelector('#navAvatar');
-  if (navName)   navName.textContent   = primerNombre;
-  if (navAvatar) navAvatar.textContent = iniciales || '?';
-
-  // Roles sin nombramiento
-  const ROLES_ADMIN = ['rrhh', 'jefe', 'admin'];
-  if (ROLES_ADMIN.includes(rol)) {
-    // Ocultar el label de nombramiento en el pill
-    const pillNom = this.querySelector('#pillNomLabel');
-    if (pillNom) pillNom.style.display = 'none';
-
-    // Ocultar todo el dropdown de nombramientos
-    const dropdown = this.querySelector('.user-dropdown');
-    if (dropdown) dropdown.style.display = 'none';
-
-    // Mostrar el rol en su lugar dentro del pill
-    const pillText = this.querySelector('.user-pill-text');
-    if (pillText) {
-      const rolBadge = document.createElement('span');
-      rolBadge.style.cssText = 'font-size:8px;font-weight:400;color:rgba(125,166,216,0.45);letter-spacing:.1em;text-transform:uppercase;font-family:"DM Mono",monospace;';
-      rolBadge.textContent = rol === 'rrhh' ? 'RRHH' : rol.charAt(0).toUpperCase() + rol.slice(1);
-      pillText.appendChild(rolBadge);
+    let nombramientos = [];
+    if (Array.isArray(raw)) {
+      nombramientos = raw;
+    } else if (raw && typeof raw === 'object') {
+      // Si el backend devolvió { data: [...] } o { nombramientos: [...] }
+      nombramientos = raw.data || raw.nombramientos || raw.rows || [];
     }
 
-    // Deshabilitar el click del pill (no tiene dropdown que abrir)
-    const pill = this.querySelector('.user-pill');
-    if (pill) pill.style.cursor = 'default';
+    // ── DEBUG: ver qué hay en localStorage ───────────────────────────────
+    console.group('[Navbar] _applyRolUI');
+    console.log('funcionario:', funcionario);
+    console.log('nombramientos raw:', raw);
+    console.log('nombramientos normalizados:', nombramientos);
+    console.log('cantidad:', nombramientos.length);
+    console.groupEnd();
+
+    // ── Nombre e iniciales ────────────────────────────────────────────────
+    const primerNombre = nombre.split(' ')[0];
+    const iniciales    = nombre.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
+
+    const navName   = this.querySelector('#navName');
+    const navAvatar = this.querySelector('#navAvatar');
+    if (navName)   navName.textContent   = primerNombre;
+    if (navAvatar) navAvatar.textContent = iniciales || '?';
+
+    const pillNom  = this.querySelector('#pillNomLabel');
+    const dropdown = this.querySelector('#userDropdown');
+    const pill     = this.querySelector('.user-pill');
+
+    // ── Roles administrativos: sin nombramiento ───────────────────────────
+    const ROLES_ADMIN = ['rrhh', 'jefe', 'admin'];
+    if (ROLES_ADMIN.includes(rol)) {
+      if (pillNom) {
+        pillNom.textContent = rol === 'rrhh' ? 'RRHH' : rol.charAt(0).toUpperCase() + rol.slice(1);
+        pillNom.style.color = 'rgba(125,166,216,0.45)';
+        pillNom.style.letterSpacing = '.1em';
+        pillNom.style.textTransform = 'uppercase';
+        pillNom.style.fontFamily = '"DM Mono",monospace';
+      }
+      if (dropdown) dropdown.style.display = 'none';
+      if (pill)     pill.style.cursor = 'default';
+      if (pill)     pill.onclick = null;
+      return;
+    }
+
+    // ── Sin nombramientos en sesión ───────────────────────────────────────
+    if (!nombramientos || nombramientos.length === 0) {
+      const tipoNom = JSON.parse(localStorage.getItem('tipoNombramiento') || '{}');
+      if (pillNom) pillNom.textContent = tipoNom.nombre_tipo || '—';
+      if (dropdown) dropdown.style.display = 'none';
+      if (pill)     pill.style.cursor = 'default';
+      return;
+    }
+
+    // ── Nombramiento activo: cargar desde localStorage o usar el primero ──
+    let idActivo    = parseInt(localStorage.getItem('id_nombramiento_activo') || '0');
+    let indexActivo = nombramientos.findIndex(n => (n.id_historial_nombramiento ?? n.id_nombramiento) === idActivo);
+    if (indexActivo < 0) indexActivo = 0;
+
+    const nomActivo = nombramientos[indexActivo];
+    this._setNomActivo(nomActivo, false);
+
+    // ── Solo 1 nombramiento: sin dropdown ─────────────────────────────────
+    if (nombramientos.length === 1) {
+      if (dropdown) dropdown.style.display = 'none';
+      if (pill)     pill.style.cursor = 'default';
+      if (pill)     pill.onclick = null;
+      return;
+    }
+
+    // ── Más de 1: construir dropdown ──────────────────────────────────────
+    console.log('[Navbar] Construyendo dropdown con', nombramientos.length, 'nombramientos');
+    this._buildDropdown(nombramientos, indexActivo);
   }
-}
+
+  /** Actualiza el pill label con el nombramiento dado */
+  _setNomActivo(nom, dispatchEvent = true) {
+    const pillNom = this.querySelector('#pillNomLabel');
+
+    // Nombre del tipo — admite distintas claves que puedan venir del backend
+    const nombreTipo = nom.nombre_tipo
+      || nom.nombre_tipo_nombramiento
+      || nom.tipo
+      || '—';
+
+    if (pillNom) pillNom.textContent = nombreTipo;
+
+    // Guardar en localStorage para que cualquier página pueda leerlo
+    localStorage.setItem('tipoNombramiento', JSON.stringify(nom));
+    localStorage.setItem('id_nombramiento_activo', (nom.id_historial_nombramiento ?? nom.id_nombramiento ?? '').toString());
+
+    if (dispatchEvent) {
+      /**
+       * Evento: 'nombramiento-changed'
+       * detail: el objeto del nombramiento completo
+       * Las páginas (dashboard, saldo, etc.) escuchan este evento
+       * y recargan el saldo llamando a su propia API con el nuevo id_nombramiento
+       */
+      document.dispatchEvent(new CustomEvent('nombramiento-changed', {
+        detail: nom,
+        bubbles: true
+      }));
+    }
+  }
+
+  /** Construye el HTML del dropdown con todos los nombramientos */
+  _buildDropdown(nombramientos, indexActivo) {
+    const dropdown = this.querySelector('#userDropdown');
+    if (!dropdown) return;
+
+    let html = `<div class="ud-label">Tipo de nombramiento</div>`;
+
+    nombramientos.forEach((nom, i) => {
+      const nombreTipo = nom.nombre_tipo
+        || nom.nombre_tipo_nombramiento
+        || nom.tipo
+        || 'Nombramiento';
+
+      // Campos opcionales de contexto
+      const categoria    = nom.categoria || nom.tipo_funcionario || '';
+      const numNom       = nom.numero_nombramiento ? `Nº ${nom.numero_nombramiento}` : '';
+      const esPrueba     = nom.en_periodo_prueba ? '· Período de prueba' : '';
+      const subLinea     = [categoria, numNom, esPrueba].filter(Boolean).join('  ');
+
+      html += `
+        <div class="ud-pill ${i === indexActivo ? 'active' : ''}"
+             data-index="${i}"
+             onclick="window._navbarSelectNom(this, event)">
+          <span class="ud-pill-name">${nombreTipo}</span>
+          ${subLinea ? `<span class="ud-pill-sub">${subLinea}</span>` : ''}
+        </div>`;
+    });
+
+    dropdown.innerHTML = html;
+    dropdown.style.display = '';
+
+    // ── Handler global para selección ────────────────────────────────────
+    window._navbarSelectNom = (el, e) => {
+      if (e) e.stopPropagation();
+
+      const idx           = parseInt(el.dataset.index);
+      const nombramientos = JSON.parse(localStorage.getItem('nombramientos') || '[]');
+      const nomSeleccionado = nombramientos[idx];
+      if (!nomSeleccionado) return;
+
+      // Marcar activo visualmente en el dropdown
+      this.querySelectorAll('.ud-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+
+      // Actualizar pill + localStorage + disparar evento
+      this._setNomActivo(nomSeleccionado, true);
+
+      // Cerrar dropdown
+      const wrap = document.getElementById('userWrap');
+      if (wrap) wrap.classList.remove('open');
+    };
+  }
 }
 
 customElements.define('app-navbar', AppNavbar);
 
-// ── toggleGroup: llamado desde onclick="toggleGroup('id')" en cada página ──
+// ── toggleGroup ───────────────────────────────────────────────────────────────
 function toggleGroup(id) {
   document.querySelectorAll('.nav-group').forEach(g => {
     if (g.id !== 'grp-' + id) g.classList.remove('open');
@@ -290,14 +406,14 @@ function toggleGroup(id) {
   if (userWrap) userWrap.classList.remove('open');
 }
 
-// ── toggleUserMenu: llamado desde onclick="toggleUserMenu()" ──
+// ── toggleUserMenu ────────────────────────────────────────────────────────────
 function toggleUserMenu() {
   document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
   const wrap = document.getElementById('userWrap');
   if (wrap) wrap.classList.toggle('open');
 }
 
-// ── Cerrar al hacer click fuera ──
+// ── Cerrar al hacer click fuera ───────────────────────────────────────────────
 document.addEventListener('click', function(e) {
   if (!e.target.closest('.nav-group')) {
     document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));

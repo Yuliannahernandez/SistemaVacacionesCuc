@@ -157,17 +157,20 @@ exports.login = async (req, res) => {
             tipoNombramiento = tn[0] || null;
         }
 
-        // Historial de nombramientos (un usuario puede tener varios)
+        // Cambio Yuliana
+        // Nombramientos activos del funcionario
         const [nombramientos] = await db.query(
-            `SELECT hn.id_historial_nombramiento, hn.fecha_inicio_nombramiento,
-                    hn.fecha_fin_nombramiento, hn.numero_nombramiento,
-                    hn.motivo_cambio, hn.observaciones, hn.fecha_registro,
-                    tn.id_tipo_nombramiento, tn.nombre_tipo,
-                    tn.es_docente_interino, tn.dias_vacaciones_anuales
-             FROM historial_nombramientos hn
-             JOIN tipos_nombramiento tn ON hn.id_tipo_nombramiento_nuevo = tn.id_tipo_nombramiento
-             WHERE hn.id_funcionario = ?
-             ORDER BY hn.fecha_inicio_nombramiento DESC`,
+            `SELECT fn.id_nombramiento, fn.numero_nombramiento,
+            fn.fecha_nombramiento, fn.fecha_fin_nombramiento,
+            fn.en_periodo_prueba, fn.es_activo,
+            tn.id_tipo_nombramiento, tn.nombre_tipo,
+            tn.es_docente_interino, tn.dias_vacaciones_anuales,
+            tn.dias_acumulacion_mensual_tramo1,
+            tn.dias_acumulacion_mensual_tramo2
+     FROM funcionarios_nombramientos fn
+     JOIN tipos_nombramiento tn ON fn.id_tipo_nombramiento = tn.id_tipo_nombramiento
+     WHERE fn.id_funcionario = ? AND fn.es_activo = 1
+     ORDER BY fn.fecha_nombramiento DESC`,
             [funcionario.id_funcionario]
         );
 
