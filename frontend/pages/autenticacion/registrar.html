@@ -1430,85 +1430,8 @@
   <div class="bg"></div>
   <div class="toast" id="toast"></div>
 
-  <!-- ══ TOPNAV ══ -->
-  <nav class="topnav">
-    <div class="nav-logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          <polyline points="9 22 9 12 15 12 15 22" />
-        </svg>
-      </div>
-      <div class="logo-text">
-        <strong>SIGEVAC</strong>
-        <small>Sistema de Gestión de Vacaciones</small>
-      </div>
-    </div>
-
-    <div class="nav-vdiv"></div>
-
-    <div class="nav-links">
-      <a class="nav-link" href="/frontend/pages/dashboard.html">
-        <svg viewBox="0 0 24 24">
-          <rect x="3" y="3" width="7" height="7" />
-          <rect x="14" y="3" width="7" height="7" />
-          <rect x="14" y="14" width="7" height="7" />
-          <rect x="3" y="14" width="7" height="7" />
-        </svg>
-        Dashboard
-      </a>
-      <a class="nav-link nav-link--active" href="#">
-        <svg viewBox="0 0 24 24">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <line x1="19" y1="8" x2="19" y2="14" />
-          <line x1="22" y1="11" x2="16" y2="11" />
-        </svg>
-        Registro de Funcionario
-      </a>
-    </div>
-
-    <div class="nav-right">
-      <!-- Pill usuario -->
-      <div class="user-pill">
-        <div class="avatar" id="navAvatar">?</div>
-        <div>
-          <div class="user-pill-name" id="navName">Cargando…</div>
-          <div class="user-pill-nom" id="pillNomLabel"></div>
-        </div>
-      </div>
-
-      <div class="nav-sep"></div>
-
-      <!-- Tema -->
-      <div class="action-btn" onclick="toggleTheme()" title="Cambiar tema">
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="5" />
-          <line x1="12" y1="1" x2="12" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="23" />
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-          <line x1="1" y1="12" x2="3" y2="12" />
-          <line x1="21" y1="12" x2="23" y2="12" />
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-        </svg>
-        Tema
-      </div>
-
-      <div class="nav-sep"></div>
-
-      <!-- Cerrar sesión -->
-      <div class="action-btn logout" onclick="window.logout()" title="Cerrar sesión">
-        <svg viewBox="0 0 24 24">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" y1="12" x2="9" y2="12" />
-        </svg>
-        Cerrar sesión
-      </div>
-    </div>
-  </nav>
+  <!-- ══ NAVBAR (componente compartido) ══ -->
+  <app-navbar></app-navbar>
 
   <!-- ══ MODAL CONFIRMACIÓN — Paso 12 / MSG-REG-001 ══ -->
   <div class="modal-overlay" id="modalConfirm">
@@ -1985,8 +1908,8 @@
     </div>
   </div>
 
+  <script src="../../components/navbar.js"></script>
   <script>
-    // SIGEVAC — registrar.html — RQ-SVC-2026-1 — v3
     // Wizard 2 pasos + múltiples nombramientos + todas las validaciones V1-V10
 
     var API_BASE = (function () {
