@@ -1132,7 +1132,7 @@
     <div class="layout">
         <main class="main">
             <div class="greeting">
-                <h1>Buen día, <em>Yuliana</em></h1>
+                <h1 id="greetTitle">Buen día, <em id="greetName">...</em></h1>
                 <p id="greetDate"></p>
             </div>
 
@@ -1170,17 +1170,17 @@
             <div class="glass-card">
                 <div class="card-label">Accesos rápidos</div>
                 <div class="quick-grid">
-                    <div class="q-btn"><svg viewBox="0 0 24 24">
+                    <div class="q-btn"  onclick="window.location.href='solicitudes/registrar.html'"><svg viewBox="0 0 24 24">
                             <path d="M12 5v14M5 12h14" />
                         </svg><span>Nueva solicitud</span></div>
-                    <div class="q-btn"><svg viewBox="0 0 24 24">
+                    <div class="q-btn"onclick="window.location.href='solicitudes/consultar.html'"><svg viewBox="0 0 24 24">
                             <path d="M9 11l3 3L22 4" />
                             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                         </svg><span>Mis solicitudes</span></div>
-                    <div class="q-btn"><svg viewBox="0 0 24 24">
+                    <div class="q-btn"onclick="window.location.href='solicitudes/historial.html'"><svg viewBox="0 0 24 24">
                             <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
                         </svg><span>Historial</span></div>
-                    <div class="q-btn"><svg viewBox="0 0 24 24">
+                    <div class="q-btn"onclick="window.location.href='reportes/index.html'"><svg viewBox="0 0 24 24">
                             <path d="M18 20V10M12 20V4M6 20v-6" />
                         </svg><span>Reportes</span></div>
                 </div>
@@ -1244,6 +1244,12 @@
         const fdc = fd.charAt(0).toUpperCase() + fd.slice(1);
         document.getElementById('navDate').textContent = fdc;
         document.getElementById('greetDate').textContent = fdc;
+
+        // Leer funcionario del localStorage y mostrar su nombre en el saludo
+const funcionario = JSON.parse(localStorage.getItem('funcionario') || '{}');
+const nombre = funcionario.nombre || 'Usuario';
+// Tomar solo el primer nombre
+document.getElementById('greetName').textContent = nombre.split(' ')[0];
 
         function toggleGroup(id) {
             const grp = document.getElementById('grp-' + id);
