@@ -512,13 +512,13 @@ tbody tr:hover td{background:var(--g050)}
 <app-navbar></app-navbar>
 
 <script>
-// FECHA NAV
+// ─── CÓDIGO ORIGINAL (sin modificar) ────────────────────────────────────────
+
 const today = new Date();
 const fd = today.toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 document.getElementById('navDate').textContent = fd.charAt(0).toUpperCase()+fd.slice(1);
 document.getElementById('alertFecha').textContent = today.toLocaleDateString('es-CR');
 
-// NAV GROUPS
 function toggleGroup(id){
   const grp = document.getElementById('grp-'+id);
   const isOpen = grp.classList.contains('open');
@@ -536,7 +536,6 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('.user-wrap')) document.getElementById('userWrap').classList.remove('open');
 });
 
-// THEME
 function toggleTheme(){
   const html=document.documentElement;
   const dark=html.getAttribute('data-theme')==='dark';
@@ -548,7 +547,6 @@ function toggleTheme(){
 }
 function logout(){ if(confirm('¿Cerrar sesión?')) window.location.href='/frontend/pages/autenticacion/login.html'; }
 
-// VIEWS
 const VIEWS=['saldo','acumulacion','descuento','historial','simulacion'];
 function showView(v){
   VIEWS.forEach(id=>{
@@ -563,7 +561,6 @@ function showView(v){
   if(v==='saldo') setTimeout(()=>updateRing(curNom),80);
 }
 
-// NOM
 const NOM_DATA={
   propiedad:{disp:15,acum:20,disf:5,regla:'PA-GIRH-10\n1–5 años · Admin.',antig:'3 años',maxDias:30},
   interino:{disp:4,acum:6,disf:2,regla:'PA-GIRH-10\n1–5 años · Doc. Interino',antig:'2 años',maxDias:30}
@@ -656,9 +653,154 @@ function calcSim(){
   document.getElementById('sf-total').textContent='₡'+fmt(monto);
 }
 
-// INIT
 updateSaldoView();
 setTimeout(()=>updateRing(curNom),200);
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ── NOELIA · Integración con API real — RQ-01, RQ-02, RQ-03 ─────────────────
+// Solo se agrega lógica de fetch. No se modifica nada del código de arriba.
+// Si la sesión no está disponible o el servidor falla, la página queda igual.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Obtiene el id_funcionario desde la sesión.
+ * session.js del proyecto expone window.SESSION con los datos del usuario.
+ */
+function _getFuncId() {
+  // Forma principal: session.js guarda en window.SESSION
+  if (window.SESSION && window.SESSION.id_funcionario) return window.SESSION.id_funcionario;
+  // Fallback: buscar en storage con las claves del proyecto
+  try {
+    for (const store of [localStorage, sessionStorage]) {
+      for (const key of ['session', 'user', 'userData']) {
+        const v = JSON.parse(store.getItem(key) || 'null');
+        if (v && v.id_funcionario) return v.id_funcionario;
+      }
+    }
+  } catch(e) {}
+  return null;
+}
+
+// ── RQ-02 · Cálculo de Saldo — GET /api/saldo/calculo ──────────────────────
+async function noeliaCargarSaldo() {
+  const id = _getFuncId();
+  if (!id) return; // sin sesión → se mantienen los datos mock originales
+
+  try {
+    const res = await fetch(`/api/saldo/calculo?id_funcionario=${id}`, { credentials: 'include' });
+    if (!res.ok) return;
+    const { funcionario: f, calculo_saldo: cs } = await res.json();
+
+    // Actualizar cards superiores
+    document.getElementById('s-acum').textContent = cs.dias_acumulados;
+    document.getElementById('s-disf').textContent = cs.dias_disfrutados;
+    document.getElementById('s-rest').textContent = cs.dias_disponibles;
+    document.getElementById('s-regla').innerHTML  =
+      `${f.tipo_nombramiento}<br><small style="font-size:9px">${f.departamento}</small>`;
+    document.getElementById('s-antig').textContent =
+      `Antigüedad: ${f.antiguedad_anios ?? f.anios_servicio} años`;
+    document.getElementById('s-acum-sub').textContent =
+      `${cs.regla} · ${cs.fecha_calculo?.slice(0,4) ?? ''}`;
+    const pct = cs.dias_acumulados > 0
+      ? Math.round((cs.dias_disponibles / cs.dias_acumulados) * 100) : 0;
+    document.getElementById('s-rest-sub').textContent = `${pct}% disponible · 30 días máx.`;
+
+    // Barras de progreso
+    setTimeout(() => {
+      document.getElementById('sb-acum').style.width = Math.min((cs.dias_acumulados/30)*100,100)+'%';
+      document.getElementById('sb-disf').style.width = Math.min((cs.dias_disfrutados/30)*100,100)+'%';
+      document.getElementById('sb-rest').style.width = Math.min((cs.dias_disponibles/30)*100,100)+'%';
+    }, 80);
+
+    // Mini-stats y ring
+    document.getElementById('sc-acum').textContent  = cs.dias_acumulados;
+    document.getElementById('sc-disf').textContent  = cs.dias_disfrutados;
+    document.getElementById('ringNomLabel').textContent = f.tipo_nombramiento ?? '—';
+    const circ = 2 * Math.PI * 44;
+    document.getElementById('ringFill').style.strokeDashoffset =
+      circ - (circ * Math.min(cs.dias_disponibles / 30, 1));
+    document.getElementById('ringVal').textContent = cs.dias_disponibles;
+
+    // Alerta vencimiento
+    document.getElementById('alertVencimiento').style.display =
+      (cs.dias_disponibles > 0 && cs.dias_disponibles < 5) ? 'flex' : 'none';
+
+    // Tabla de períodos: reemplazar fila mock con dato real
+    const tbody = document.getElementById('tbodyPeriodos');
+    tbody.innerHTML = '';
+    const badgeEstado = cs.dias_disponibles > 0
+      ? '<span class="badge ok">Vigente</span>'
+      : '<span class="badge zero">Agotado</span>';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-year">${cs.fecha_calculo?.slice(0,4) ?? '2026'}</td>
+      <td><span class="td-num g">${cs.dias_acumulados}</span></td>
+      <td><span class="td-num">—</span></td>
+      <td><span class="td-num">${cs.dias_disfrutados}</span></td>
+      <td><span class="td-num g">${cs.dias_disponibles}</span></td>
+      <td><span class="rule-chip">${cs.regla}</span></td>
+      <td>${badgeEstado}</td>`;
+    tbody.appendChild(tr);
+
+    // Sincronizar panel Acumulación
+    document.getElementById('acumSaldoTotal').textContent = cs.dias_disponibles;
+    document.getElementById('reglaTxt').innerHTML =
+      `<strong style="font-weight:400;color:var(--g700)">${f.tipo_nombramiento}</strong><br>
+       Antigüedad: ${f.antiguedad_anios ?? f.anios_servicio} años<br>${cs.regla}`;
+
+  } catch (err) {
+    console.warn('[NOELIA] noeliaCargarSaldo:', err.message);
+  }
+}
+
+// ── RQ-01 · Acumulación Mensual — POST /api/saldo/acumulacion ───────────────
+async function noeliaAcumular() {
+  const id = _getFuncId();
+  if (!id) return;
+  try {
+    const res = await fetch('/api/saldo/acumulacion', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_funcionario: id })
+    });
+    if (res.ok) {
+      console.info('[NOELIA] Acumulación procesada:', await res.json());
+      noeliaCargarSaldo(); // refrescar pantalla después de acumular
+    }
+  } catch (err) {
+    console.warn('[NOELIA] noeliaAcumular:', err.message);
+  }
+}
+
+// ── RQ-03 · Descuento por Disfrute — PATCH /api/saldo/descuento/:id ─────────
+// Se expone como función global para que aprobacion.html la pueda llamar
+// cuando aprueba una solicitud: await noeliaRegistrarDescuento(id_solicitud)
+window.noeliaRegistrarDescuento = async function(id_solicitud) {
+  if (!id_solicitud) return { ok: false, error: 'id_solicitud requerido' };
+  try {
+    const res = await fetch(`/api/saldo/descuento/${id_solicitud}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      console.info('[NOELIA] Descuento registrado:', data);
+      noeliaCargarSaldo(); // refrescar saldo en pantalla
+      return { ok: true, data };
+    }
+    return { ok: false, error: data.error };
+  } catch (err) {
+    console.warn('[NOELIA] noeliaRegistrarDescuento:', err.message);
+    return { ok: false, error: err.message };
+  }
+};
+
+// ── Iniciar carga de datos reales al abrir la página ────────────────────────
+// setTimeout de 300ms para que session.js termine de poblar window.SESSION
+setTimeout(noeliaCargarSaldo, 300);
 </script>
 </body>
 </html>

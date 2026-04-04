@@ -7,13 +7,17 @@ const {
   crearColectiva,
   desactivarColectiva,
   simularLiquidacion,
+  
+  acumularVacaciones,
+  calcularSaldoVacaciones,
+  registrarDescuentoVacaciones,
 } = require('./controllers/saldo.controller');
-// ── Saldo propio del funcionario ──────────────────────────────────────────────
-// GET /api/saldo/mio?id_funcionario=X
+
+
+
 router.get("/mio", obtenerSaldoPropio);
 
-// ── Historial por departamento (Jefe / RRHH) ──────────────────────────────────
-// GET /api/saldo/departamento?id_departamento=X
+
 router.get("/departamento", historialPorDepartamento);
 
 // ── Vacaciones colectivas ─────────────────────────────────────────────────────
@@ -24,8 +28,18 @@ router.post("/colectivas", crearColectiva);
 // DELETE /api/saldo/colectivas/:id
 router.delete("/colectivas/:id", desactivarColectiva);
 
-// ── Simulación de liquidación ─────────────────────────────────────────────────
-// GET /api/saldo/liquidacion?id_funcionario=X
+
 router.get("/liquidacion", simularLiquidacion);
+
+
+router.post("/acumulacion", acumularVacaciones);
+
+// ── RQ-02 · Cálculo de Saldo de Vacaciones ───────────────────────────────────
+
+router.get("/calculo", calcularSaldoVacaciones);
+
+// ── RQ-03 · Descuento por Disfrute de Vacaciones ─────────────────────────────
+
+router.patch("/descuento/:id_solicitud", registrarDescuentoVacaciones);
 
 module.exports = router;
