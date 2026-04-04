@@ -8,15 +8,8 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
-  /* Paleta azul */
-  --g900:#001f52;
-  --g800:#002D72;
-  --g700:#1a5ba8;
-  --g500:#2d7dd2;
-  --g300:#7da6d8;
-  --g100:#ccddf0;
-  --g050:#e8f0fa;
- 
+  --g900:#001f52;--g800:#002D72;--g700:#1a5ba8;--g500:#2d7dd2;
+  --g300:#7da6d8;--g100:#ccddf0;--g050:#e8f0fa;
   --gold:#b8922a;--gold-bg:rgba(185,150,60,0.1);
   --bone:#f4f6fb;--text:#001530;--muted:rgba(0,30,80,0.45);--dim:rgba(0,30,80,0.22);
   --red:#E4002B;--red-bg:rgba(228,0,43,0.08);
@@ -31,67 +24,61 @@
 }
 html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bone);color:var(--text);transition:background .3s,color .3s}
 body{overflow-x:hidden}
- 
 .bg{position:fixed;inset:0;z-index:0;background:var(--bone);transition:background .3s}
 .bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 40% at 80% 5%,rgba(45,125,210,0.07) 0%,transparent 60%),radial-gradient(ellipse 30% 50% at 5% 95%,rgba(26,91,168,0.05) 0%,transparent 55%)}
- 
-/* TOPNAV */
-.topnav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:200;display:flex;align-items:center;padding:0 20px;gap:0;background:rgba(26,51,38,0.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.05)}
+.topnav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:200;display:flex;align-items:center;padding:0 20px;background:rgba(0,45,114,0.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.05)}
 .nav-logo{display:flex;align-items:center;gap:10px;margin-right:20px;flex-shrink:0}
 .logo-icon{width:29px;height:29px;border-radius:8px;background:linear-gradient(135deg,var(--g500),var(--g300));display:flex;align-items:center;justify-content:center}
 .logo-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round}
-.logo-text strong{font-family:'DM Mono',monospace;font-size:12px;font-weight:400;color:rgba(214,237,224,0.9);letter-spacing:.1em;display:block;line-height:1}
-.logo-text small{font-size:8px;font-weight:300;color:rgba(140,201,163,0.3);letter-spacing:.18em;text-transform:uppercase}
+.logo-text strong{font-family:'DM Mono',monospace;font-size:12px;font-weight:400;color:rgba(204,220,240,0.9);letter-spacing:.1em;display:block;line-height:1}
+.logo-text small{font-size:8px;font-weight:300;color:rgba(125,166,216,0.3);letter-spacing:.18em;text-transform:uppercase}
 .nav-vdiv{width:1px;height:18px;background:rgba(255,255,255,0.07);margin-right:16px;flex-shrink:0}
 .nav-links{display:flex;align-items:center;gap:1px;flex:1}
-.nav-link{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.4);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap}
+.nav-link{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.4);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap}
 .nav-link svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;flex-shrink:0}
-.nav-link:hover{background:rgba(255,255,255,0.06);color:rgba(214,237,224,0.7)}
-.nav-link.active{background:rgba(140,201,163,0.11);color:var(--g300);border:1px solid rgba(140,201,163,0.13)}
+.nav-link:hover{background:rgba(255,255,255,0.06);color:rgba(204,220,240,0.7)}
+.nav-link.active{background:rgba(125,166,216,0.11);color:var(--g300);border:1px solid rgba(125,166,216,0.13)}
 .nav-group{position:relative;flex-shrink:0}
-.nav-group-btn{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.4);cursor:pointer;transition:var(--trans);white-space:nowrap;user-select:none}
+.nav-group-btn{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.4);cursor:pointer;transition:var(--trans);white-space:nowrap;user-select:none}
 .nav-group-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;flex-shrink:0}
 .nav-chevron{margin-left:2px;transition:transform .2s;opacity:.5}
-.nav-group-btn:hover{background:rgba(255,255,255,0.06);color:rgba(214,237,224,0.7)}
-.nav-group.open .nav-group-btn{background:rgba(140,201,163,0.11);color:var(--g300)}
+.nav-group-btn:hover{background:rgba(255,255,255,0.06);color:rgba(204,220,240,0.7)}
+.nav-group.open .nav-group-btn{background:rgba(125,166,216,0.11);color:var(--g300)}
 .nav-group.open .nav-chevron{transform:rotate(180deg)}
-.nav-submenu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:rgba(22,44,32,0.97);backdrop-filter:blur(16px);border:1px solid rgba(140,201,163,0.1);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,0.25);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+.nav-submenu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,0.25);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
 .nav-group.open .nav-submenu{opacity:1;transform:translateY(0);pointer-events:all}
-.nav-sub-item{display:block;padding:8px 12px;border-radius:8px;font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.5);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap}
-.nav-sub-item:hover{background:rgba(140,201,163,0.1);color:rgba(214,237,224,0.85)}
-.nav-sub-item.active{background:rgba(74,140,101,0.15);color:var(--g300)}
+.nav-sub-item{display:block;padding:8px 12px;border-radius:8px;font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.5);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap}
+.nav-sub-item:hover{background:rgba(125,166,216,0.1);color:rgba(204,220,240,0.85)}
 .nav-right{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0}
-.nav-date{font-size:9.5px;font-weight:300;color:rgba(140,201,163,0.3);font-family:'DM Mono',monospace;margin-right:6px;white-space:nowrap}
+.nav-date{font-size:9.5px;font-weight:300;color:rgba(125,166,216,0.3);font-family:'DM Mono',monospace;margin-right:6px;white-space:nowrap}
 .nav-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--trans);position:relative}
 .nav-btn:hover{background:rgba(255,255,255,0.09)}
-.nav-btn svg{width:13px;height:13px;stroke:rgba(140,201,163,0.5);fill:none;stroke-width:1.5;stroke-linecap:round}
-.notif-dot{position:absolute;top:6px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--g500);border:1.5px solid var(--g900)}
-.action-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:300;color:rgba(140,201,163,0.38);transition:var(--trans);white-space:nowrap}
+.nav-btn svg{width:13px;height:13px;stroke:rgba(125,166,216,0.5);fill:none;stroke-width:1.5;stroke-linecap:round}
+.notif-dot{position:absolute;top:6px;right:6px;width:5px;height:5px;border-radius:50%;background:#E4002B;border:1.5px solid #002D72}
+.action-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:300;color:rgba(125,166,216,0.38);transition:var(--trans);white-space:nowrap}
 .action-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;flex-shrink:0}
-.action-btn:hover{background:rgba(255,255,255,0.05);color:rgba(214,237,224,0.62)}
-.action-btn.logout:hover{color:rgba(255,110,90,0.6)}
+.action-btn:hover{background:rgba(255,255,255,0.05);color:rgba(204,220,240,0.62)}
+.action-btn.logout:hover{color:rgba(228,0,43,0.7)}
 .user-wrap{position:relative;margin-left:3px}
 .user-pill{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 5px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);cursor:pointer;transition:var(--trans)}
 .user-pill:hover{background:rgba(255,255,255,0.08)}
-.avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--g700),var(--g500));display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:500;color:#fff;flex-shrink:0}
+.user-wrap.open .user-pill{background:rgba(125,166,216,0.1);border-color:rgba(125,166,216,0.15)}
+.avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#001f52,#1a5ba8);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:500;color:#fff;flex-shrink:0}
 .user-pill-text{display:flex;flex-direction:column}
-.user-pill-name{font-size:11px;font-weight:300;color:rgba(214,237,224,0.62);line-height:1.1}
-.user-pill-nom{font-size:8.5px;font-weight:300;color:rgba(140,201,163,0.35);letter-spacing:.04em}
-.user-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:180px;background:rgba(22,44,32,0.97);backdrop-filter:blur(16px);border:1px solid rgba(140,201,163,0.1);border-radius:12px;padding:8px;box-shadow:0 12px 32px rgba(0,0,0,0.25);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+.user-pill-name{font-size:11px;font-weight:300;color:rgba(204,220,240,0.62);line-height:1.1}
+.user-pill-nom{font-size:8.5px;font-weight:300;color:rgba(125,166,216,0.35);letter-spacing:.04em}
+.user-dropdown{position:absolute;top:calc(100% + 7px);right:0;min-width:220px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:14px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,0.28);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
 .user-wrap.open .user-dropdown{opacity:1;transform:translateY(0);pointer-events:all}
-.ud-label{font-size:8px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:rgba(140,201,163,0.3);font-family:'DM Mono',monospace;padding:4px 8px 6px}
-.ud-pill{padding:8px 10px;border-radius:8px;cursor:pointer;transition:var(--trans)}
-.ud-pill:hover{background:rgba(140,201,163,0.08)}
-.ud-pill.active{background:rgba(74,140,101,0.15)}
-.ud-pill-name{font-size:11.5px;font-weight:300;color:rgba(214,237,224,0.7);display:block}
-.ud-pill-sub{font-size:9px;font-weight:300;color:rgba(140,201,163,0.35);font-family:'DM Mono',monospace}
-
-/* LAYOUT */
+.ud-label{font-size:8px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(125,166,216,0.3);margin-bottom:8px;padding:0 4px;font-family:'DM Mono',monospace}
+.ud-pill{display:flex;flex-direction:column;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid transparent;cursor:pointer;transition:var(--trans);margin-bottom:4px}
+.ud-pill:hover{background:rgba(125,166,216,0.08)}
+.ud-pill.active{background:rgba(26,91,168,0.15);border-color:rgba(125,166,216,0.18)}
+.ud-pill-name{font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.55)}
+.ud-pill.active .ud-pill-name{color:var(--g300)}
+.ud-pill-sub{font-size:9px;font-weight:300;color:rgba(125,166,216,0.28);margin-top:1px}
 .layout{position:relative;z-index:10;margin-top:var(--nav-h);height:calc(100vh - var(--nav-h));display:flex;overflow:hidden}
-
-/* TAB SIDEBAR */
-.tab-rail{width:56px;flex-shrink:0;background:rgba(26,51,38,0.04);border-right:1px solid var(--dim);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px}
-[data-theme="dark"] .tab-rail{background:rgba(0,0,0,0.15);border-right-color:rgba(140,201,163,0.08)}
+.tab-rail{width:56px;flex-shrink:0;background:rgba(0,45,114,0.04);border-right:1px solid var(--dim);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px}
+[data-theme="dark"] .tab-rail{background:rgba(0,0,0,0.15);border-right-color:rgba(125,166,216,0.08)}
 .tab-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--trans);position:relative}
 .tab-icon svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:1.5;stroke-linecap:round;transition:var(--trans)}
 .tab-icon:hover{background:var(--g050)}
@@ -101,13 +88,9 @@ body{overflow-x:hidden}
 .tab-icon .tab-tt{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--g900);color:var(--g300);font-size:9.5px;font-weight:300;padding:5px 9px;border-radius:7px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;font-family:'DM Mono',monospace}
 .tab-icon:hover .tab-tt{opacity:1}
 .tab-divider{width:22px;height:1px;background:var(--dim);margin:4px 0}
-
-/* MAIN AREA */
 .main{flex:1;overflow-y:auto;overflow-x:hidden;padding:22px 24px;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
 .main::-webkit-scrollbar{width:4px}
 .main::-webkit-scrollbar-thumb{background:var(--dim);border-radius:4px}
-
-/* PAGE HEADER */
 .page-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;animation:fadeUp .35s both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .page-hd-left h1{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text)}
@@ -116,17 +99,12 @@ body{overflow-x:hidden}
 .page-hd-left p{font-size:10px;font-weight:300;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px}
 .breadcrumb{display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:300;color:var(--dim);font-family:'DM Mono',monospace;margin-bottom:6px}
 .breadcrumb span{color:var(--muted)}
-
-/* NOM SELECTOR */
-.nom-strip{display:flex;gap:8px;margin-bottom:20px;animation:fadeUp .35s .05s both}
+.nom-strip{display:flex;gap:8px;margin-bottom:20px;animation:fadeUp .35s .05s both;flex-wrap:wrap;min-height:38px}
 .nom-chip{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:30px;background:var(--g050);border:1px solid var(--g100);cursor:pointer;transition:var(--trans);font-size:11px;font-weight:300;color:var(--muted)}
 .nom-chip:hover{background:var(--g100);color:var(--text)}
 .nom-chip.active{background:var(--g800);border-color:transparent;color:var(--g300)}
-[data-theme="dark"] .nom-chip.active{background:rgba(74,140,101,0.25)}
 .nom-chip-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.6}
 .nom-chip.active .nom-chip-dot{opacity:1;background:var(--g300)}
-
-/* SUMMARY ROW */
 .summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;animation:fadeUp .35s .08s both}
 .sum-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:16px 18px;transition:background .3s,box-shadow .2s;cursor:default}
 .sum-card:hover{box-shadow:0 4px 18px rgba(0,0,0,0.07)}
@@ -135,15 +113,10 @@ body{overflow-x:hidden}
 [data-theme="dark"] .sum-val{color:var(--g300)}
 .sum-val.highlight{color:var(--g700)}
 [data-theme="dark"] .sum-val.highlight{color:var(--g300)}
-.sum-val.gold{color:var(--gold)}
 .sum-sub{font-size:9.5px;font-weight:300;color:var(--muted)}
 .sum-bar{height:2px;background:var(--g100);border-radius:2px;margin-top:10px;overflow:hidden}
 .sum-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--g700),var(--g500));transition:width 1.4s cubic-bezier(.16,1,.3,1)}
-
-/* CONTENT GRID */
 .content-grid{display:grid;grid-template-columns:1fr 340px;gap:14px;animation:fadeUp .35s .12s both}
-
-/* PANELS */
 .panel{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:var(--radius);overflow:hidden;transition:background .3s}
 .panel-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--dim)}
 .panel-title{font-size:9px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace}
@@ -153,8 +126,6 @@ body{overflow-x:hidden}
 .p-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round}
 .p-btn.primary{background:var(--g800);border-color:transparent;color:var(--g300)}
 .p-btn.primary:hover{background:var(--g700)}
-
-/* TABLE */
 .tbl-wrap{overflow-x:auto;padding:0 18px 14px}
 table{width:100%;border-collapse:collapse;margin-top:2px}
 thead th{font-size:8.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:10px 10px 7px;text-align:left;border-bottom:1px solid var(--dim);white-space:nowrap;font-family:'DM Mono',monospace}
@@ -162,24 +133,18 @@ tbody td{font-size:11px;font-weight:300;color:var(--text);padding:9px 10px;borde
 [data-theme="dark"] tbody td{border-bottom-color:rgba(255,255,255,0.04)}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:var(--g050)}
-[data-theme="dark"] tbody tr:hover td{background:rgba(74,140,101,0.06)}
 .td-year{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
 .td-num{font-family:'DM Serif Display',serif;font-size:16px}
 .td-num.g{color:var(--g700)}
 [data-theme="dark"] .td-num.g{color:var(--g300)}
 .td-num.r{color:#c0392b}
-.td-num.gold{color:var(--gold)}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:400;letter-spacing:.04em}
-.badge.ok{background:rgba(74,140,101,0.1);color:var(--g700)}
-[data-theme="dark"] .badge.ok{background:rgba(74,140,101,0.2);color:var(--g300)}
+.badge.ok{background:rgba(45,125,210,0.1);color:var(--g700)}
+[data-theme="dark"] .badge.ok{color:var(--g300)}
 .badge.warn{background:var(--gold-bg);color:var(--gold)}
 .badge.zero{background:rgba(180,60,60,0.08);color:#c0392b}
 .rule-chip{font-size:9px;font-weight:300;color:var(--dim);font-family:'DM Mono',monospace;background:var(--g050);padding:2px 7px;border-radius:4px}
-
-/* RIGHT COLUMN */
 .right-col{display:flex;flex-direction:column;gap:12px}
-
-/* SALDO VIVO */
 .saldo-live{padding:18px}
 .ring-wrap{display:flex;justify-content:center;margin:10px 0 14px}
 .ring-svg{width:110px;height:110px}
@@ -193,50 +158,35 @@ tbody tr:hover td{background:var(--g050)}
 .stat-cell-val{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text)}
 [data-theme="dark"] .stat-cell-val{color:var(--g300)}
 .stat-cell-sub{font-size:9px;font-weight:300;color:var(--muted)}
-
-/* SIMULACION */
 .sim-card{padding:16px}
 .sim-tag{display:inline-flex;align-items:center;gap:5px;font-size:8.5px;font-weight:300;color:var(--gold);background:var(--gold-bg);padding:3px 8px;border-radius:5px;margin-bottom:10px;font-family:'DM Mono',monospace}
 .sim-tag svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:1.8}
 .sim-amount{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text);line-height:1;margin-bottom:4px}
-[data-theme="dark"] .sim-amount{color:var(--g300)}
 .sim-amount span{font-size:13px;font-weight:300;color:var(--muted);font-family:'DM Sans',sans-serif}
 .sim-detail{font-size:9.5px;font-weight:300;color:var(--muted);margin-bottom:12px;line-height:1.5}
 .sim-formula{background:var(--g050);border:1px solid var(--g100);border-radius:8px;padding:10px 12px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.7}
 .sim-formula strong{color:var(--g500);font-weight:400}
 .sim-note{font-size:8.5px;color:var(--dim);margin-top:8px;line-height:1.5;padding:7px 10px;background:var(--gold-bg);border-radius:7px;border-left:2px solid var(--gold)}
-
-/* ALERTAS */
 .alert-strip{padding:14px 16px;display:flex;flex-direction:column;gap:6px}
 .alert-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,0.35);border:1px solid rgba(255,255,255,0.55)}
-[data-theme="dark"] .alert-item{background:rgba(35,68,51,0.14);border-color:rgba(140,201,163,0.07)}
+[data-theme="dark"] .alert-item{background:rgba(0,45,114,0.14);border-color:rgba(125,166,216,0.07)}
 .alert-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .alert-icon svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round}
 .alert-icon.warn{background:var(--gold-bg);color:var(--gold)}
-.alert-icon.info{background:rgba(74,140,101,0.1);color:var(--g500)}
+.alert-icon.info{background:rgba(45,125,210,0.1);color:var(--g500)}
 .alert-text{font-size:10px;font-weight:300;color:var(--text);line-height:1.4}
 .alert-text small{display:block;font-size:8.5px;color:var(--muted);font-family:'DM Mono',monospace}
-
-/* FILTER BAR */
 .filter-bar{display:flex;gap:8px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--dim);flex-wrap:wrap}
 .filter-select{appearance:none;background:var(--g050);border:1px solid var(--g100);border-radius:8px;padding:5px 10px;font-size:10.5px;font-weight:300;color:var(--text);font-family:'DM Sans',sans-serif;cursor:pointer;transition:var(--trans);outline:none}
 .filter-select:focus{border-color:var(--g500)}
 .filter-label{font-size:9px;font-weight:300;color:var(--dim);font-family:'DM Mono',monospace;white-space:nowrap}
 .filter-divider{width:1px;height:14px;background:var(--dim);margin:0 4px}
-
-/* TOOLTIP */
-.tt{position:fixed;z-index:9999;background:var(--g900);border-radius:9px;padding:8px 13px;pointer-events:none;white-space:nowrap;opacity:0;transform:translateY(4px);transition:opacity .14s,transform .14s;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
-.tt.show{opacity:1;transform:translateY(0)}
-.tt strong{display:block;font-size:10px;font-weight:400;color:var(--g300);margin-bottom:2px}
-.tt span{font-size:9px;font-weight:300;color:rgba(140,201,163,0.5)}
+.loading-row td{text-align:center;color:var(--muted);padding:24px;font-family:'DM Mono',monospace;font-size:10px}
 </style>
 </head>
 <body>
 <div class="bg"></div>
-<div class="tt" id="tt"><strong id="ttTitle"></strong><span id="ttBody"></span></div>
 
-
-<!-- LAYOUT -->
 <div class="layout">
   <div class="tab-rail">
     <div class="tab-icon active" onclick="showView('saldo')" id="tab-saldo">
@@ -277,36 +227,26 @@ tbody tr:hover td{background:var(--g050)}
           <div class="p-btn"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Último cálculo: hoy</div>
         </div>
       </div>
-      <div class="nom-strip">
-        <div class="nom-chip active" data-nom="propiedad" onclick="selectNom(this)"><div class="nom-chip-dot"></div>Propiedad · Administrativo</div>
-        <div class="nom-chip" data-nom="interino" onclick="selectNom(this)"><div class="nom-chip-dot"></div>Interino · Docente</div>
-        <div class="nom-chip active" data-nom="propiedad" onclick="selectNom(this)"><div class="nom-chip-dot"></div>Interino · Administrativo</div>
-        <div class="nom-chip" data-nom="interino" onclick="selectNom(this)"><div class="nom-chip-dot"></div>Propiedad · Docente</div>
-      </div>
+      <!-- chips se llenan dinámicamente -->
+      <div class="nom-strip" id="nomStrip1"></div>
       <div class="summary-row">
-        <div class="sum-card"><div class="sum-label">Días Acumulados</div><div class="sum-val highlight" id="s-acum">20</div><div class="sum-sub" id="s-acum-sub">Período 2026 · Anual</div><div class="sum-bar"><div class="sum-bar-fill" id="sb-acum" style="width:0%"></div></div></div>
-        <div class="sum-card"><div class="sum-label">Días Disfrutados</div><div class="sum-val" id="s-disf">5</div><div class="sum-sub">Solicitudes con estado Disfrutada</div><div class="sum-bar"><div class="sum-bar-fill" id="sb-disf" style="width:0%"></div></div></div>
-        <div class="sum-card"><div class="sum-label">Saldo Restante</div><div class="sum-val highlight" id="s-rest">15</div><div class="sum-sub" id="s-rest-sub">75% disponible · 30 días máx.</div><div class="sum-bar"><div class="sum-bar-fill" id="sb-rest" style="width:0%"></div></div></div>
-        <div class="sum-card"><div class="sum-label">Regla Aplicada</div><div class="sum-val" style="font-size:14px;font-family:'DM Mono',monospace;color:var(--muted);padding-top:5px" id="s-regla">PA-GIRH-10<br>1–5 años · Admin.</div><div class="sum-sub" id="s-antig" style="margin-top:6px">Antigüedad: 3 años</div></div>
+        <div class="sum-card"><div class="sum-label">Días Acumulados</div><div class="sum-val highlight" id="s-acum">—</div><div class="sum-sub" id="s-acum-sub">Cargando...</div><div class="sum-bar"><div class="sum-bar-fill" id="sb-acum" style="width:0%"></div></div></div>
+        <div class="sum-card"><div class="sum-label">Días Disfrutados</div><div class="sum-val" id="s-disf">—</div><div class="sum-sub">Solicitudes aprobadas</div><div class="sum-bar"><div class="sum-bar-fill" id="sb-disf" style="width:0%"></div></div></div>
+        <div class="sum-card"><div class="sum-label">Saldo Restante</div><div class="sum-val highlight" id="s-rest">—</div><div class="sum-sub" id="s-rest-sub">Calculando...</div><div class="sum-bar"><div class="sum-bar-fill" id="sb-rest" style="width:0%"></div></div></div>
+        <div class="sum-card"><div class="sum-label">Regla Aplicada</div><div class="sum-val" style="font-size:14px;font-family:'DM Mono',monospace;color:var(--muted);padding-top:5px" id="s-regla">—</div><div class="sum-sub" id="s-antig" style="margin-top:6px">—</div></div>
       </div>
       <div class="content-grid">
         <div class="panel">
           <div class="panel-hd">
             <span class="panel-title">Detalle por Período</span>
             <div class="panel-actions">
-              <select class="filter-select" id="filterAno" onchange="filterTable()">
-                <option value="">Todos los años</option>
-                <option value="2026" selected>2026</option>
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-              </select>
               <div class="p-btn primary"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar</div>
             </div>
           </div>
           <div class="tbl-wrap">
             <table id="tablaPeriodos">
               <thead><tr><th>Año / Período</th><th>Acumulados</th><th>Vac. Colectivas (Art.50)</th><th>Disfrutados</th><th>Saldo</th><th>Regla</th><th>Estado</th></tr></thead>
-              <tbody id="tbodyPeriodos"></tbody>
+              <tbody id="tbodyPeriodos"><tr class="loading-row"><td colspan="7">Cargando datos...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -314,21 +254,21 @@ tbody tr:hover td{background:var(--g050)}
           <div class="panel">
             <div class="panel-hd">
               <span class="panel-title">Saldo Vigente</span>
-              <span id="ringNomLabel" style="font-size:9px;font-weight:300;color:var(--muted);font-family:'DM Mono',monospace">Propiedad</span>
+              <span id="ringNomLabel" style="font-size:9px;font-weight:300;color:var(--muted);font-family:'DM Mono',monospace">—</span>
             </div>
             <div class="saldo-live">
               <div class="ring-wrap">
                 <svg class="ring-svg" viewBox="0 0 110 110">
-                  <defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2d5c42"/><stop offset="100%" stop-color="#4a8c65"/></linearGradient></defs>
+                  <defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#1a5ba8"/><stop offset="100%" stop-color="#7da6d8"/></linearGradient></defs>
                   <circle class="ring-bg" cx="55" cy="55" r="44"/>
                   <circle class="ring-fill" id="ringFill" cx="55" cy="55" r="44" stroke-dasharray="276.46" stroke-dashoffset="276.46"/>
-                  <text class="ring-text-val" id="ringVal" x="55" y="50">15</text>
+                  <text class="ring-text-val" id="ringVal" x="55" y="50">—</text>
                   <text class="ring-text-sub" x="55" y="65">días disp.</text>
                 </svg>
               </div>
               <div class="saldo-stats">
-                <div class="stat-cell"><div class="stat-cell-label">Acumulados</div><div class="stat-cell-val" id="sc-acum">20</div><div class="stat-cell-sub">días período</div></div>
-                <div class="stat-cell"><div class="stat-cell-label">Disfrutados</div><div class="stat-cell-val" id="sc-disf">5</div><div class="stat-cell-sub">días usados</div></div>
+                <div class="stat-cell"><div class="stat-cell-label">Acumulados</div><div class="stat-cell-val" id="sc-acum">—</div><div class="stat-cell-sub">días período</div></div>
+                <div class="stat-cell"><div class="stat-cell-label">Disfrutados</div><div class="stat-cell-val" id="sc-disf">—</div><div class="stat-cell-sub">días usados</div></div>
               </div>
             </div>
           </div>
@@ -341,7 +281,7 @@ tbody tr:hover td{background:var(--g050)}
               </div>
               <div class="alert-item" id="alertVencimiento" style="display:none">
                 <div class="alert-icon warn"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-                <div class="alert-text">Saldo próximo a vencer<small>Período finaliza: 31/12/2026</small></div>
+                <div class="alert-text">Saldo próximo a vencer<small>Planifique sus vacaciones pronto</small></div>
               </div>
             </div>
           </div>
@@ -358,23 +298,14 @@ tbody tr:hover td{background:var(--g050)}
           <p>Historial de acumulación según tipo de nombramiento y antigüedad · PA-GIRH-10</p>
         </div>
       </div>
-      <div class="nom-strip">
-        <div class="nom-chip active" data-nom="propiedad" onclick="selectNom(this)"><div class="nom-chip-dot"></div>Propiedad · Administrativo</div>
-        <div class="nom-chip" data-nom="interino" onclick="selectNom(this)"><div class="nom-chip-dot"></div>Interino · Docente</div>
-        <div class="nom-chip active" data-nom="propiedad" onclick="selectNom(this)"><div class="nom-chip-dot"></div>Interino · Administrativo</div>
-        <div class="nom-chip" data-nom="interino" onclick="selectNom(this)"><div class="nom-chip-dot"></div>Propiedad · Docente</div>
-      </div>
+      <div class="nom-strip" id="nomStrip2"></div>
       <div class="content-grid" style="grid-template-columns:1fr 280px">
         <div class="panel">
           <div class="panel-hd"><span class="panel-title">Tabla de Acumulación por Año</span><div class="panel-actions"><div class="p-btn primary"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar</div></div></div>
           <div class="tbl-wrap">
             <table>
               <thead><tr><th>Año</th><th>Días Acumulados</th><th>Vac. Colectivas (Art.50)</th><th>Días Utilizados</th><th>Saldo Disponible</th></tr></thead>
-              <tbody>
-                <tr><td class="td-year">2026</td><td><span class="td-num g">20</span></td><td><span class="td-num">10</span></td><td><span class="td-num">5</span></td><td><span class="td-num g">15</span> <span class="badge ok">Vigente</span></td></tr>
-                <tr><td class="td-year">2025</td><td><span class="td-num g">20</span></td><td><span class="td-num">10</span></td><td><span class="td-num">20</span></td><td><span class="td-num">0</span> <span class="badge zero">Agotado</span></td></tr>
-                <tr><td class="td-year">2024</td><td><span class="td-num g">20</span></td><td><span class="td-num">10</span></td><td><span class="td-num">15</span></td><td><span class="td-num">5</span> <span class="badge warn">Parcial</span></td></tr>
-              </tbody>
+              <tbody id="tbodyAcum"><tr class="loading-row"><td colspan="5">Cargando...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -383,10 +314,10 @@ tbody tr:hover td{background:var(--g050)}
             <div class="panel-hd"><span class="panel-title">Regla Aplicada</span></div>
             <div style="padding:14px 16px">
               <div style="font-size:9px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-family:'DM Mono',monospace;margin-bottom:10px">PA-GIRH-10</div>
-              <div id="reglaTxt" style="font-size:11px;font-weight:300;color:var(--text);line-height:1.7"><strong style="font-weight:400;color:var(--g700)">Administrativo en Propiedad</strong><br>Antigüedad 1–5 años:<br>Vacaciones colectivas<br>+ 5 días hábiles anuales<br>para asuntos personales.</div>
+              <div id="reglaTxt" style="font-size:11px;font-weight:300;color:var(--text);line-height:1.7">—</div>
               <div style="margin-top:14px;padding:8px 10px;background:var(--g050);border-radius:8px;border:1px solid var(--g100)">
                 <div style="font-size:8.5px;color:var(--dim);font-family:'DM Mono',monospace;margin-bottom:3px">SALDO TOTAL VIGENTE</div>
-                <div style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--g700)" id="acumSaldoTotal">15</div>
+                <div style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--g700)" id="acumSaldoTotal">—</div>
                 <div style="font-size:9px;color:var(--muted)">días disponibles</div>
               </div>
             </div>
@@ -405,20 +336,16 @@ tbody tr:hover td{background:var(--g050)}
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">
-        <div class="sum-card"><div class="sum-label">Último descuento</div><div class="sum-val" style="font-size:14px;font-family:'DM Mono',monospace;color:var(--muted);padding-top:4px">15/03/2026</div><div class="sum-sub">Solicitud #00023</div></div>
-        <div class="sum-card"><div class="sum-label">Días descontados</div><div class="sum-val highlight">5</div><div class="sum-sub">Del saldo vigente</div></div>
-        <div class="sum-card"><div class="sum-label">Estado</div><div class="sum-val" style="font-size:14px;padding-top:4px"><span class="badge ok" style="font-size:11px;padding:5px 12px">✓ Disfrutada</span></div><div class="sum-sub">Solicitud activa procesada</div></div>
+        <div class="sum-card"><div class="sum-label">Último descuento</div><div class="sum-val" style="font-size:14px;font-family:'DM Mono',monospace;color:var(--muted);padding-top:4px" id="desc-fecha">—</div><div class="sum-sub" id="desc-num">—</div></div>
+        <div class="sum-card"><div class="sum-label">Días descontados (total)</div><div class="sum-val highlight" id="desc-dias">—</div><div class="sum-sub">Del saldo vigente</div></div>
+        <div class="sum-card"><div class="sum-label">Último estado</div><div class="sum-val" style="font-size:14px;padding-top:4px" id="desc-estado">—</div><div class="sum-sub">Solicitud procesada</div></div>
       </div>
       <div class="panel">
         <div class="panel-hd"><span class="panel-title">Historial de Descuentos</span><div class="panel-actions"><div class="p-btn primary"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar</div></div></div>
         <div class="tbl-wrap">
           <table>
             <thead><tr><th>Fecha Ejecución</th><th>Concepto</th><th>N.° Solicitud</th><th>Días Descontados</th><th>Saldo Anterior</th><th>Saldo Nuevo</th></tr></thead>
-            <tbody>
-              <tr><td class="td-year">15/03/2026</td><td>Disfrute de Vacaciones</td><td><span class="rule-chip">#00023</span></td><td><span class="td-num r">-5</span></td><td><span class="td-num">20</span></td><td><span class="td-num g">15</span></td></tr>
-              <tr><td class="td-year">10/06/2025</td><td>Disfrute de Vacaciones</td><td><span class="rule-chip">#00018</span></td><td><span class="td-num r">-10</span></td><td><span class="td-num">30</span></td><td><span class="td-num g">20</span></td></tr>
-              <tr><td class="td-year">22/01/2025</td><td>Disfrute de Vacaciones</td><td><span class="rule-chip">#00011</span></td><td><span class="td-num r">-10</span></td><td><span class="td-num">10</span></td><td><span class="td-num">0</span></td></tr>
-            </tbody>
+            <tbody id="tbodyDescuentos"><tr class="loading-row"><td colspan="6">Cargando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -435,27 +362,25 @@ tbody tr:hover td{background:var(--g050)}
       </div>
       <div class="panel">
         <div class="filter-bar">
-          <span class="filter-label">Departamento:</span>
-          <select class="filter-select"><option>Todos</option><option>TI</option><option>Docencia</option><option>Administración</option></select>
-          <div class="filter-divider"></div>
           <span class="filter-label">Estado:</span>
-          <select class="filter-select"><option>Todos</option><option>Pendiente</option><option>Aprobada</option><option>Rechazada</option><option>Cancelada</option></select>
+          <select class="filter-select" id="filtEstado" onchange="cargarHistorial()">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="aprobada">Aprobada</option>
+            <option value="rechazada">Rechazada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
           <div class="filter-divider"></div>
           <span class="filter-label">Desde:</span>
-          <input type="date" class="filter-select" value="2026-01-01">
+          <input type="date" class="filter-select" id="filtDesde" onchange="cargarHistorial()">
           <span class="filter-label">Hasta:</span>
-          <input type="date" class="filter-select" value="2026-12-31">
-          <div class="p-btn primary" style="margin-left:auto">Filtrar</div>
-          <div class="p-btn">Exportar</div>
+          <input type="date" class="filter-select" id="filtHasta" onchange="cargarHistorial()">
+          <div class="p-btn primary" style="margin-left:auto" onclick="cargarHistorial()">Filtrar</div>
         </div>
         <div class="tbl-wrap">
           <table>
             <thead><tr><th>Funcionario</th><th>Cédula</th><th>Departamento</th><th>Tipo Nombramiento</th><th>Fecha Inicio</th><th>Fecha Fin</th><th>Días Sol.</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr><td>Yuliana Rodríguez</td><td class="td-year">1-1234-5678</td><td>TI</td><td><span class="rule-chip">Adm. Propiedad</span></td><td class="td-year">10/03/2026</td><td class="td-year">20/03/2026</td><td><span class="td-num">8</span></td><td><span class="badge ok">Aprobada</span></td></tr>
-              <tr><td>Mario Solís</td><td class="td-year">2-2345-6789</td><td>Docencia</td><td><span class="rule-chip">Doc. Interino</span></td><td class="td-year">01/04/2026</td><td class="td-year">15/04/2026</td><td><span class="td-num">12</span></td><td><span class="badge warn">Pendiente</span></td></tr>
-              <tr><td>Ana González</td><td class="td-year">3-3456-7890</td><td>Administración</td><td><span class="rule-chip">Adm. Interino</span></td><td class="td-year">05/02/2026</td><td class="td-year">10/02/2026</td><td><span class="td-num">4</span></td><td><span class="badge zero">Rechazada</span></td></tr>
-            </tbody>
+            <tbody id="tbodyHistorial"><tr class="loading-row"><td colspan="8">Cargando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -475,13 +400,16 @@ tbody tr:hover td{background:var(--g050)}
           <div class="panel-hd"><span class="panel-title">Datos para Simulación</span></div>
           <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
             <div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-family:'DM Mono',monospace;margin-bottom:5px">Nombramiento</div>
-              <select class="filter-select" style="width:100%" id="simNom" onchange="calcSim()"><option value="interino">Docente / Doc.-Adm. Interino</option><option value="propiedad" disabled>Adm. Propiedad (no aplica)</option></select>
+              <select class="filter-select" style="width:100%" id="simNom" onchange="calcSim()">
+                <option value="interino">Docente / Doc.-Adm. Interino</option>
+                <option value="propiedad" disabled>Adm. Propiedad (no aplica)</option>
+              </select>
             </div>
             <div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-family:'DM Mono',monospace;margin-bottom:5px">Días Disponibles (período lectivo)</div>
-              <input type="number" class="filter-select" id="simDias" value="8" min="0" max="30" style="width:100%" oninput="calcSim()">
+              <input type="number" class="filter-select" id="simDias" value="0" min="0" max="30" style="width:100%" oninput="calcSim()">
             </div>
             <div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-family:'DM Mono',monospace;margin-bottom:5px">Salario Base Mensual (₡)</div>
-              <input type="number" class="filter-select" id="simSalario" value="850000" style="width:100%" oninput="calcSim()">
+              <input type="number" class="filter-select" id="simSalario" value="0" style="width:100%" oninput="calcSim()">
             </div>
             <div class="p-btn primary" onclick="calcSim()" style="justify-content:center;padding:8px">Calcular Simulación</div>
           </div>
@@ -490,12 +418,12 @@ tbody tr:hover td{background:var(--g050)}
           <div class="panel-hd"><span class="panel-title">Resultado Estimado</span></div>
           <div class="sim-card">
             <div class="sim-tag"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Estimación — sin cambios reales</div>
-            <div class="sim-amount"><span>₡ </span><span id="simMonto">226,666</span></div>
+            <div class="sim-amount"><span>₡ </span><span id="simMonto">0</span></div>
             <div class="sim-detail">Monto estimado de liquidación al término del nombramiento interino.</div>
             <div class="sim-formula">
-              <strong>Salario diario</strong> = <span id="sf-salario">₡850,000</span> ÷ 30 = <span id="sf-diario">₡28,333</span><br>
-              <strong>Días disponibles</strong> = <span id="sf-dias">8</span> días<br>
-              <strong>Monto estimado</strong> = <span id="sf-diario2">₡28,333</span> × <span id="sf-dias2">8</span> = <strong id="sf-total">₡226,664</strong>
+              <strong>Salario diario</strong> = <span id="sf-salario">₡0</span> ÷ 30 = <span id="sf-diario">₡0</span><br>
+              <strong>Días disponibles</strong> = <span id="sf-dias">0</span> días<br>
+              <strong>Monto estimado</strong> = <span id="sf-diario2">₡0</span> × <span id="sf-dias2">0</span> = <strong id="sf-total">₡0</strong>
             </div>
             <div class="sim-note">El monto real puede variar por deducciones legales y cargas sociales. La liquidación efectiva requiere formulario FA-GIRH-02 ante el GIRH (PA-GIRH-10 §5.2).</div>
           </div>
@@ -508,157 +436,331 @@ tbody tr:hover td{background:var(--g050)}
 
 <script src="/frontend/components/navbar.js"></script>
 <script src="/frontend/js/session.js"></script>
-
 <app-navbar></app-navbar>
 
 <script>
-// FECHA NAV
-const today = new Date();
-const fd = today.toLocaleDateString('es-CR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-document.getElementById('navDate').textContent = fd.charAt(0).toUpperCase()+fd.slice(1);
-document.getElementById('alertFecha').textContent = today.toLocaleDateString('es-CR');
+const API_BASE = 'http://localhost:3000';
 
-// NAV GROUPS
-function toggleGroup(id){
-  const grp = document.getElementById('grp-'+id);
-  const isOpen = grp.classList.contains('open');
-  document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open'));
-  document.getElementById('userWrap').classList.remove('open');
-  if(!isOpen) grp.classList.add('open');
-}
-function toggleUserMenu(){
-  const wrap = document.getElementById('userWrap');
-  document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open'));
-  wrap.classList.toggle('open');
-}
-document.addEventListener('click',e=>{
-  if(!e.target.closest('.nav-group')) document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open'));
-  if(!e.target.closest('.user-wrap')) document.getElementById('userWrap').classList.remove('open');
-});
+window.addEventListener('load', iniciar);
 
-// THEME
-function toggleTheme(){
-  const html=document.documentElement;
-  const dark=html.getAttribute('data-theme')==='dark';
-  html.setAttribute('data-theme',dark?'light':'dark');
-  const icon=document.getElementById('themeIcon');
-  icon.innerHTML=dark
-    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
-    : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-}
-function logout(){ if(confirm('¿Cerrar sesión?')) window.location.href='/frontend/pages/autenticacion/login.html'; }
+function iniciar() {
 
-// VIEWS
-const VIEWS=['saldo','acumulacion','descuento','historial','simulacion'];
-function showView(v){
-  VIEWS.forEach(id=>{
-    document.getElementById('view-'+id).style.display=(id===v)?'':'none';
-    const tab=document.getElementById('tab-'+id);
-    if(tab) tab.classList.toggle('active',id===v);
+  // ── Estado global ────────────────────────────────────────────────────
+  let saldosPorNom  = [];
+  let nomActivoIdx  = 0;
+
+  function getFuncId() {
+    try { return JSON.parse(localStorage.getItem('funcionario'))?.id_funcionario || null; }
+    catch(e) { return null; }
+  }
+
+  // ── Vistas ───────────────────────────────────────────────────────────
+  window.showView = function(v) {
+    ['saldo','acumulacion','descuento','historial','simulacion'].forEach(id => {
+      document.getElementById('view-'+id).style.display = id === v ? '' : 'none';
+      const tab = document.getElementById('tab-'+id);
+      if (tab) tab.classList.toggle('active', id === v);
+    });
+    document.getElementById('mainArea').scrollTop = 0;
+    if (v === 'descuento') cargarDescuentos();
+    if (v === 'historial') cargarHistorial();
+  };
+
+  window.toggleTheme = function() {
+    const h = document.documentElement;
+    h.setAttribute('data-theme', h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  };
+
+  // ── Simulación ────────────────────────────────────────────────────────
+  window.calcSim = function() {
+    const dias   = parseInt(document.getElementById('simDias').value) || 0;
+    const sal    = parseFloat(document.getElementById('simSalario').value) || 0;
+    const diario = sal / 30;
+    const monto  = diario * dias;
+    const fmt = v => v.toLocaleString('es-CR', {minimumFractionDigits:0, maximumFractionDigits:0});
+    document.getElementById('simMonto').textContent   = fmt(monto);
+    document.getElementById('sf-salario').textContent = '₡' + fmt(sal);
+    document.getElementById('sf-diario').textContent  = '₡' + fmt(diario);
+    document.getElementById('sf-diario2').textContent = '₡' + fmt(diario);
+    document.getElementById('sf-dias').textContent    = dias;
+    document.getElementById('sf-dias2').textContent   = dias;
+    document.getElementById('sf-total').textContent   = '₡' + fmt(monto);
+  };
+
+  // ── Formatear fecha ───────────────────────────────────────────────────
+  function fmt(s) {
+    if (!s) return '—';
+    const d = s.split('T')[0]; // quitar hora si viene con ISO
+    const [y, m, dd] = d.split('-');
+    return dd && m && y ? `${dd}/${m}/${y}` : s;
+  }
+
+  // ── Antigüedad ────────────────────────────────────────────────────────
+  function calcularAntigüedad(fechaIngreso) {
+    if (!fechaIngreso) return 0;
+    const hoy = new Date();
+    const ing = new Date(fechaIngreso);
+    let años = hoy.getFullYear() - ing.getFullYear();
+    const m = hoy.getMonth() - ing.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < ing.getDate())) años--;
+    return Math.max(años, 0);
+  }
+
+  // ── Ring SVG ──────────────────────────────────────────────────────────
+  function updateRing(disp, acum) {
+    const circ = 2 * Math.PI * 44;
+    const max  = acum > 0 ? acum : 30;
+    document.getElementById('ringFill').style.strokeDashoffset =
+      circ - (circ * Math.min(disp / max, 1));
+    document.getElementById('ringVal').textContent = disp % 1 === 0 ? disp : disp.toFixed(1);
+  }
+
+  // ── Construir chips dinámicos ─────────────────────────────────────────
+  function buildChips(noms, activeIdx) {
+    ['nomStrip1','nomStrip2'].forEach(id => {
+      const strip = document.getElementById(id);
+      if (!strip) return;
+      strip.innerHTML = '';
+      noms.forEach((nom, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'nom-chip' + (i === activeIdx ? ' active' : '');
+        chip.dataset.index = i;
+        chip.innerHTML = `<div class="nom-chip-dot"></div>${nom.nombre_tipo || 'Nombramiento'}`;
+        chip.onclick = () => seleccionarNom(i);
+        strip.appendChild(chip);
+      });
+    });
+  }
+
+  // ── Seleccionar nombramiento ──────────────────────────────────────────
+  window.seleccionarNom = function(idx) {
+    if (!saldosPorNom.length) return;
+    nomActivoIdx = idx;
+    buildChips(saldosPorNom, idx);
+    aplicarSaldo(saldosPorNom[idx]);
+  };
+
+  // ── Aplicar datos de un nombramiento a la UI ──────────────────────────
+  function aplicarSaldo(nom) {
+    const acum  = parseFloat(nom.dias_acumulados)  || 0;
+    const disf  = parseFloat(nom.dias_usados)      || 0;
+    const disp  = parseFloat(nom.dias_disponibles) || 0;
+    const pct   = acum > 0 ? Math.round((disp / acum) * 100) : 0;
+    const regla = nom.regla || 'PA-GIRH-10';
+    const año   = new Date().getFullYear();
+    const f     = JSON.parse(localStorage.getItem('funcionario') || '{}');
+    const antig = calcularAntigüedad(f.fecha_ingreso);
+
+    const n = v => v % 1 === 0 ? v : v.toFixed(1);
+
+    // Cards resumen
+    document.getElementById('s-acum').textContent     = n(acum);
+    document.getElementById('s-disf').textContent     = n(disf);
+    document.getElementById('s-rest').textContent     = n(disp);
+    document.getElementById('s-regla').innerHTML      = `${nom.nombre_tipo || '—'}<br><small style="font-size:9px">${regla}</small>`;
+    document.getElementById('s-antig').textContent    = `Antigüedad: ${antig} años`;
+    document.getElementById('s-acum-sub').textContent = `${regla} · ${año}`;
+    document.getElementById('s-rest-sub').textContent = `${pct}% disponible`;
+    document.getElementById('ringNomLabel').textContent = nom.nombre_tipo || '—';
+    document.getElementById('sc-acum').textContent    = n(acum);
+    document.getElementById('sc-disf').textContent    = n(disf);
+    document.getElementById('alertFecha').textContent = new Date().toLocaleDateString('es-CR');
+    document.getElementById('alertVencimiento').style.display = (disp > 0 && disp < 5) ? 'flex' : 'none';
+
+    // Barras
+    setTimeout(() => {
+      const max = acum || 30;
+      document.getElementById('sb-acum').style.width = Math.min((acum/max)*100, 100) + '%';
+      document.getElementById('sb-disf').style.width = Math.min((disf/max)*100, 100) + '%';
+      document.getElementById('sb-rest').style.width = Math.min((disp/max)*100, 100) + '%';
+    }, 80);
+
+    updateRing(disp, acum);
+
+    // Tabla saldo
+    const tbody = document.getElementById('tbodyPeriodos');
+    const estadoBadge = disp > 0
+      ? '<span class="badge ok">Vigente</span>'
+      : '<span class="badge zero">Agotado</span>';
+    tbody.innerHTML = `
+      <tr>
+        <td class="td-year">${año}</td>
+        <td><span class="td-num g">${n(acum)}</span></td>
+        <td><span class="td-num">—</span></td>
+        <td><span class="td-num">${n(disf)}</span></td>
+        <td><span class="td-num ${disp > 0 ? 'g' : ''}">${n(disp)}</span></td>
+        <td><span class="rule-chip">${regla}</span></td>
+        <td>${estadoBadge}</td>
+      </tr>`;
+
+    // Tabla acumulación
+    const tbodyAcum = document.getElementById('tbodyAcum');
+    if (tbodyAcum) {
+      tbodyAcum.innerHTML = `
+        <tr>
+          <td class="td-year">${año}</td>
+          <td><span class="td-num g">${n(acum)}</span></td>
+          <td><span class="td-num">—</span></td>
+          <td><span class="td-num">${n(disf)}</span></td>
+          <td><span class="td-num ${disp > 0 ? 'g' : ''}">${n(disp)}</span> ${estadoBadge}</td>
+        </tr>`;
+    }
+
+    // Panel regla
+    document.getElementById('acumSaldoTotal').textContent = n(disp);
+    document.getElementById('reglaTxt').innerHTML =
+      `<strong style="font-weight:400;color:var(--g700)">${nom.nombre_tipo || '—'}</strong><br>
+       Antigüedad: ${antig} años<br>${regla}`;
+
+    // Precargar días en simulación si es interino
+    if (nom.es_docente_interino) {
+      document.getElementById('simDias').value = n(disp);
+      calcSim();
+    }
+  }
+
+  // ── Cargar saldo desde API ────────────────────────────────────────────
+  async function cargarSaldo() {
+    const id = getFuncId();
+    if (!id) { console.warn('[SALDO] Sin sesión'); return; }
+    try {
+      const res = await fetch(`${API_BASE}/api/saldo/calculo/${id}`);
+      if (!res.ok) { console.warn('[SALDO] Error API:', res.status); return; }
+
+      const data = await res.json();
+
+      if (data.saldos_por_nombramiento && data.saldos_por_nombramiento.length > 0) {
+        saldosPorNom = data.saldos_por_nombramiento;
+      } else if (data.calculo_saldo) {
+        saldosPorNom = [{
+          id_nombramiento: null,
+          nombre_tipo:     data.funcionario?.tipo_nombramiento || '—',
+          dias_acumulados:  data.calculo_saldo.dias_acumulados,
+          dias_usados:      data.calculo_saldo.dias_disfrutados,
+          dias_disponibles: data.calculo_saldo.dias_disponibles,
+          regla:            data.calculo_saldo.regla,
+          es_docente_interino: false,
+        }];
+      }
+
+      if (!saldosPorNom.length) return;
+
+      // Sincronizar con nombramiento activo del navbar
+      const nomGuardado = JSON.parse(localStorage.getItem('tipoNombramiento') || 'null');
+      if (nomGuardado?.id_nombramiento) {
+        const idx = saldosPorNom.findIndex(n => n.id_nombramiento === nomGuardado.id_nombramiento);
+        if (idx >= 0) nomActivoIdx = idx;
+      }
+
+      buildChips(saldosPorNom, nomActivoIdx);
+      aplicarSaldo(saldosPorNom[nomActivoIdx]);
+
+    } catch(err) { console.warn('[SALDO] error:', err.message); }
+  }
+
+  // ── Vista DESCUENTO ───────────────────────────────────────────────────
+  window.cargarDescuentos = async function() {
+    const id = getFuncId();
+    if (!id) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/saldo/descuentos/${id}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const desc = data.historial_descuentos || [];
+
+      if (desc.length) {
+        const ultimo = desc[0];
+        document.getElementById('desc-fecha').textContent = fmt(ultimo.fecha_aprobacion);
+        document.getElementById('desc-num').textContent   = ultimo.numero_solicitud ? 'Solicitud ' + ultimo.numero_solicitud : '—';
+        document.getElementById('desc-dias').textContent  = data.resumen_descuentos?.total_dias_descontados || 0;
+        document.getElementById('desc-estado').innerHTML  = '<span class="badge ok">✓ Disfrutada</span>';
+      } else {
+        document.getElementById('desc-fecha').textContent = '—';
+        document.getElementById('desc-num').textContent   = 'Sin solicitudes';
+        document.getElementById('desc-dias').textContent  = '0';
+        document.getElementById('desc-estado').textContent = '—';
+      }
+
+      const tbody = document.getElementById('tbodyDescuentos');
+      if (!desc.length) {
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="6">Sin descuentos registrados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = desc.map(d => {
+        const dias   = parseFloat(d.dias_solicitados) || 0;
+        const antes  = parseFloat(d.saldo_antes) || 0;
+        const desp   = parseFloat(d.saldo_despues) || 0;
+        const n = v => v % 1 === 0 ? v : v.toFixed(1);
+        return `
+          <tr>
+            <td class="td-year">${fmt(d.fecha_aprobacion)}</td>
+            <td>Disfrute de Vacaciones${d.nombre_tipo ? ' · <span class="rule-chip">' + d.nombre_tipo + '</span>' : ''}</td>
+            <td><span class="rule-chip">${d.numero_solicitud || '—'}</span></td>
+            <td><span class="td-num r">-${n(dias)}</span></td>
+            <td><span class="td-num">${n(antes)}</span></td>
+            <td><span class="td-num g">${n(desp)}</span></td>
+          </tr>`;
+      }).join('');
+    } catch(err) { console.warn('[DESCUENTOS] error:', err.message); }
+  };
+
+  // ── Vista HISTORIAL DEPTO ─────────────────────────────────────────────
+  window.cargarHistorial = async function() {
+    const f      = JSON.parse(localStorage.getItem('funcionario') || '{}');
+    const idDep  = f.id_departamento;
+    const estado = document.getElementById('filtEstado')?.value || '';
+    const desde  = document.getElementById('filtDesde')?.value  || '';
+    const hasta  = document.getElementById('filtHasta')?.value  || '';
+    const params = new URLSearchParams();
+    if (idDep)  params.set('id_departamento', idDep);
+    if (estado) params.set('estado', estado);
+    if (desde)  params.set('desde', desde);
+    if (hasta)  params.set('hasta', hasta);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/saldo/historial-departamento?${params}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const rows = data.historial || [];
+      const tbody = document.getElementById('tbodyHistorial');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="8">Sin registros para los filtros seleccionados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(r => {
+        const cls = r.estado === 'aprobada' ? 'ok' : r.estado === 'pendiente' ? 'warn' : 'zero';
+        return `
+          <tr>
+            <td>${r.funcionario || '—'}</td>
+            <td class="td-year">${r.cedula || '—'}</td>
+            <td>${r.nombre_departamento || '—'}</td>
+            <td><span class="rule-chip">${r.tipo_nombramiento || '—'}</span></td>
+            <td class="td-year">${fmt(r.fecha_inicio)}</td>
+            <td class="td-year">${fmt(r.fecha_fin)}</td>
+            <td><span class="td-num">${r.dias_solicitados || 0}</span></td>
+            <td><span class="badge ${cls}">${r.estado || '—'}</span></td>
+          </tr>`;
+      }).join('');
+    } catch(err) { console.warn('[HISTORIAL] error:', err.message); }
+  };
+
+  // ── Sincronizar con navbar ────────────────────────────────────────────
+  document.addEventListener('nombramiento-changed', (e) => {
+    if (!saldosPorNom.length) return;
+    const idx = saldosPorNom.findIndex(n => n.id_nombramiento === e.detail?.id_nombramiento);
+    if (idx >= 0) seleccionarNom(idx);
   });
-  document.getElementById('mainArea').scrollTop=0;
-  document.querySelectorAll('#view-'+v+' .page-hd,#view-'+v+' .nom-strip,#view-'+v+' .summary-row,#view-'+v+' .content-grid').forEach(el=>{
-    el.style.animation='none'; el.offsetHeight; el.style.animation='';
-  });
-  if(v==='saldo') setTimeout(()=>updateRing(curNom),80);
-}
 
-// NOM
-const NOM_DATA={
-  propiedad:{disp:15,acum:20,disf:5,regla:'PA-GIRH-10\n1–5 años · Admin.',antig:'3 años',maxDias:30},
-  interino:{disp:4,acum:6,disf:2,regla:'PA-GIRH-10\n1–5 años · Doc. Interino',antig:'2 años',maxDias:30}
-};
-const TABLA_DATA={
-  propiedad:[
-    {year:'2026',acum:20,col:10,disf:5,saldo:15,regla:'Prop. 1-5a',estado:'ok'},
-    {year:'2025',acum:20,col:10,disf:20,saldo:0,regla:'Prop. 1-5a',estado:'zero'},
-    {year:'2024',acum:20,col:10,disf:15,saldo:5,regla:'Prop. 1-5a',estado:'warn'},
-  ],
-  interino:[
-    {year:'P.I 2026-1',acum:6,col:2,disf:2,saldo:4,regla:'Int. Doc. 1-5a',estado:'ok'},
-    {year:'P.I 2025-2',acum:6,col:2,disf:6,saldo:0,regla:'Int. Doc. 1-5a',estado:'zero'},
-  ]
-};
-let curNom='propiedad';
+  // ── Navbar helpers ────────────────────────────────────────────────────
+  window.toggleGroup = function(id){const g=document.getElementById('grp-'+id);const o=g.classList.contains('open');document.querySelectorAll('.nav-group').forEach(x=>x.classList.remove('open'));document.getElementById('userWrap').classList.remove('open');if(!o)g.classList.add('open')};
+  document.addEventListener('click',e=>{if(!e.target.closest('.nav-group'))document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open'));if(!e.target.closest('.user-wrap'))document.getElementById('userWrap')?.classList.remove('open')});
+  window.toggleUserMenu = function(){const w=document.getElementById('userWrap');const o=w.classList.contains('open');document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open'));w.classList.toggle('open',!o)};
+  window.logout = function(){if(confirm('¿Cerrar sesión?')){localStorage.clear();window.location.href='../autenticacion/login.html';}};
 
-function selectNom(el){
-  document.querySelectorAll('#view-saldo .nom-chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  curNom=el.dataset.nom;
-  document.getElementById('pillNomLabel').textContent=curNom==='propiedad'?'Propiedad':'Interino';
-  updateSaldoView();
+  // ── Arranque ──────────────────────────────────────────────────────────
+  calcSim();
+  cargarSaldo();
 }
-function selectNomAcum(el){
-  document.querySelectorAll('#view-acumulacion .nom-chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-}
-function selectNomFromPill(el){
-  document.querySelectorAll('.ud-pill').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  curNom=el.dataset.nom;
-  document.querySelectorAll('#view-saldo .nom-chip').forEach(p=>p.classList.toggle('active',p.dataset.nom===curNom));
-  document.getElementById('pillNomLabel').textContent=curNom==='propiedad'?'Propiedad':'Interino';
-  document.getElementById('userWrap').classList.remove('open');
-  updateSaldoView();
-}
-
-function updateSaldoView(){
-  const d=NOM_DATA[curNom];
-  document.getElementById('s-acum').textContent=d.acum;
-  document.getElementById('s-disf').textContent=d.disf;
-  document.getElementById('s-rest').textContent=d.disp;
-  document.getElementById('s-rest-sub').textContent=Math.round((d.disp/d.maxDias)*100)+'% disponible · 30 días máx.';
-  document.getElementById('s-regla').innerHTML=d.regla.replace('\n','<br>');
-  document.getElementById('s-antig').textContent='Antigüedad: '+d.antig;
-  document.getElementById('s-acum-sub').textContent=curNom==='interino'?'Período lectivo activo':'Período 2026 · Anual';
-  setTimeout(()=>{
-    document.getElementById('sb-acum').style.width=(d.acum/d.maxDias*100)+'%';
-    document.getElementById('sb-disf').style.width=(d.disf/d.maxDias*100)+'%';
-    document.getElementById('sb-rest').style.width=(d.disp/d.maxDias*100)+'%';
-  },50);
-  document.getElementById('sc-acum').textContent=d.acum;
-  document.getElementById('sc-disf').textContent=d.disf;
-  document.getElementById('ringNomLabel').textContent=curNom==='propiedad'?'Propiedad':'Interino';
-  buildTable(curNom);
-  updateRing(curNom);
-  document.getElementById('alertVencimiento').style.display=d.disp<5?'flex':'none';
-}
-
-function updateRing(nom){
-  const d=NOM_DATA[nom];
-  const circ=2*Math.PI*44;
-  document.getElementById('ringFill').style.strokeDashoffset=circ-(circ*(d.disp/d.maxDias));
-  document.getElementById('ringVal').textContent=d.disp;
-}
-
-function buildTable(nom){
-  const tbody=document.getElementById('tbodyPeriodos');
-  tbody.innerHTML='';
-  (TABLA_DATA[nom]||[]).forEach(r=>{
-    const estadoMap={ok:'<span class="badge ok">Vigente</span>',zero:'<span class="badge zero">Agotado</span>',warn:'<span class="badge warn">Parcial</span>'};
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td class="td-year">${r.year}</td><td><span class="td-num g">${r.acum}</span></td><td><span class="td-num">${r.col}</span></td><td><span class="td-num">${r.disf}</span></td><td><span class="td-num g">${r.saldo}</span></td><td><span class="rule-chip">${r.regla}</span></td><td>${estadoMap[r.estado]||''}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function calcSim(){
-  const dias=parseInt(document.getElementById('simDias').value)||0;
-  const sal=parseFloat(document.getElementById('simSalario').value)||0;
-  const diario=sal/30, monto=diario*dias;
-  const fmt=v=>v.toLocaleString('es-CR',{minimumFractionDigits:0,maximumFractionDigits:0});
-  document.getElementById('simMonto').textContent=fmt(monto);
-  document.getElementById('sf-salario').textContent='₡'+fmt(sal);
-  document.getElementById('sf-diario').textContent='₡'+fmt(diario);
-  document.getElementById('sf-diario2').textContent='₡'+fmt(diario);
-  document.getElementById('sf-dias').textContent=dias;
-  document.getElementById('sf-dias2').textContent=dias;
-  document.getElementById('sf-total').textContent='₡'+fmt(monto);
-}
-
-// INIT
-updateSaldoView();
-setTimeout(()=>updateRing(curNom),200);
 </script>
 </body>
 </html>

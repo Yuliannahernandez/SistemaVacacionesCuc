@@ -13,6 +13,35 @@ function generarContrasena() {
     return pass;
 }
 
+// ─── Calcula saldo según reglas PA-GIRH-10 ───────────────────────────────
+function calcularSaldoInicial(fecha_ingreso, id_tipo_nombramiento, tramo1, tramo2) {
+    const fechaIngreso = new Date(fecha_ingreso);
+    const hoy = new Date();
+    
+    // Años de servicio
+    const aniosServicio = (hoy - fechaIngreso) / (365.25 * 24 * 60 * 60 * 1000);
+    
+    // Regla 2023: si ingresó a partir del 2023
+    const desde2023 = fechaIngreso.getFullYear() >= 2023;
+
+    const esDocInterino = id_tipo_nombramiento === 6;
+
+    if (esDocInterino) {
+        // Docente interino: acumula mensual
+        const mesesLaborados = Math.floor(aniosServicio * 12);
+        const diasPorMes = desde2023 ? 1.67
+                         : aniosServicio <= 5 ? tramo1   // 1.5
+                         : tramo2;                        // 2.5
+        return Math.min(30, Math.round(mesesLaborados * diasPorMes * 100) / 100);
+    } else {
+        // Administrativo / Docente en propiedad o interino
+        if (desde2023) return 20.00;
+        if (aniosServicio < 1)  return 0;   // aún no cumple el año
+        if (aniosServicio <= 5) return 5;   // colectivas + 5 días personales
+        return 30.00;                        // 6+ años
+    }
+}
+
 // ─── Utilidad: envía credenciales por correo ─────────────────────────────────
 async function enviarCredenciales(email, usuario, contrasena) {
     let nodemailer;
@@ -48,8 +77,14 @@ async function enviarCredenciales(email, usuario, contrasena) {
 // ─── Utilidad: calcula saldo de vacaciones para interinos (PA-GIRH-10) ───────
 function calcularVacacionesInterino(fecha_ingreso) {
     if (!fecha_ingreso) return 0;
-    const diasTrabajados = Math.floor((new Date() - new Date(fecha_ingreso)) / (1000 * 60 * 60 * 24));
-    return Math.max(0, Math.min(30, Math.floor((diasTrabajados / 365) * 14 * 100) / 100));
+    const saldo = calcularSaldoInicial(
+    fecha_ingreso,
+    tipoNom,
+    nom.dias_acumulacion_mensual_tramo1,
+    nom.dias_acumulacion_mensual_tramo2
+);
+diasAcum = saldo;
+diasDisp = saldo;
 }
 
 // ─── Utilidad: calcula saldo de vacaciones por nombramiento ──────────────────

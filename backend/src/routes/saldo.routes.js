@@ -1,31 +1,54 @@
-const express = require("express");
-const router = express.Router();
+// src/routes/saldo.routes.js
+'use strict';
+
+const express = require('express');
+const router  = express.Router();
 const {
   obtenerSaldoPropio,
   historialPorDepartamento,
   listarColectivas,
   crearColectiva,
+  actualizarColectiva,
+  eliminarColectiva,
   desactivarColectiva,
   simularLiquidacion,
+  getAcumulacion,
+  getCalculoSaldo,
+  getDescuentos,
+  getColectivas,
+  getHistorialDepartamento,
+  getSaldoDisponible,
+  getSimulacionLiquidacion,
 } = require('./controllers/saldo.controller');
-// ── Saldo propio del funcionario ──────────────────────────────────────────────
-// GET /api/saldo/mio?id_funcionario=X
-router.get("/mio", obtenerSaldoPropio);
 
-// ── Historial por departamento (Jefe / RRHH) ──────────────────────────────────
-// GET /api/saldo/departamento?id_departamento=X
-router.get("/departamento", historialPorDepartamento);
+// ── Saldo propio (legacy) ─────────────────────────────────────────────────────
+router.get('/mio', obtenerSaldoPropio);
+
+// ── Saldo disponible detallado ────────────────────────────────────────────────
+router.get('/disponible/:id_funcionario', getSaldoDisponible);
+
+// ── Cálculo por nombramiento (saldo.html y registrar.html) ───────────────────
+router.get('/calculo/:id_funcionario', getCalculoSaldo);
+
+// ── Acumulación histórica ─────────────────────────────────────────────────────
+router.get('/acumulacion/:id_funcionario', getAcumulacion);
+
+// ── Descuentos por disfrute ───────────────────────────────────────────────────
+router.get('/descuentos/:id_funcionario', getDescuentos);
+
+// ── Historial por departamento ────────────────────────────────────────────────
+router.get('/historial-departamento', getHistorialDepartamento);
+router.get('/departamento', historialPorDepartamento);
 
 // ── Vacaciones colectivas ─────────────────────────────────────────────────────
-// GET  /api/saldo/colectivas
-router.get("/colectivas", listarColectivas);
-// POST /api/saldo/colectivas   body: { descripcion, fecha_inicio, fecha_fin }
-router.post("/colectivas", crearColectiva);
-// DELETE /api/saldo/colectivas/:id
-router.delete("/colectivas/:id", desactivarColectiva);
+router.get('/colectivas',        getColectivas);
+router.post('/colectivas',       crearColectiva);
+router.put('/colectivas/:id',    actualizarColectiva);
+router.delete('/colectivas/:id', eliminarColectiva);
+router.delete('/colectivas/:id/desactivar', desactivarColectiva);
 
 // ── Simulación de liquidación ─────────────────────────────────────────────────
-// GET /api/saldo/liquidacion?id_funcionario=X
-router.get("/liquidacion", simularLiquidacion);
+router.get('/simulacion/:id_funcionario', getSimulacionLiquidacion);
+router.get('/liquidacion', simularLiquidacion);
 
 module.exports = router;
