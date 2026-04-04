@@ -18,7 +18,6 @@
     }
 
     :root {
-      /* Paleta azul */
       --g900: #001f52;
       --g800: #002D72;
       --g700: #1a5ba8;
@@ -26,7 +25,6 @@
       --g300: #7da6d8;
       --g100: #ccddf0;
       --g050: #e8f0fa;
-
       --gold: #b8922a;
       --gold-bg: rgba(185, 150, 60, 0.1);
       --bone: #f4f6fb;
@@ -35,6 +33,8 @@
       --dim: rgba(0, 30, 80, 0.22);
       --red: #E4002B;
       --red-bg: rgba(228, 0, 43, 0.08);
+      --green: #1a7a4a;
+      --green-bg: rgba(26, 122, 74, 0.08);
       --nav-h: 56px;
       --radius: 14px;
       --trans: all .2s cubic-bezier(.4, 0, .2, 1);
@@ -52,1388 +52,270 @@
       --glass: rgba(0, 45, 114, 0.22);
       --glass-border: rgba(125, 166, 216, 0.1);
       --red-bg: rgba(228, 0, 43, 0.15);
+      --green-bg: rgba(26, 122, 74, 0.15);
     }
 
-    html,
-    body {
-      height: 100%;
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bone);
-      color: var(--text);
-      transition: background .3s, color .3s
-    }
+    html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bone); color: var(--text); transition: background .3s, color .3s }
+    body { overflow-x: hidden }
+    .bg { position: fixed; inset: 0; z-index: 0; background: var(--bone); transition: background .3s }
+    .bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 40% at 80% 5%, rgba(45, 125, 210, 0.07) 0%, transparent 60%), radial-gradient(ellipse 30% 50% at 5% 95%, rgba(26, 91, 168, 0.05) 0%, transparent 55%) }
 
-    body {
-      overflow-x: hidden
-    }
+    .topnav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); z-index: 200; display: flex; align-items: center; padding: 0 20px; background: rgba(0, 45, 114, 0.96); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.05) }
+    .nav-logo { display: flex; align-items: center; gap: 10px; margin-right: 20px; flex-shrink: 0 }
+    .logo-icon { width: 29px; height: 29px; border-radius: 8px; background: linear-gradient(135deg, #002D72, #7da6d8); display: flex; align-items: center; justify-content: center }
+    .logo-icon svg { width: 13px; height: 13px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round }
+    .logo-text strong { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 400; color: rgba(204, 220, 240, 0.9); letter-spacing: .1em; display: block; line-height: 1 }
+    .logo-text small { font-size: 8px; font-weight: 300; color: rgba(125, 166, 216, 0.3); letter-spacing: .18em; text-transform: uppercase }
+    .nav-right { display: flex; align-items: center; gap: 4px; margin-left: auto; flex-shrink: 0 }
+    .action-btn { display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 300; color: rgba(125, 166, 216, 0.38); transition: var(--trans) }
+    .action-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round }
+    .action-btn:hover { background: rgba(255, 255, 255, 0.05); color: rgba(204, 220, 240, 0.62) }
+    .action-btn.logout:hover { color: rgba(228, 0, 43, 0.7) }
+    .user-pill { display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 5px; border-radius: 20px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.07); cursor: pointer }
+    .avatar { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--g800), var(--g700)); display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 500; color: #fff }
+    .user-pill-name { font-size: 11px; font-weight: 300; color: rgba(204, 220, 240, 0.62) }
+    .user-pill-nom { font-size: 8.5px; font-weight: 300; color: rgba(125, 166, 216, 0.35) }
 
-    .bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background: var(--bone);
-      transition: background .3s
-    }
+    .page-wrap { position: relative; z-index: 10; margin-top: var(--nav-h); min-height: calc(100vh - var(--nav-h)); display: grid; grid-template-columns: 260px 1fr; gap: 0 }
 
-    .bg::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 55% 40% at 80% 5%, rgba(45, 125, 210, 0.07) 0%, transparent 60%), radial-gradient(ellipse 30% 50% at 5% 95%, rgba(26, 91, 168, 0.05) 0%, transparent 55%)
-    }
+    .form-sidebar { position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow-y: auto; padding: 24px 16px; border-right: 1px solid var(--dim); display: flex; flex-direction: column; gap: 6px; scrollbar-width: thin; scrollbar-color: var(--dim) transparent }
+    .sidebar-label { font-size: 8px; font-weight: 400; letter-spacing: .22em; text-transform: uppercase; color: var(--dim); font-family: 'DM Mono', monospace; padding: 4px 10px; margin-top: 8px; margin-bottom: 2px }
+    .sidebar-label:first-child { margin-top: 0 }
+    .step-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer; transition: var(--trans); border: 1px solid transparent }
+    .step-item:hover { background: var(--g050) }
+    .step-num { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 400; font-family: 'DM Mono', monospace; flex-shrink: 0; background: var(--g050); border: 1px solid var(--g100); color: var(--muted); transition: var(--trans) }
+    .step-text { font-size: 11px; font-weight: 300; color: var(--muted); transition: var(--trans) }
+    .step-item.active { background: rgba(45, 125, 210, 0.08); border-color: rgba(45, 125, 210, 0.18) }
+    .step-item.active .step-num { background: var(--g800); border-color: transparent; color: #fff }
+    .step-item.active .step-text { color: var(--text); font-weight: 400 }
+    .step-item.done .step-num { background: var(--g500); border-color: transparent; color: #fff }
+    .step-item.done .step-text { color: var(--muted) }
+    .progress-bar { height: 3px; background: var(--g100); border-radius: 3px; margin: 12px 10px 4px; overflow: hidden }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--g800), var(--g500)); border-radius: 3px; transition: width .5s cubic-bezier(.16, 1, .3, 1) }
+    .progress-label { font-size: 8.5px; font-weight: 300; color: var(--muted); font-family: 'DM Mono', monospace; padding: 0 10px; margin-bottom: 6px }
 
-    /* ══ TOPNAV ══ */
-    .topnav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: var(--nav-h);
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      background: rgba(0, 45, 114, 0.96);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05)
-    }
+    .form-main { overflow-y: auto; padding: 28px 32px 60px; scrollbar-width: thin; scrollbar-color: var(--dim) transparent }
+    .form-main::-webkit-scrollbar { width: 4px }
+    .form-main::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 4px }
 
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-right: 20px;
-      flex-shrink: 0
-    }
+    .page-hd { margin-bottom: 28px; animation: fadeUp .35s both }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(7px) } to { opacity: 1; transform: translateY(0) } }
+    .breadcrumb { display: flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 300; color: var(--dim); font-family: 'DM Mono', monospace; margin-bottom: 6px }
+    .breadcrumb span { color: var(--muted) }
+    .page-hd h1 { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text) }
+    .page-hd h1 em { font-style: italic; color: var(--g700) }
+    [data-theme="dark"] .page-hd h1 em { color: var(--g300) }
+    .page-hd p { font-size: 10px; font-weight: 300; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 4px }
 
-    .logo-icon {
-      width: 29px;
-      height: 29px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #002D72, #7da6d8);
-      display: flex;
-      align-items: center;
-      justify-content: center
-    }
+    .form-section { margin-bottom: 28px; animation: fadeUp .4s both }
+    .section-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--dim) }
+    .section-icon { width: 32px; height: 32px; border-radius: 9px; background: var(--g800); display: flex; align-items: center; justify-content: center; flex-shrink: 0 }
+    .section-icon svg { width: 14px; height: 14px; stroke: var(--g300); fill: none; stroke-width: 1.6; stroke-linecap: round }
+    .section-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text) }
+    .section-sub { font-size: 9.5px; font-weight: 300; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 1px }
+    .section-num { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--dim); margin-left: auto; flex-shrink: 0 }
 
-    .logo-icon svg {
-      width: 13px;
-      height: 13px;
-      stroke: #fff;
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round
-    }
+    .field-card { background: var(--glass); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 20px 22px; box-shadow: 0 1px 12px rgba(0, 0, 0, 0.04); transition: background .3s }
+    [data-theme="dark"] .field-card { background: var(--glass); border-color: var(--glass-border) }
 
-    .logo-text strong {
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      font-weight: 400;
-      color: rgba(204, 220, 240, 0.9);
-      letter-spacing: .1em;
-      display: block;
-      line-height: 1
-    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px }
+    .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px }
+    .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 14px }
+    .grid-full { grid-column: 1/-1 }
+    .gap-top { margin-top: 14px }
 
-    .logo-text small {
-      font-size: 8px;
-      font-weight: 300;
-      color: rgba(125, 166, 216, 0.3);
-      letter-spacing: .18em;
-      text-transform: uppercase
-    }
+    .field { display: flex; flex-direction: column; gap: 5px }
+    .field-label { font-size: 9px; font-weight: 400; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 5px }
+    .field-label .req { color: var(--red); font-size: 10px; font-weight: 400 }
+    .field-label .opt { color: var(--dim); font-size: 8px; font-weight: 300; letter-spacing: .08em; text-transform: none; font-family: 'DM Sans', sans-serif }
+    .field input, .field select, .field textarea { background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 9px; padding: 9px 12px; font-size: 12px; font-weight: 300; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: var(--trans); width: 100% }
+    [data-theme="dark"] .field input, [data-theme="dark"] .field select, [data-theme="dark"] .field textarea { background: rgba(0, 45, 114, 0.3); border-color: rgba(125, 166, 216, 0.15); color: var(--text) }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--g500); background: rgba(255, 255, 255, 0.85); box-shadow: 0 0 0 3px rgba(45, 125, 210, 0.1) }
+    [data-theme="dark"] .field input:focus, [data-theme="dark"] .field select:focus { background: rgba(0, 45, 114, 0.5); box-shadow: 0 0 0 3px rgba(45, 125, 210, 0.15) }
+    .field input.error, .field select.error { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-bg) }
+    .field-hint { font-size: 9px; font-weight: 300; color: var(--dim); font-family: 'DM Mono', monospace }
+    .field-error { font-size: 9px; font-weight: 300; color: var(--red); font-family: 'DM Mono', monospace; display: none }
+    .field-error.show { display: block }
+    .field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232d7dd2' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer }
+    .field textarea { resize: vertical; min-height: 80px; line-height: 1.5 }
 
-    .nav-vdiv {
-      width: 1px;
-      height: 18px;
-      background: rgba(255, 255, 255, 0.07);
-      margin-right: 16px;
-      flex-shrink: 0
-    }
+    .toggle-group { display: flex; gap: 6px; flex-wrap: wrap }
+    .toggle-chip { padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 300; border: 1px solid var(--g100); background: var(--g050); color: var(--muted); cursor: pointer; transition: var(--trans); user-select: none }
+    .toggle-chip:hover { background: var(--g100); color: var(--text) }
+    .toggle-chip.active { background: var(--g800); border-color: transparent; color: var(--g300) }
 
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 1px;
-      flex: 1
-    }
+    .inline-note { display: flex; align-items: flex-start; gap: 8px; padding: 9px 12px; background: var(--gold-bg); border: 1px solid rgba(185, 150, 60, 0.2); border-radius: 9px; margin-top: 10px }
+    .inline-note svg { width: 13px; height: 13px; stroke: var(--gold); fill: none; stroke-width: 1.6; stroke-linecap: round; flex-shrink: 0; margin-top: 1px }
+    .inline-note p { font-size: 9.5px; font-weight: 300; color: var(--gold); line-height: 1.5; font-family: 'DM Mono', monospace }
 
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 6px 12px;
-      border-radius: 9px;
-      font-size: 11.5px;
-      font-weight: 300;
-      color: rgba(204, 220, 240, 0.4);
-      text-decoration: none;
-      cursor: pointer;
-      transition: var(--trans);
-      white-space: nowrap
-    }
+    .field-divider { height: 1px; background: var(--dim); margin: 16px 0; opacity: .5 }
 
-    .nav-link svg {
-      width: 13px;
-      height: 13px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.5;
-      stroke-linecap: round
-    }
+    .avatar-preview { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--g050); border: 1px solid var(--g100); border-radius: 10px; margin-bottom: 14px }
+    .av-circle { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--g800), var(--g500)); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 20px; color: #fff; flex-shrink: 0; transition: var(--trans) }
+    .av-info { flex: 1 }
+    .av-name { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--text); transition: var(--trans) }
+    .av-sub { font-size: 9.5px; font-weight: 300; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; transition: var(--trans) }
 
-    .nav-link:hover {
-      background: rgba(255, 255, 255, 0.06);
-      color: rgba(204, 220, 240, 0.7)
-    }
+    .badge-row { display: flex; gap: 6px; flex-wrap: wrap }
+    .badge-chip { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 300; cursor: pointer; transition: var(--trans); border: 1px solid transparent; user-select: none }
+    .badge-chip.c-activo { background: rgba(45, 125, 210, 0.1); border-color: rgba(45, 125, 210, 0.25); color: var(--g700) }
+    .badge-chip.sel { box-shadow: 0 0 0 2px currentColor }
 
-    .nav-group {
-      position: relative;
-      flex-shrink: 0
-    }
+    .actions-bar { position: sticky; bottom: 0; left: 0; right: 0; padding: 14px 32px; background: rgba(244, 246, 251, 0.9); backdrop-filter: blur(16px); border-top: 1px solid var(--dim); display: flex; align-items: center; justify-content: space-between; z-index: 100; transition: background .3s }
+    [data-theme="dark"] .actions-bar { background: rgba(6, 13, 26, 0.9) }
+    .actions-left { display: flex; align-items: center; gap: 8px }
+    .actions-right { display: flex; align-items: center; gap: 8px }
+    .btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 9px; font-size: 11.5px; font-weight: 300; cursor: pointer; transition: var(--trans); border: none; font-family: 'DM Sans', sans-serif }
+    .btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; flex-shrink: 0 }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--dim) }
+    .btn-ghost:hover { background: var(--g050); color: var(--text); border-color: var(--g100) }
+    .btn-outline { background: transparent; color: var(--g700); border: 1px solid var(--g300) }
+    .btn-outline:hover { background: var(--g050) }
+    [data-theme="dark"] .btn-outline { color: var(--g300); border-color: rgba(125, 166, 216, 0.3) }
+    .btn-primary { background: var(--g800); color: var(--g300); border: 1px solid transparent }
+    .btn-primary:hover { background: var(--g700); box-shadow: 0 4px 14px rgba(26, 91, 168, 0.3) }
+    .btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid rgba(228, 0, 43, 0.2) }
+    .btn-danger:hover { background: rgba(228, 0, 43, 0.15) }
+    .required-note { font-size: 9px; font-weight: 300; color: var(--dim); font-family: 'DM Mono', monospace }
+    .required-note span { color: var(--red) }
 
-    .nav-group-btn {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 6px 11px;
-      border-radius: 9px;
-      font-size: 11.5px;
-      font-weight: 300;
-      color: rgba(204, 220, 240, 0.4);
-      cursor: pointer;
-      transition: var(--trans);
-      white-space: nowrap;
-      user-select: none
-    }
+    .toast { position: fixed; bottom: 80px; right: 24px; z-index: 9999; padding: 11px 18px; border-radius: 11px; font-size: 11px; font-weight: 300; font-family: 'DM Mono', monospace; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18); opacity: 0; transform: translateY(10px); transition: opacity .22s, transform .22s; pointer-events: none }
+    .toast.show { opacity: 1; transform: translateY(0) }
+    .toast.ok { background: var(--g800); color: var(--g300) }
+    .toast.err { background: rgba(228, 0, 43, 0.9); color: #fff }
 
-    .nav-group-btn svg {
-      width: 13px;
-      height: 13px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.5;
-      stroke-linecap: round
-    }
+    .form-section:nth-child(1) { animation-delay: .04s }
+    .form-section:nth-child(2) { animation-delay: .08s }
+    .form-section:nth-child(3) { animation-delay: .12s }
+    .form-section:nth-child(4) { animation-delay: .16s }
+    .form-section:nth-child(5) { animation-delay: .20s }
 
-    .nav-chevron {
-      margin-left: 2px;
-      transition: transform .2s;
-      opacity: .5
-    }
+    .wizard-indicator { display: flex; align-items: center; margin-bottom: 20px }
+    .wi-step { display: flex; align-items: center; gap: 8px; flex: 1 }
+    .wi-bubble { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 400; font-family: 'DM Mono', monospace; flex-shrink: 0; background: var(--g050); border: 1px solid var(--g100); color: var(--muted); transition: var(--trans) }
+    .wi-label { font-size: 10px; font-weight: 300; color: var(--muted); font-family: 'DM Mono', monospace }
+    .wi-step.wi-active .wi-bubble { background: var(--g800); border-color: transparent; color: #fff }
+    .wi-step.wi-active .wi-label { color: var(--text); font-weight: 400 }
+    .wi-step.wi-done .wi-bubble { background: var(--g500); border-color: transparent; color: #fff }
+    .wi-connector { flex: 0 0 32px; height: 1px; background: var(--dim); margin: 0 4px }
 
-    .nav-group-btn:hover,
-    .nav-group.open .nav-group-btn {
-      background: rgba(255, 255, 255, 0.06);
-      color: rgba(204, 220, 240, 0.7)
-    }
+    .wizard-panel { display: none }
+    .wizard-panel.wp-active { display: block }
 
-    .nav-group.open .nav-group-btn {
-      background: rgba(125, 166, 216, 0.11);
-      color: var(--g300)
-    }
+    .modal-overlay { position: fixed; inset: 0; z-index: 9000; background: rgba(0, 10, 30, .55); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s }
+    .modal-overlay.show { opacity: 1; pointer-events: all }
+    .modal-box { background: var(--bone); border: 1px solid var(--glass-border); border-radius: 18px; padding: 32px 28px 24px; width: 430px; max-width: 92vw; box-shadow: 0 24px 64px rgba(0, 0, 0, .22); transform: translateY(12px); transition: transform .25s }
+    .modal-overlay.show .modal-box { transform: translateY(0) }
+    .modal-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(45, 125, 210, .12); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px }
+    .modal-icon svg { width: 22px; height: 22px; stroke: var(--g500); fill: none; stroke-width: 1.8; stroke-linecap: round }
+    .modal-title { font-family: 'DM Serif Display', serif; font-size: 18px; text-align: center; color: var(--text); margin-bottom: 8px }
+    .modal-msg { font-size: 11px; font-weight: 300; color: var(--muted); font-family: 'DM Mono', monospace; text-align: center; line-height: 1.6; margin-bottom: 20px }
+    .modal-actions { display: flex; justify-content: center; gap: 10px }
 
-    .nav-group.open .nav-chevron {
-      transform: rotate(180deg)
-    }
+    .info-pill { display: flex; align-items: flex-start; gap: 8px; padding: 10px 14px; background: rgba(45, 125, 210, .07); border: 1px solid rgba(45, 125, 210, .18); border-radius: 9px; margin-top: 6px }
+    .info-pill svg { width: 13px; height: 13px; stroke: var(--g500); fill: none; stroke-width: 1.6; flex-shrink: 0; margin-top: 1px }
+    .info-pill p { font-size: 9.5px; font-weight: 300; color: var(--g700); font-family: 'DM Mono', monospace; line-height: 1.5 }
+    [data-theme="dark"] .info-pill p { color: var(--g300) }
 
-    .nav-submenu {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      min-width: 200px;
-      background: rgba(0, 31, 82, 0.97);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(125, 166, 216, 0.1);
-      border-radius: 12px;
-      padding: 6px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
-      z-index: 300;
-      opacity: 0;
-      transform: translateY(-6px);
-      pointer-events: none;
-      transition: opacity .18s, transform .18s
-    }
+    /* ══ TABLA NOMBRAMIENTOS ══ */
+    .nom-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px }
+    .nom-table th { font-size: 8.5px; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-family: 'DM Mono', monospace; padding: 6px 8px; border-bottom: 1px solid var(--dim); text-align: left }
+    .nom-table td { padding: 7px 8px; font-weight: 300; color: var(--text); border-bottom: 1px solid var(--dim); vertical-align: middle }
+    .nom-table tr:last-child td { border-bottom: none }
+    .nom-table input, .nom-table select { padding: 5px 8px; font-size: 11px; border-radius: 7px; width: 100%; border: 1px solid rgba(0, 0, 0, .1); background: rgba(255, 255, 255, .6); font-family: 'DM Sans', sans-serif; color: var(--text); outline: none }
+    [data-theme="dark"] .nom-table input, [data-theme="dark"] .nom-table select { background: rgba(0, 45, 114, .3); border-color: rgba(125, 166, 216, .15) }
+    .nom-table input.error, .nom-table select.error { border-color: var(--red) }
+    .btn-remove-row { background: var(--red-bg); border: 1px solid rgba(228, 0, 43, .2); color: var(--red); border-radius: 7px; padding: 4px 10px; cursor: pointer; font-size: 10px; font-family: 'DM Sans', sans-serif; transition: var(--trans); white-space: nowrap }
+    .btn-remove-row:hover { background: rgba(228, 0, 43, .15) }
+    .btn-add-row { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; margin-top: 10px; background: var(--g050); border: 1px dashed var(--g300); color: var(--g700); font-size: 11px; font-weight: 300; cursor: pointer; transition: var(--trans); font-family: 'DM Sans', sans-serif }
+    .btn-add-row:hover { background: var(--g100) }
+    .btn-add-row svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2 }
 
-    .nav-group.open .nav-submenu {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: all
-    }
-
-    .nav-sub-item {
-      display: block;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 11.5px;
-      font-weight: 300;
-      color: rgba(204, 220, 240, 0.5);
-      text-decoration: none;
-      cursor: pointer;
-      transition: var(--trans);
-      white-space: nowrap
-    }
-
-    .nav-sub-item:hover {
-      background: rgba(125, 166, 216, 0.1);
-      color: rgba(204, 220, 240, 0.85)
-    }
-
-    .nav-sub-item.active {
-      background: rgba(26, 91, 168, 0.15);
-      color: var(--g300)
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-left: auto;
-      flex-shrink: 0
-    }
-
-    .action-btn {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 300;
-      color: rgba(125, 166, 216, 0.38);
-      transition: var(--trans)
-    }
-
-    .action-btn svg {
-      width: 12px;
-      height: 12px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.5;
-      stroke-linecap: round
-    }
-
-    .action-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: rgba(204, 220, 240, 0.62)
-    }
-
-    .nav-link.nav-link--active {
-      background: rgba(255, 255, 255, 0.06);
-      color: rgba(204, 220, 240, 0.85)
-    }
-
-    .action-btn.logout:hover {
-      color: rgba(228, 0, 43, 0.7)
-    }
-
-    .user-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 10px 4px 5px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      cursor: pointer
-    }
-
-    .avatar {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--g800), var(--g700));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9.5px;
-      font-weight: 500;
-      color: #fff
-    }
-
-    .user-pill-name {
-      font-size: 11px;
-      font-weight: 300;
-      color: rgba(204, 220, 240, 0.62)
-    }
-
-    .user-pill-nom {
-      font-size: 8.5px;
-      font-weight: 300;
-      color: rgba(125, 166, 216, 0.35)
-    }
-
-    .nav-sep {
-      width: 1px;
-      height: 14px;
-      background: rgba(255, 255, 255, 0.07);
-      margin: 0 4px
-    }
-
-    /* ══ PAGE LAYOUT ══ */
-    .page-wrap {
-      position: relative;
-      z-index: 10;
-      margin-top: var(--nav-h);
-      min-height: calc(100vh - var(--nav-h));
+    /* ══ SALDO PREVIEW ══ */
+    .saldo-preview {
       display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 0
-    }
-
-    /* ══ STICKY SIDEBAR (progreso) ══ */
-    .form-sidebar {
-      position: sticky;
-      top: var(--nav-h);
-      height: calc(100vh - var(--nav-h));
-      overflow-y: auto;
-      padding: 24px 16px;
-      border-right: 1px solid var(--dim);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--dim) transparent
-    }
-
-    .sidebar-label {
-      font-size: 8px;
-      font-weight: 400;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: var(--dim);
-      font-family: 'DM Mono', monospace;
-      padding: 4px 10px;
-      margin-top: 8px;
-      margin-bottom: 2px
-    }
-
-    .sidebar-label:first-child {
-      margin-top: 0
-    }
-
-    .step-item {
-      display: flex;
-      align-items: center;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: var(--trans);
-      border: 1px solid transparent
+      margin-top: 16px;
     }
-
-    .step-item:hover {
-      background: var(--g050)
-    }
-
-    .step-num {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      font-weight: 400;
-      font-family: 'DM Mono', monospace;
-      flex-shrink: 0;
+    .saldo-card {
       background: var(--g050);
       border: 1px solid var(--g100);
-      color: var(--muted);
-      transition: var(--trans)
+      border-radius: 10px;
+      padding: 12px 14px;
+      text-align: center;
+      transition: var(--trans);
     }
-
-    .step-text {
-      font-size: 11px;
-      font-weight: 300;
-      color: var(--muted);
-      transition: var(--trans)
+    .saldo-card.highlight {
+      background: rgba(26, 122, 74, 0.06);
+      border-color: rgba(26, 122, 74, 0.2);
     }
-
-    .step-item.active {
-      background: rgba(45, 125, 210, 0.08);
-      border-color: rgba(45, 125, 210, 0.18)
-    }
-
-    .step-item.active .step-num {
-      background: var(--g800);
-      border-color: transparent;
-      color: #fff
-    }
-
-    .step-item.active .step-text {
-      color: var(--text);
-      font-weight: 400
-    }
-
-    .step-item.done .step-num {
-      background: var(--g500);
-      border-color: transparent;
-      color: #fff
-    }
-
-    .step-item.done .step-text {
-      color: var(--muted)
-    }
-
-    .progress-bar {
-      height: 3px;
-      background: var(--g100);
-      border-radius: 3px;
-      margin: 12px 10px 4px;
-      overflow: hidden
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--g800), var(--g500));
-      border-radius: 3px;
-      transition: width .5s cubic-bezier(.16, 1, .3, 1)
-    }
-
-    .progress-label {
-      font-size: 8.5px;
-      font-weight: 300;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      padding: 0 10px;
-      margin-bottom: 6px
-    }
-
-    /* ══ MAIN FORM AREA ══ */
-    .form-main {
-      overflow-y: auto;
-      padding: 28px 32px 60px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--dim) transparent
-    }
-
-    .form-main::-webkit-scrollbar {
-      width: 4px
-    }
-
-    .form-main::-webkit-scrollbar-thumb {
-      background: var(--dim);
-      border-radius: 4px
-    }
-
-    /* ══ PAGE HEADER ══ */
-    .page-hd {
-      margin-bottom: 28px;
-      animation: fadeUp .35s both
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(7px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 9.5px;
-      font-weight: 300;
-      color: var(--dim);
-      font-family: 'DM Mono', monospace;
-      margin-bottom: 6px
-    }
-
-    .breadcrumb span {
-      color: var(--muted)
-    }
-
-    .page-hd h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 24px;
-      color: var(--text)
-    }
-
-    .page-hd h1 em {
-      font-style: italic;
-      color: var(--g700)
-    }
-
-    [data-theme="dark"] .page-hd h1 em {
-      color: var(--g300)
-    }
-
-    .page-hd p {
-      font-size: 10px;
-      font-weight: 300;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      margin-top: 4px
-    }
-
-    /* ══ SECTIONS ══ */
-    .form-section {
-      margin-bottom: 28px;
-      animation: fadeUp .4s both
-    }
-
-    .section-hd {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--dim)
-    }
-
-    .section-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 9px;
-      background: var(--g800);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0
-    }
-
-    .section-icon svg {
-      width: 14px;
-      height: 14px;
-      stroke: var(--g300);
-      fill: none;
-      stroke-width: 1.6;
-      stroke-linecap: round
-    }
-
-    .section-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 16px;
-      color: var(--text)
-    }
-
-    .section-sub {
-      font-size: 9.5px;
-      font-weight: 300;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      margin-top: 1px
-    }
-
-    .section-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 9px;
-      color: var(--dim);
-      margin-left: auto;
-      flex-shrink: 0
-    }
-
-    /* ══ FIELD CARD ══ */
-    .field-card {
-      background: var(--glass);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      padding: 20px 22px;
-      box-shadow: 0 1px 12px rgba(0, 0, 0, 0.04);
-      transition: background .3s
-    }
-
-    [data-theme="dark"] .field-card {
-      background: var(--glass);
-      border-color: var(--glass-border)
-    }
-
-    /* ══ GRID LAYOUTS ══ */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px
-    }
-
-    .grid-2-1 {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 14px
-    }
-
-    .grid-1-2 {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 14px
-    }
-
-    .grid-full {
-      grid-column: 1/-1
-    }
-
-    .gap-top {
-      margin-top: 14px
-    }
-
-    /* ══ FIELD ══ */
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 5px
-    }
-
-    .field-label {
-      font-size: 9px;
+    .saldo-card-label {
+      font-size: 8px;
       font-weight: 400;
       letter-spacing: .16em;
       text-transform: uppercase;
       color: var(--muted);
       font-family: 'DM Mono', monospace;
-      display: flex;
-      align-items: center;
-      gap: 5px
+      margin-bottom: 6px;
     }
-
-    .field-label .req {
-      color: var(--red);
-      font-size: 10px;
-      font-weight: 400
-    }
-
-    .field-label .opt {
-      color: var(--dim);
-      font-size: 8px;
-      font-weight: 300;
-      letter-spacing: .08em;
-      text-transform: none;
-      font-family: 'DM Sans', sans-serif
-    }
-
-    .field input,
-    .field select,
-    .field textarea {
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: 9px;
-      padding: 9px 12px;
-      font-size: 12px;
-      font-weight: 300;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text);
-      outline: none;
-      transition: var(--trans);
-      width: 100%;
-    }
-
-    [data-theme="dark"] .field input,
-    [data-theme="dark"] .field select,
-    [data-theme="dark"] .field textarea {
-      background: rgba(0, 45, 114, 0.3);
-      border-color: rgba(125, 166, 216, 0.15);
-      color: var(--text);
-    }
-
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus {
-      border-color: var(--g500);
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 0 0 3px rgba(45, 125, 210, 0.1);
-    }
-
-    [data-theme="dark"] .field input:focus,
-    [data-theme="dark"] .field select:focus {
-      background: rgba(0, 45, 114, 0.5);
-      box-shadow: 0 0 0 3px rgba(45, 125, 210, 0.15);
-    }
-
-    .field input.error,
-    .field select.error {
-      border-color: var(--red);
-      box-shadow: 0 0 0 3px var(--red-bg)
-    }
-
-    .field-hint {
-      font-size: 9px;
-      font-weight: 300;
-      color: var(--dim);
-      font-family: 'DM Mono', monospace
-    }
-
-    .field-error {
-      font-size: 9px;
-      font-weight: 300;
-      color: var(--red);
-      font-family: 'DM Mono', monospace;
-      display: none
-    }
-
-    .field-error.show {
-      display: block
-    }
-
-    .field select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232d7dd2' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      padding-right: 28px;
-      cursor: pointer
-    }
-
-    .field textarea {
-      resize: vertical;
-      min-height: 80px;
-      line-height: 1.5
-    }
-
-    /* ══ TOGGLE CHIP ══ */
-    .toggle-group {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap
-    }
-
-    .toggle-chip {
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 300;
-      border: 1px solid var(--g100);
-      background: var(--g050);
-      color: var(--muted);
-      cursor: pointer;
-      transition: var(--trans);
-      user-select: none
-    }
-
-    .toggle-chip:hover {
-      background: var(--g100);
-      color: var(--text)
-    }
-
-    .toggle-chip.active {
-      background: var(--g800);
-      border-color: transparent;
-      color: var(--g300)
-    }
-
-    .toggle-chip.active-red {
-      background: rgba(228, 0, 43, 0.1);
-      border-color: rgba(228, 0, 43, 0.25);
-      color: var(--red)
-    }
-
-    .toggle-chip.active-gold {
-      background: var(--gold-bg);
-      border-color: rgba(185, 150, 60, 0.3);
-      color: var(--gold)
-    }
-
-    /* ══ INLINE NOTE ══ */
-    .inline-note {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 9px 12px;
-      background: var(--gold-bg);
-      border: 1px solid rgba(185, 150, 60, 0.2);
-      border-radius: 9px;
-      margin-top: 10px
-    }
-
-    .inline-note svg {
-      width: 13px;
-      height: 13px;
-      stroke: var(--gold);
-      fill: none;
-      stroke-width: 1.6;
-      stroke-linecap: round;
-      flex-shrink: 0;
-      margin-top: 1px
-    }
-
-    .inline-note p {
-      font-size: 9.5px;
-      font-weight: 300;
-      color: var(--gold);
-      line-height: 1.5;
-      font-family: 'DM Mono', monospace
-    }
-
-    /* ══ DIVIDER ══ */
-    .field-divider {
-      height: 1px;
-      background: var(--dim);
-      margin: 16px 0;
-      opacity: .5
-    }
-
-    /* ══ AVATAR PREVIEW ══ */
-    .avatar-preview {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px;
-      background: var(--g050);
-      border: 1px solid var(--g100);
-      border-radius: 10px;
-      margin-bottom: 14px
-    }
-
-    .av-circle {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--g800), var(--g500));
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .saldo-card-value {
       font-family: 'DM Serif Display', serif;
-      font-size: 20px;
-      color: #fff;
-      flex-shrink: 0;
-      transition: var(--trans)
-    }
-
-    .av-info {
-      flex: 1
-    }
-
-    .av-name {
-      font-family: 'DM Serif Display', serif;
-      font-size: 15px;
+      font-size: 22px;
       color: var(--text);
-      transition: var(--trans)
+      line-height: 1;
     }
-
-    .av-sub {
-      font-size: 9.5px;
+    .saldo-card.highlight .saldo-card-value {
+      color: var(--green);
+    }
+    [data-theme="dark"] .saldo-card.highlight .saldo-card-value {
+      color: #4caf7d;
+    }
+    .saldo-card-unit {
+      font-size: 9px;
       font-weight: 300;
       color: var(--muted);
       font-family: 'DM Mono', monospace;
       margin-top: 2px;
-      transition: var(--trans)
     }
-
-    /* ══ BADGE CHIPS ══ */
-    .badge-row {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap
-    }
-
-    .badge-chip {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 300;
-      cursor: pointer;
-      transition: var(--trans);
-      border: 1px solid transparent;
-      user-select: none
-    }
-
-    .badge-chip.c-activo {
-      background: rgba(45, 125, 210, 0.1);
-      border-color: rgba(45, 125, 210, 0.25);
-      color: var(--g700)
-    }
-
-    .badge-chip.c-inactivo {
-      background: rgba(180, 180, 180, 0.1);
-      border-color: rgba(180, 180, 180, 0.25);
-      color: var(--muted)
-    }
-
-    .badge-chip.c-suspendido {
-      background: var(--gold-bg);
-      border-color: rgba(185, 150, 60, 0.25);
-      color: var(--gold)
-    }
-
-    .badge-chip.sel {
-      box-shadow: 0 0 0 2px currentColor
-    }
-
-    /* ══ ACTIONS BAR ══ */
-    .actions-bar {
-      position: sticky;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 14px 32px;
-      background: rgba(244, 246, 251, 0.9);
-      backdrop-filter: blur(16px);
-      border-top: 1px solid var(--dim);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 100;
-      transition: background .3s
-    }
-
-    [data-theme="dark"] .actions-bar {
-      background: rgba(6, 13, 26, 0.9)
-    }
-
-    .actions-left {
-      display: flex;
-      align-items: center;
-      gap: 8px
-    }
-
-    .actions-right {
-      display: flex;
-      align-items: center;
-      gap: 8px
-    }
-
-    .btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      border-radius: 9px;
-      font-size: 11.5px;
-      font-weight: 300;
-      cursor: pointer;
-      transition: var(--trans);
-      border: none;
-      font-family: 'DM Sans', sans-serif
-    }
-
-    .btn svg {
-      width: 13px;
-      height: 13px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.6;
-      stroke-linecap: round;
-      flex-shrink: 0
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--dim)
-    }
-
-    .btn-ghost:hover {
-      background: var(--g050);
-      color: var(--text);
-      border-color: var(--g100)
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--g700);
-      border: 1px solid var(--g300)
-    }
-
-    .btn-outline:hover {
-      background: var(--g050)
-    }
-
-    [data-theme="dark"] .btn-outline {
-      color: var(--g300);
-      border-color: rgba(125, 166, 216, 0.3)
-    }
-
-    .btn-primary {
-      background: var(--g800);
-      color: var(--g300);
-      border: 1px solid transparent
-    }
-
-    .btn-primary:hover {
-      background: var(--g700);
-      box-shadow: 0 4px 14px rgba(26, 91, 168, 0.3)
-    }
-
-    .btn-danger {
-      background: var(--red-bg);
-      color: var(--red);
-      border: 1px solid rgba(228, 0, 43, 0.2)
-    }
-
-    .btn-danger:hover {
-      background: rgba(228, 0, 43, 0.15)
-    }
-
-    .required-note {
+    .saldo-regla {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(45, 125, 210, 0.05);
+      border: 1px solid rgba(45, 125, 210, 0.12);
+      border-radius: 8px;
       font-size: 9px;
       font-weight: 300;
-      color: var(--dim);
-      font-family: 'DM Mono', monospace
-    }
-
-    .required-note span {
-      color: var(--red)
-    }
-
-    /* ══ TOAST ══ */
-    .toast {
-      position: fixed;
-      bottom: 80px;
-      right: 24px;
-      z-index: 9999;
-      padding: 11px 18px;
-      border-radius: 11px;
-      font-size: 11px;
-      font-weight: 300;
-      font-family: 'DM Mono', monospace;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity .22s, transform .22s;
-      pointer-events: none
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0)
-    }
-
-    .toast.ok {
-      background: var(--g800);
-      color: var(--g300)
-    }
-
-    .toast.err {
-      background: rgba(228, 0, 43, 0.9);
-      color: #fff
-    }
-
-    /* ══ SECTION ANIMATIONS ══ */
-    .form-section:nth-child(1) {
-      animation-delay: .04s
-    }
-
-    .form-section:nth-child(2) {
-      animation-delay: .08s
-    }
-
-    .form-section:nth-child(3) {
-      animation-delay: .12s
-    }
-
-    .form-section:nth-child(4) {
-      animation-delay: .16s
-    }
-
-    .form-section:nth-child(5) {
-      animation-delay: .20s
-    }
-
-    .form-section:nth-child(6) {
-      animation-delay: .24s
-    }
-
-    /* ══ WIZARD STEP INDICATOR ══ */
-    .wizard-indicator {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .wi-step {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1;
-    }
-
-    .wi-bubble {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 400;
-      font-family: 'DM Mono', monospace;
-      flex-shrink: 0;
-      background: var(--g050);
-      border: 1px solid var(--g100);
       color: var(--muted);
-      transition: var(--trans);
-    }
-
-    .wi-label {
-      font-size: 10px;
-      font-weight: 300;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-    }
-
-    .wi-step.wi-active .wi-bubble {
-      background: var(--g800);
-      border-color: transparent;
-      color: #fff;
-    }
-
-    .wi-step.wi-active .wi-label {
-      color: var(--text);
-      font-weight: 400;
-    }
-
-    .wi-step.wi-done .wi-bubble {
-      background: var(--g500);
-      border-color: transparent;
-      color: #fff;
-    }
-
-    .wi-connector {
-      flex: 0 0 32px;
-      height: 1px;
-      background: var(--dim);
-      margin: 0 4px;
-    }
-
-    /* ══ WIZARD PANELS ══ */
-    .wizard-panel {
-      display: none;
-    }
-
-    .wizard-panel.wp-active {
-      display: block;
-    }
-
-    /* ══ MODAL CONFIRMACIÓN (Paso 12) ══ */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9000;
-      background: rgba(0, 10, 30, .55);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s;
-    }
-
-    .modal-overlay.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .modal-box {
-      background: var(--bone);
-      border: 1px solid var(--glass-border);
-      border-radius: 18px;
-      padding: 32px 28px 24px;
-      width: 430px;
-      max-width: 92vw;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, .22);
-      transform: translateY(12px);
-      transition: transform .25s;
-    }
-
-    .modal-overlay.show .modal-box {
-      transform: translateY(0);
-    }
-
-    .modal-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: rgba(45, 125, 210, .12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 16px;
-    }
-
-    .modal-icon svg {
-      width: 22px;
-      height: 22px;
-      stroke: var(--g500);
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-    }
-
-    .modal-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 18px;
-      text-align: center;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-
-    .modal-msg {
-      font-size: 11px;
-      font-weight: 300;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      text-align: center;
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    /* ══ INFO PILL (contraseña autogenerada) ══ */
-    .info-pill {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 10px 14px;
-      background: rgba(45, 125, 210, .07);
-      border: 1px solid rgba(45, 125, 210, .18);
-      border-radius: 9px;
-      margin-top: 6px;
-    }
-
-    .info-pill svg {
-      width: 13px;
-      height: 13px;
-      stroke: var(--g500);
-      fill: none;
-      stroke-width: 1.6;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .info-pill p {
-      font-size: 9.5px;
-      font-weight: 300;
-      color: var(--g700);
       font-family: 'DM Mono', monospace;
       line-height: 1.5;
     }
-
-    [data-theme="dark"] .info-pill p {
+    .saldo-regla strong {
+      color: var(--g700);
+      font-weight: 400;
+    }
+    [data-theme="dark"] .saldo-regla strong {
       color: var(--g300);
     }
-
-    /* ══ TABLA NOMBRAMIENTOS (múltiples) ══ */
-    .nom-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 8px;
-      font-size: 11px;
-    }
-
-    .nom-table th {
-      font-size: 8.5px;
-      font-weight: 400;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      padding: 6px 8px;
-      border-bottom: 1px solid var(--dim);
-      text-align: left;
-    }
-
-    .nom-table td {
-      padding: 7px 8px;
-      font-weight: 300;
-      color: var(--text);
-      border-bottom: 1px solid var(--dim);
-      vertical-align: middle;
-    }
-
-    .nom-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .nom-table input,
-    .nom-table select {
-      padding: 5px 8px;
-      font-size: 11px;
-      border-radius: 7px;
-      width: 100%;
-      border: 1px solid rgba(0, 0, 0, .1);
-      background: rgba(255, 255, 255, .6);
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text);
-      outline: none;
-    }
-
-    [data-theme="dark"] .nom-table input,
-    [data-theme="dark"] .nom-table select {
-      background: rgba(0, 45, 114, .3);
-      border-color: rgba(125, 166, 216, .15);
-    }
-
-    .nom-table input.error,
-    .nom-table select.error {
-      border-color: var(--red);
-    }
-
-    .btn-remove-row {
-      background: var(--red-bg);
-      border: 1px solid rgba(228, 0, 43, .2);
-      color: var(--red);
-      border-radius: 7px;
-      padding: 4px 10px;
-      cursor: pointer;
+    .saldo-empty {
+      text-align: center;
+      padding: 18px;
       font-size: 10px;
-      font-family: 'DM Sans', sans-serif;
-      transition: var(--trans);
-      white-space: nowrap;
-    }
-
-    .btn-remove-row:hover {
-      background: rgba(228, 0, 43, .15);
-    }
-
-    .btn-add-row {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      border-radius: 8px;
-      margin-top: 10px;
-      background: var(--g050);
-      border: 1px dashed var(--g300);
-      color: var(--g700);
-      font-size: 11px;
       font-weight: 300;
-      cursor: pointer;
-      transition: var(--trans);
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .btn-add-row:hover {
-      background: var(--g100);
-    }
-
-    .btn-add-row svg {
-      width: 12px;
-      height: 12px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
+      color: var(--dim);
+      font-family: 'DM Mono', monospace;
     }
   </style>
 </head>
 
 <body>
-
   <div class="bg"></div>
   <div class="toast" id="toast"></div>
 
-  <!-- ══ NAVBAR (componente compartido) ══ -->
   <app-navbar></app-navbar>
 
-  <!-- ══ MODAL CONFIRMACIÓN — Paso 12 / MSG-REG-001 ══ -->
+  <!-- ══ MODAL CONFIRMACIÓN ══ -->
   <div class="modal-overlay" id="modalConfirm">
     <div class="modal-box">
       <div class="modal-icon">
@@ -1443,19 +325,15 @@
         </svg>
       </div>
       <div class="modal-title">¡Usuario creado exitosamente!</div>
-      <div class="modal-msg" id="modalMsg">El funcionario puede revisar su correo electrónico para obtener sus
-        credenciales de acceso.</div>
+      <div class="modal-msg" id="modalMsg">El funcionario puede revisar su correo electrónico para obtener sus credenciales de acceso.</div>
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="closeModal()">
-          <svg viewBox="0 0 24 24">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
           Aceptar
         </button>
       </div>
     </div>
   </div>
-
 
   <!-- ══ PAGE LAYOUT ══ -->
   <div class="page-wrap">
@@ -1465,8 +343,7 @@
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill" style="width:0%"></div>
       </div>
-      <div class="progress-label" id="progressLabel">0 / 6 secciones</div>
-
+      <div class="progress-label" id="progressLabel">0 / 6 campos clave</div>
       <div class="sidebar-label">Secciones</div>
       <div class="step-item active" id="step-1" onclick="scrollToSection('s1')">
         <div class="step-num">1</div>
@@ -1488,9 +365,6 @@
         <div class="step-num">5</div>
         <div class="step-text">Acceso al Sistema</div>
       </div>
-     
-
-
     </aside>
 
     <!-- Form main -->
@@ -1523,30 +397,23 @@
         </div>
       </div>
 
-      <!-- ══════════════════════════════════════════════ -->
-      <!-- PASO 1 — DATOS PERSONALES                     -->
-      <!-- ══════════════════════════════════════════════ -->
+      <!-- ══ PASO 1 — DATOS PERSONALES ══ -->
       <div class="wizard-panel wp-active" id="wizardPanel1">
 
-        <!-- ══ S1: DATOS PERSONALES ══ -->
         <div class="form-section" id="s1">
           <div class="section-hd">
-            <div class="section-icon"><svg viewBox="0 0 24 24">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg></div>
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
             <div>
               <div class="section-title">Datos Personales</div>
               <div class="section-sub">identificación · nombre · fecha de nacimiento</div>
             </div>
-            <div class="section-num">01 / 06</div>
+            <div class="section-num">01 / 05</div>
           </div>
           <div class="field-card">
             <div class="grid-2-1">
               <div class="field">
                 <label class="field-label">Cédula / Pasaporte / DIMEX <span class="req">*</span></label>
-                <input type="text" id="cedula" name="cedula" placeholder="Ej: 123456789" maxlength="20"
-                  oninput="updatePreview(); autoFillUsuario()">
+                <input type="text" id="cedula" name="cedula" placeholder="Ej: 123456789" maxlength="20" oninput="updatePreview(); autoFillUsuario()">
                 <span class="field-hint">Nacional: 9 dígitos · Extranjero: 9–12 dígitos</span>
                 <span class="field-error" id="err-cedula">Cédula requerida</span>
               </div>
@@ -1560,62 +427,54 @@
             </div>
             <div class="field-divider"></div>
             <div class="grid-3">
-              <div class="field" style="grid-column:span 1">
+              <div class="field">
                 <label class="field-label">Nombre Completo <span class="req">*</span></label>
-                <input type="text" id="nombre" name="nombre" placeholder="Nombre(s)" maxlength="50"
-                  oninput="updatePreview()">
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre(s)" maxlength="50" oninput="updatePreview()">
                 <span class="field-hint">Máx. 50 caracteres</span>
                 <span class="field-error" id="err-nombre">Nombre requerido</span>
               </div>
               <div class="field">
                 <label class="field-label">Primer Apellido <span class="req">*</span></label>
-                <input type="text" id="apellido1" name="apellido1" placeholder="Primer apellido" maxlength="100"
-                  oninput="updatePreview()">
+                <input type="text" id="apellido1" name="apellido1" placeholder="Primer apellido" maxlength="100" oninput="updatePreview()">
                 <span class="field-error" id="err-apellido1">Apellido requerido</span>
               </div>
               <div class="field">
                 <label class="field-label">Segundo Apellido <span class="opt">(opcional)</span></label>
-                <input type="text" id="apellido2" name="apellido2" placeholder="Segundo apellido" maxlength="100"
-                  oninput="updatePreview()">
+                <input type="text" id="apellido2" name="apellido2" placeholder="Segundo apellido" maxlength="100" oninput="updatePreview()">
               </div>
             </div>
             <div class="field-divider"></div>
-            <!-- V6: fecha nacimiento + teléfono -->
             <div class="grid-2">
               <div class="field">
                 <label class="field-label">Fecha de Nacimiento <span class="req">*</span></label>
                 <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
-                <span class="field-hint">Debe ser mayor de 18 años (V6)</span>
+                <span class="field-hint">Debe ser mayor de 18 años</span>
                 <span class="field-error" id="err-fnac">Fecha de nacimiento requerida</span>
               </div>
               <div class="field">
                 <label class="field-label">Teléfono <span class="req">*</span></label>
                 <input type="tel" id="telefono" name="telefono" placeholder="Ej: 88888888" maxlength="20">
-                <span class="field-hint">Solo números positivos (V5)</span>
+                <span class="field-hint">Solo números</span>
                 <span class="field-error" id="err-telefono">Teléfono requerido</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ══ S2: CONTACTO ══ -->
         <div class="form-section" id="s2">
           <div class="section-hd">
-            <div class="section-icon"><svg viewBox="0 0 24 24">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <polyline points="22,6 12,13 2,6" />
-              </svg></div>
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
             <div>
               <div class="section-title">Contacto</div>
               <div class="section-sub">email · las credenciales se enviarán aquí</div>
             </div>
-            <div class="section-num">02 / 06</div>
+            <div class="section-num">02 / 05</div>
           </div>
           <div class="field-card">
             <div class="field">
               <label class="field-label">Correo Electrónico <span class="req">*</span></label>
               <input type="email" id="email" name="email" placeholder="funcionario@cuc.ac.cr" maxlength="150">
-              <span class="field-hint">Las credenciales de acceso se enviarán a este correo (Paso 11)</span>
+              <span class="field-hint">Las credenciales de acceso se enviarán a este correo</span>
               <span class="field-error" id="err-email">Email requerido y válido</span>
             </div>
           </div>
@@ -1623,23 +482,17 @@
 
       </div><!-- /wizardPanel1 -->
 
-      <!-- ══════════════════════════════════════════════ -->
-      <!-- PASO 2 — DATOS LABORALES                      -->
-      <!-- ══════════════════════════════════════════════ -->
+      <!-- ══ PASO 2 — DATOS LABORALES ══ -->
       <div class="wizard-panel" id="wizardPanel2">
 
-        <!-- ══ S3: CARGO Y DEPARTAMENTO ══ -->
         <div class="form-section" id="s3">
           <div class="section-hd">
-            <div class="section-icon"><svg viewBox="0 0 24 24">
-                <rect x="2" y="7" width="20" height="14" rx="2" />
-                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-              </svg></div>
+            <div class="section-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
             <div>
               <div class="section-title">Cargo y Departamento</div>
               <div class="section-sub">departamento · cargo · tipo · condición · código</div>
             </div>
-            <div class="section-num">03 / 06</div>
+            <div class="section-num">03 / 05</div>
           </div>
           <div class="field-card">
             <div class="grid-3">
@@ -1647,12 +500,6 @@
                 <label class="field-label">Departamento <span class="req">*</span></label>
                 <select id="id_departamento" name="id_departamento" onchange="updatePreview()">
                   <option value="">— Seleccionar —</option>
-                  <option value="1">TI</option>
-                  <option value="2">Docencia</option>
-                  <option value="3">Administración</option>
-                  <option value="4">RRHH / GIRH</option>
-                  <option value="5">Finanzas</option>
-                  <option value="6">Biblioteca</option>
                 </select>
                 <span class="field-error" id="err-depto">Departamento requerido</span>
               </div>
@@ -1660,12 +507,6 @@
                 <label class="field-label">Cargo <span class="req">*</span></label>
                 <select id="id_cargo" name="id_cargo" onchange="updatePreview()">
                   <option value="">— Seleccionar —</option>
-                  <option value="1">Docente</option>
-                  <option value="2">Administrativo</option>
-                  <option value="3">Asistente</option>
-                  <option value="4">Jefe de Departamento</option>
-                  <option value="5">Coordinador</option>
-                  <option value="6">Director</option>
                 </select>
                 <span class="field-error" id="err-cargo">Cargo requerido</span>
               </div>
@@ -1699,9 +540,8 @@
               </div>
               <div class="field">
                 <label class="field-label">Código Administrativo / N.° Carpeta <span class="req">*</span></label>
-                <input type="number" id="codigo_administrativo" name="codigo_administrativo" placeholder="Ej: 1042"
-                  min="0" step="1">
-                <span class="field-hint">Numérico no negativo (V10)</span>
+                <input type="number" id="codigo_administrativo" name="codigo_administrativo" placeholder="Ej: 1042" min="0" step="1">
+                <span class="field-hint">Numérico no negativo</span>
                 <span class="field-error" id="err-codadmin">Código requerido</span>
               </div>
             </div>
@@ -1711,43 +551,34 @@
         <!-- ══ S4: NOMBRAMIENTO ══ -->
         <div class="form-section" id="s4">
           <div class="section-hd">
-            <div class="section-icon"><svg viewBox="0 0 24 24">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg></div>
+            <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
             <div>
               <div class="section-title">Nombramientos</div>
-              <div class="section-sub">múltiples nombramientos permitidos · al menos 1 requerido</div>
+              <div class="section-sub">múltiples nombramientos · al menos 1 requerido</div>
             </div>
-            <div class="section-num">04 / 06</div>
+            <div class="section-num">04 / 05</div>
           </div>
           <div class="field-card">
 
-            <!-- Fechas de ingreso (V8) -->
             <div class="grid-2">
               <div class="field">
                 <label class="field-label">Fecha de Ingreso al Sector Público <span class="req">*</span></label>
                 <input type="date" id="fecha_ingreso_sector_publico" name="fecha_ingreso_sector_publico">
-                <span class="field-hint">No puede ser posterior a hoy (V8)</span>
+                <span class="field-hint">No puede ser posterior a hoy</span>
                 <span class="field-error" id="err-fsp">Fecha requerida</span>
               </div>
               <div class="field">
                 <label class="field-label">Fecha de Ingreso a la Institución <span class="req">*</span></label>
-                <input type="date" id="fecha_ingreso" name="fecha_ingreso">
-                <span class="field-hint">No puede ser posterior a hoy (V8)</span>
+                <input type="date" id="fecha_ingreso" name="fecha_ingreso" onchange="recalcularTodosSaldos()">
+                <span class="field-hint">No puede ser posterior a hoy</span>
                 <span class="field-error" id="err-finicio">Fecha de ingreso requerida</span>
               </div>
             </div>
 
             <div class="field-divider"></div>
 
-            <!-- Tabla de nombramientos múltiples (V7) -->
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <span class="field-label" style="margin:0">Lista de Nombramientos <span class="req">*</span> <span
-                  class="opt">(al menos 1)</span></span>
+              <span class="field-label" style="margin:0">Lista de Nombramientos <span class="req">*</span> <span class="opt">(al menos 1)</span></span>
             </div>
             <span class="field-error" id="err-nombramientos" style="margin-bottom:6px"></span>
 
@@ -1758,23 +589,28 @@
                     <th>Tipo de Nombramiento <span style="color:var(--red)">*</span></th>
                     <th>N.° Nombramiento</th>
                     <th>Fecha Nombramiento</th>
-                    <th>Fecha Fin Nombramiento</th>
+                    <th>Fecha Fin</th>
                     <th>Período Lectivo</th>
                     <th></th>
                   </tr>
                 </thead>
-                <tbody id="nomBody">
-                  <!-- filas dinámicas -->
-                </tbody>
+                <tbody id="nomBody"></tbody>
               </table>
             </div>
             <button type="button" class="btn-add-row" onclick="addNomRow()">
-              <svg viewBox="0 0 24 24">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Agregar nombramiento
             </button>
+
+            <!-- ══ SALDO PREVIEW ══ -->
+            <div class="field-divider"></div>
+            <div class="field-label" style="margin-bottom:8px">
+              Saldo de Vacaciones Calculado
+              <span class="opt" style="margin-left:4px">— se actualiza automáticamente</span>
+            </div>
+            <div id="saldoPreviewWrap">
+              <div class="saldo-empty">Seleccione un tipo de nombramiento y una fecha de ingreso para calcular el saldo.</div>
+            </div>
 
             <div class="field-divider"></div>
 
@@ -1799,35 +635,26 @@
         <!-- ══ S5: ACCESO AL SISTEMA ══ -->
         <div class="form-section" id="s5">
           <div class="section-hd">
-            <div class="section-icon"><svg viewBox="0 0 24 24">
-                <rect x="3" y="11" width="18" height="11" rx="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg></div>
+            <div class="section-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
             <div>
               <div class="section-title">Acceso al Sistema</div>
               <div class="section-sub">usuario · contraseña autogenerada por el sistema</div>
             </div>
-            <div class="section-num">05 / 06</div>
+            <div class="section-num">05 / 05</div>
           </div>
           <div class="field-card">
             <div class="grid-2">
               <div class="field">
                 <label class="field-label">Usuario <span class="req">*</span></label>
-                <input type="text" id="usuario" name="usuario" placeholder="Ej: 123456789" maxlength="50"
-                  autocomplete="off">
+                <input type="text" id="usuario" name="usuario" placeholder="Ej: 123456789" maxlength="50" autocomplete="off">
                 <span class="field-hint">Se auto-rellena con la cédula. Puede modificarse.</span>
                 <span class="field-error" id="err-usuario">Usuario requerido</span>
               </div>
               <div class="field">
                 <label class="field-label">Contraseña</label>
                 <div class="info-pill">
-                  <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                  <p>La contraseña inicial será <strong>autogenerada</strong> por el sistema y enviada al correo del
-                    funcionario junto con el usuario (MSG-REG-INFO-003 · Paso 10–11).</p>
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <p>La contraseña inicial será <strong>autogenerada</strong> por el sistema y enviada al correo del funcionario.</p>
                 </div>
               </div>
             </div>
@@ -1847,7 +674,7 @@
 
       </div><!-- /wizardPanel2 -->
 
-      <div style="height:80px"></div><!-- espacio para actions bar -->
+      <div style="height:80px"></div>
     </div><!-- /form-main -->
   </div><!-- /page-wrap -->
 
@@ -1858,62 +685,36 @@
     </div>
     <div class="actions-right">
       <button class="btn btn-danger" onclick="resetForm()">
-        <svg viewBox="0 0 24 24">
-          <polyline points="1 4 1 10 7 10" />
-          <path d="M3.51 15a9 9 0 1 0 .49-4.95" />
-        </svg>
+        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>
         Limpiar
       </button>
       <button class="btn btn-ghost" onclick="history.back()">
-        <svg viewBox="0 0 24 24">
-          <line x1="19" y1="12" x2="5" y2="12" />
-          <polyline points="12 19 5 12 12 5" />
-        </svg>
+        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Cancelar
       </button>
-      <!-- Paso 1 -->
       <button class="btn btn-primary" id="btnSiguiente" onclick="wizardNext()">
-        <svg viewBox="0 0 24 24">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         Siguiente
       </button>
-      <!-- Paso 2 -->
       <button class="btn btn-ghost" id="btnAtras" style="display:none" onclick="wizardBack()">
-        <svg viewBox="0 0 24 24">
-          <line x1="19" y1="12" x2="5" y2="12" />
-          <polyline points="12 19 5 12 12 5" />
-        </svg>
+        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         Atrás
       </button>
       <button class="btn btn-outline" id="btnPreview" style="display:none" onclick="previewJSON()">
-        <svg viewBox="0 0 24 24">
-          <polyline points="16 18 22 12 16 6" />
-          <polyline points="8 6 2 12 8 18" />
-        </svg>
+        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         Ver JSON
       </button>
       <button class="btn btn-primary" id="btnFinalizar" style="display:none" onclick="submitForm()">
-        <svg viewBox="0 0 24 24">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-          <polyline points="17 21 17 13 7 13" />
-          <polyline points="7 3 7 8 15 8" />
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg>
         Finalizar Registro
       </button>
     </div>
   </div>
 
-<script src="/frontend/components/navbar.js"></script>
-<script src="/frontend/js/session.js"></script>
+  <script src="/frontend/components/navbar.js"></script>
+  <script src="/frontend/js/session.js"></script>
 
-<app-navbar></app-navbar>
-
- <script>
-    // SIGEVAC — registrar.html — RQ-SVC-2026-1
-    // Funciones globales directas. Sin IIFE. Sin dependencias externas.
-
+  <script>
     var API_BASE = (function () {
       var p = window.location.port;
       if (p && p !== '3000') return window.location.protocol + '//' + window.location.hostname + ':3000';
@@ -1921,6 +722,9 @@
     })();
 
     var _wizardStep = 1;
+    var _tiposNombramiento = [];
+    var _periodosLectivos  = [];
+    var _nomRowId = 0;
 
     // ─── Toast ────────────────────────────────────────────────────────────────
     function showToast(msg, type) {
@@ -1946,7 +750,7 @@
       if (er) er.classList.remove('show');
     }
 
-    // ─── Modal confirmación ────────────────────────────────────────────────────
+    // ─── Modal ────────────────────────────────────────────────────────────────
     function showModal(msg) {
       var m = document.getElementById('modalMsg');
       if (m) m.textContent = msg || 'El funcionario puede revisar su correo electrónico para obtener sus credenciales de acceso.';
@@ -1959,90 +763,160 @@
       resetForm();
     }
 
-    // ─── Catálogos en memoria ─────────────────────────────────────────────────
-    var _tiposNombramiento = [];
-    var _periodosLectivos  = [];
+    // ─── CÁLCULO DE SALDO EN FRONT (espejo de saldo.controller.js) ───────────
+    // Misma lógica que calcularSaldoParaNombramiento() en el backend.
+    // Permite mostrar el saldo en tiempo real sin llamar al servidor.
+    function calcularSaldoFront(tipoData, fechaRef) {
+      if (!tipoData || !fechaRef) return null;
 
-    // ─── cargarDepartamentos ──────────────────────────────────────────────────
-    function cargarDepartamentos() {
-      return fetch(API_BASE + '/api/catalogos/departamentos')
-        .then(function (res) { return res.ok ? res.json() : []; })
-        .then(function (lista) {
-          var sel = document.getElementById('id_departamento');
-          if (!sel) return;
-          sel.innerHTML = '<option value="">— Seleccionar —</option>';
-          lista.forEach(function (d) {
-            var opt = document.createElement('option');
-            opt.value       = d.id_departamento;
-            opt.textContent = d.nombre_departamento;
-            sel.appendChild(opt);
-          });
-        })
-        .catch(function () {
-          console.warn('[SIGEVAC] No se pudieron cargar los departamentos.');
-        });
+      var hoy    = new Date();
+      var inicio = new Date(fechaRef);
+      if (isNaN(inicio.getTime())) return null;
+
+      var mesesTrabajados = Math.max(
+        Math.floor((hoy - inicio) / (1000 * 60 * 60 * 24 * 30.44)),
+        0
+      );
+
+      var diasAcumulados = 0;
+
+      if (tipoData.es_docente_interino) {
+        var tramo1    = parseFloat(tipoData.dias_acumulacion_mensual_tramo1) || 1.5;
+        var tramo2    = parseFloat(tipoData.dias_acumulacion_mensual_tramo2) || 2.5;
+        var mesesT1   = Math.min(mesesTrabajados, 60);
+        var mesesT2   = Math.max(mesesTrabajados - 60, 0);
+        var acum      = mesesT1 * tramo1 + mesesT2 * tramo2;
+        var max       = parseFloat(tipoData.maximo_dias_acumulados) || 30;
+        diasAcumulados = Math.min(Math.round(acum * 100) / 100, max);
+      } else {
+        var diasAnuales    = parseFloat(tipoData.dias_vacaciones_anuales) || 30;
+        var maxA           = parseFloat(tipoData.maximo_dias_acumulados) || 60;
+        var aniosCompletos = Math.floor(mesesTrabajados / 12);
+        diasAcumulados = Math.min(aniosCompletos * diasAnuales, maxA);
+      }
+
+      return {
+        diasAcumulados:  diasAcumulados,
+        diasUsados:      0,  // siempre 0 al registrar
+        diasDisponibles: diasAcumulados,
+        esInterino:      !!tipoData.es_docente_interino,
+        tramo1:          parseFloat(tipoData.dias_acumulacion_mensual_tramo1) || 1.5,
+        tramo2:          parseFloat(tipoData.dias_acumulacion_mensual_tramo2) || 2.5,
+        diasAnuales:     parseFloat(tipoData.dias_vacaciones_anuales) || 30,
+        maxDias:         parseFloat(tipoData.maximo_dias_acumulados) || (tipoData.es_docente_interino ? 30 : 60),
+        mesesTrabajados: mesesTrabajados,
+      };
     }
 
-    // ─── cargarCargos ─────────────────────────────────────────────────────────
-    function cargarCargos() {
-      return fetch(API_BASE + '/api/catalogos/cargos')
-        .then(function (res) { return res.ok ? res.json() : []; })
-        .then(function (lista) {
-          var sel = document.getElementById('id_cargo');
-          if (!sel) return;
-          sel.innerHTML = '<option value="">— Seleccionar —</option>';
-          lista.forEach(function (c) {
-            var opt = document.createElement('option');
-            opt.value       = c.id_cargo;
-            opt.textContent = c.nombre_cargo;
-            sel.appendChild(opt);
-          });
-        })
-        .catch(function () {
-          console.warn('[SIGEVAC] No se pudieron cargar los cargos.');
-        });
+    // ─── Renderiza el panel de saldo calculado ────────────────────────────────
+  function renderSaldoPreview(saldos) {
+  var wrap = document.getElementById('saldoPreviewWrap');
+  if (!wrap) return;
+
+  if (!saldos || saldos.length === 0) {
+    wrap.innerHTML = '<div class="saldo-empty">Seleccione un tipo de nombramiento y una fecha de ingreso para calcular el saldo.</div>';
+    return;
+  }
+
+  var html = '';
+
+  saldos.forEach(function (s, idx) {
+    html += '<div style="margin-bottom:' + (saldos.length > 1 ? '16px' : '0') + '">';
+
+    if (saldos.length > 1) {
+      html += '<div style="font-size:9px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:\'DM Mono\',monospace;margin-bottom:6px">' +
+        'Nombramiento ' + (idx + 1) + (idx === 0 ? ' (principal)' : '') + ' — ' + (s.nombreTipo || '') +
+        '</div>';
     }
 
-    // ─── cargarTiposNombramiento ──────────────────────────────────────────────
-    function cargarTiposNombramiento() {
-      return fetch(API_BASE + '/api/catalogos/tipos-nombramiento')
-        .then(function (res) { return res.ok ? res.json() : []; })
-        .then(function (lista) {
-          _tiposNombramiento = lista;
-        })
-        .catch(function () {
-          console.warn('[SIGEVAC] No se pudieron cargar los tipos de nombramiento.');
-        });
+    // Sin fecha: mostrar aviso en lugar de tarjetas
+    if (s.sinFecha) {
+      html += '<div class="inline-note">' +
+        '<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' +
+        '<p>Ingrese la <strong>fecha de nombramiento</strong> para calcular el saldo de este nombramiento.</p>' +
+        '</div>';
+      html += '</div>';
+      return;
     }
 
-    // ─── cargarPeriodosLectivos ───────────────────────────────────────────────
-    function cargarPeriodosLectivos() {
-      return fetch(API_BASE + '/api/catalogos/periodos-lectivos')
-        .then(function (res) { return res.ok ? res.json() : []; })
-        .then(function (lista) {
-          _periodosLectivos = lista;
-        })
-        .catch(function () {
-          console.warn('[SIGEVAC] No se pudieron cargar los períodos lectivos.');
+    var reglaTexto = s.esInterino
+      ? 'Docente interino — ' + s.tramo1 + ' días/mes (primeros 60 meses) · ' + s.tramo2 + ' días/mes (mes 61+) · Tope: ' + s.maxDias + ' días'
+      : 'En propiedad / administrativo — ' + s.diasAnuales + ' días/año · Tope: ' + s.maxDias + ' días · ' + s.mesesTrabajados + ' meses (' + Math.floor(s.mesesTrabajados / 12) + ' años completos)';
+
+    html += '<div class="saldo-preview">';
+    html += '<div class="saldo-card"><div class="saldo-card-label">Días Acumulados</div><div class="saldo-card-value">' + s.diasAcumulados.toFixed(2) + '</div><div class="saldo-card-unit">días</div></div>';
+    html += '<div class="saldo-card"><div class="saldo-card-label">Días Usados</div><div class="saldo-card-value">0.00</div><div class="saldo-card-unit">días (registro nuevo)</div></div>';
+    html += '<div class="saldo-card highlight"><div class="saldo-card-label">Días Disponibles</div><div class="saldo-card-value">' + s.diasDisponibles.toFixed(2) + '</div><div class="saldo-card-unit">días</div></div>';
+    html += '</div>';
+    html += '<div class="saldo-regla"><strong>Regla aplicada:</strong> ' + reglaTexto + '</div>';
+    html += '</div>';
+  });
+
+  wrap.innerHTML = html;
+}
+    function recalcularTodosSaldos() {
+  var fechaIngreso = (document.getElementById('fecha_ingreso') || {}).value || null;
+  var rows = document.querySelectorAll('#nomBody tr');
+  var saldos = [];
+
+  rows.forEach(function (tr, rowIndex) {
+    var idStr   = tr.id.replace('nom-row-', '');
+    var tipoSel = document.getElementById('nom-tipo-'  + idStr);
+    var fechaSel= document.getElementById('nom-fecha-' + idStr);
+
+    if (!tipoSel || !tipoSel.value) return;
+
+    var tipoId   = parseInt(tipoSel.value);
+    var tipoData = _tiposNombramiento.find(function (t) {
+      return t.id_tipo_nombramiento === tipoId;
+    });
+    if (!tipoData) return;
+
+    var fechaNom = (fechaSel && fechaSel.value) ? fechaSel.value : null;
+
+    // Nombramiento principal (primero): usa fecha_nombramiento o fecha_ingreso como fallback
+    // Nombramientos adicionales: SOLO usa su propia fecha — sin ella no se puede calcular
+    var fechaRef;
+    if (rowIndex === 0) {
+      fechaRef = fechaNom || fechaIngreso;
+    } else {
+      if (!fechaNom) {
+        // Mostrar aviso en lugar de calcular con fecha incorrecta
+        saldos.push({
+          nombreTipo:      tipoData.nombre_tipo,
+          sinFecha:        true,
+          diasAcumulados:  0,
+          diasUsados:      0,
+          diasDisponibles: 0,
+          esInterino:      !!tipoData.es_docente_interino,
         });
+        return;
+      }
+      fechaRef = fechaNom;
     }
+
+    var saldo = calcularSaldoFront(tipoData, fechaRef);
+    if (!saldo) return;
+
+    saldo.nombreTipo = tipoData.nombre_tipo;
+    saldos.push(saldo);
+  });
+
+  renderSaldoPreview(saldos);
+}
 
     // ─── Tabla de nombramientos múltiples ─────────────────────────────────────
-    var _nomRowId = 0;
-
     function addNomRow() {
       var id    = ++_nomRowId;
       var tbody = document.getElementById('nomBody');
       var tr    = document.createElement('tr');
       tr.id     = 'nom-row-' + id;
 
-      // Opciones de tipo desde memoria (cargadas al inicio)
       var opcionesTipo = '<option value="">— Seleccionar —</option>';
       _tiposNombramiento.forEach(function (t) {
         opcionesTipo += '<option value="' + t.id_tipo_nombramiento + '">' + t.nombre_tipo + '</option>';
       });
 
-      // Opciones de período desde memoria (cargadas al inicio)
       var opcionesPeriodo = '<option value="">— Sin período —</option>';
       _periodosLectivos.forEach(function (p) {
         var label = p.nombre_periodo + ' — ' + p.anio;
@@ -2050,16 +924,16 @@
         opcionesPeriodo += '<option value="' + p.id_periodo_lectivo + '">' + label + '</option>';
       });
 
-      var esPrimero = (_nomRowId === 1);
+      var esPrimero = (id === 1);
 
       tr.innerHTML =
         '<td>' +
-          '<select id="nom-tipo-' + id + '" style="min-width:200px">' +
+          '<select id="nom-tipo-' + id + '" style="min-width:200px" onchange="recalcularTodosSaldos()">' +
             opcionesTipo +
           '</select>' +
         '</td>' +
         '<td><input type="text" id="nom-num-' + id + '" placeholder="NOM-2026-0001" maxlength="50" style="min-width:130px"></td>' +
-        '<td><input type="date" id="nom-fecha-' + id + '" style="min-width:130px"></td>' +
+        '<td><input type="date" id="nom-fecha-' + id + '" style="min-width:130px" onchange="recalcularTodosSaldos()"></td>' +
         '<td><input type="date" id="nom-fin-' + id + '" style="min-width:130px"></td>' +
         '<td>' +
           '<select id="nom-periodo-' + id + '" style="min-width:160px">' +
@@ -2078,24 +952,25 @@
     function removeNomRow(id) {
       var tr = document.getElementById('nom-row-' + id);
       if (tr) tr.remove();
+      recalcularTodosSaldos();
     }
 
     function getNomData() {
       var rows = [];
       document.querySelectorAll('#nomBody tr').forEach(function (tr) {
         var idStr = tr.id.replace('nom-row-', '');
-        var tipo  = document.getElementById('nom-tipo-'   + idStr);
-        var num   = document.getElementById('nom-num-'    + idStr);
-        var fecha = document.getElementById('nom-fecha-'  + idStr);
-        var fin   = document.getElementById('nom-fin-'    + idStr);
-        var per   = document.getElementById('nom-periodo-'+ idStr);
+        var tipo  = document.getElementById('nom-tipo-'    + idStr);
+        var num   = document.getElementById('nom-num-'     + idStr);
+        var fecha = document.getElementById('nom-fecha-'   + idStr);
+        var fin   = document.getElementById('nom-fin-'     + idStr);
+        var per   = document.getElementById('nom-periodo-' + idStr);
         if (!tipo) return;
         rows.push({
-          id_tipo_nombramiento:  parseInt(tipo.value) || null,
-          numero_nombramiento:   num   ? num.value.trim() || null   : null,
-          fecha_nombramiento:    fecha ? fecha.value || null         : null,
-          fecha_fin_nombramiento:fin   ? fin.value   || null         : null,
-          id_periodo_lectivo:    per   ? parseInt(per.value) || null : null
+          id_tipo_nombramiento:   parseInt(tipo.value) || null,
+          numero_nombramiento:    num   ? num.value.trim() || null : null,
+          fecha_nombramiento:     fecha ? fecha.value || null      : null,
+          fecha_fin_nombramiento: fin   ? fin.value   || null      : null,
+          id_periodo_lectivo:     per   ? parseInt(per.value) || null : null
         });
       });
       return rows;
@@ -2104,43 +979,29 @@
     function validateNombramientos() {
       var rows  = getNomData();
       var errEl = document.getElementById('err-nombramientos');
-
       if (rows.length === 0 || !rows[0].id_tipo_nombramiento) {
-        if (errEl) {
-          errEl.textContent = 'MSG-REG-ERR-008: Debe agregar al menos un nombramiento con tipo seleccionado.';
-          errEl.classList.add('show');
-        }
-        var sel = document.getElementById('nom-tipo-1');
-        if (sel) sel.classList.add('error');
+        if (errEl) { errEl.textContent = 'MSG-REG-ERR-008: Debe agregar al menos un nombramiento con tipo seleccionado.'; errEl.classList.add('show'); }
+        var sel = document.getElementById('nom-tipo-1'); if (sel) sel.classList.add('error');
         return false;
       }
-
       var todasValidas = true;
       document.querySelectorAll('#nomBody tr').forEach(function (tr) {
         var idStr = tr.id.replace('nom-row-', '');
         var sel   = document.getElementById('nom-tipo-' + idStr);
         if (sel && !sel.value) { sel.classList.add('error'); todasValidas = false; }
-        else if (sel)            sel.classList.remove('error');
+        else if (sel) sel.classList.remove('error');
       });
-
       if (!todasValidas) {
-        if (errEl) {
-          errEl.textContent = 'MSG-REG-ERR-008: Todos los nombramientos agregados deben tener un tipo seleccionado.';
-          errEl.classList.add('show');
-        }
+        if (errEl) { errEl.textContent = 'MSG-REG-ERR-008: Todos los nombramientos deben tener un tipo seleccionado.'; errEl.classList.add('show'); }
         return false;
       }
-
       if (errEl) errEl.classList.remove('show');
       return true;
     }
 
     // ─── Wizard ───────────────────────────────────────────────────────────────
     function wizardNext() {
-      if (!validateStep1()) {
-        showToast('Corrija los errores marcados antes de continuar.', 'err');
-        return;
-      }
+      if (!validateStep1()) { showToast('Corrija los errores marcados antes de continuar.', 'err'); return; }
       _wizardStep = 2;
       document.getElementById('wizardPanel1').classList.remove('wp-active');
       document.getElementById('wizardPanel2').classList.add('wp-active');
@@ -2155,7 +1016,7 @@
       document.getElementById('btnPreview').style.display   = '';
       document.getElementById('btnFinalizar').style.display = '';
       var fm = document.getElementById('formMain'); if (fm) fm.scrollTop = 0;
-      showToast('MSG-REG-INFO-001: Cargando formulario de registro...', 'ok');
+      showToast('Paso 2 de 2 — Datos laborales', 'ok');
     }
 
     function wizardBack() {
@@ -2175,59 +1036,45 @@
       var fm = document.getElementById('formMain'); if (fm) fm.scrollTop = 0;
     }
 
-    // ─── Validación Paso 1 (V1,V2,V3,V4,V5,V6) ───────────────────────────────
+    // ─── Validación Paso 1 ────────────────────────────────────────────────────
     function validateStep1() {
       var ok = true;
-
       [
-        { f: 'cedula',           e: 'err-cedula'   },
-        { f: 'nombre',           e: 'err-nombre'   },
-        { f: 'apellido1',        e: 'err-apellido1'},
-        { f: 'email',            e: 'err-email'    },
-        { f: 'telefono',         e: 'err-telefono' },
-        { f: 'fecha_nacimiento', e: 'err-fnac'     }
+        { f: 'cedula',           e: 'err-cedula'    },
+        { f: 'nombre',           e: 'err-nombre'    },
+        { f: 'apellido1',        e: 'err-apellido1' },
+        { f: 'email',            e: 'err-email'     },
+        { f: 'telefono',         e: 'err-telefono'  },
+        { f: 'fecha_nacimiento', e: 'err-fnac'      }
       ].forEach(function (r) {
         var el = document.getElementById(r.f);
-        if (!el || el.value.trim() === '') {
-          setErr(r.f, r.e, 'MSG-REG-ERR-001: Por favor complete y/o seleccione todos los campos obligatorios.');
-          ok = false;
-        } else { clearErr(r.f, r.e); }
+        if (!el || el.value.trim() === '') { setErr(r.f, r.e, 'MSG-REG-ERR-001: Campo obligatorio.'); ok = false; }
+        else clearErr(r.f, r.e);
       });
 
-      // V2 — Nombre máx. 50
       var n = document.getElementById('nombre');
-      if (n && n.value.trim().length > 50) {
-        setErr('nombre', 'err-nombre', 'MSG-REG-ERR-002: Por favor no exceda los 50 caracteres en el campo Nombre Completo.'); ok = false;
-      }
+      if (n && n.value.trim().length > 50) { setErr('nombre', 'err-nombre', 'MSG-REG-ERR-002: Máximo 50 caracteres.'); ok = false; }
 
-      // V3 — Cédula formato
       var ced = document.getElementById('cedula');
       if (ced && ced.value.trim() !== '') {
         var cv = ced.value.trim().replace(/-/g, '');
-        if (!/^\d+$/.test(cv) || cv.length < 9) {
-          setErr('cedula', 'err-cedula', 'MSG-REG-ERR-003: La cédula de un funcionario nacional no puede tener más ni menos de 9 dígitos.'); ok = false;
-        } else if (cv.length > 12) {
-          setErr('cedula', 'err-cedula', 'MSG-REG-ERR-004: El pasaporte o DIMEX del funcionario no puede tener menos de 9 dígitos ni más de 12 dígitos.'); ok = false;
-        } else { clearErr('cedula', 'err-cedula'); }
+        if (!/^\d+$/.test(cv) || cv.length < 9) { setErr('cedula', 'err-cedula', 'MSG-REG-ERR-003: Mínimo 9 dígitos.'); ok = false; }
+        else if (cv.length > 12) { setErr('cedula', 'err-cedula', 'MSG-REG-ERR-004: Máximo 12 dígitos.'); ok = false; }
+        else clearErr('cedula', 'err-cedula');
       }
 
-      // V4 — Email
       var em = document.getElementById('email');
       if (em && em.value.trim() !== '') {
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim())) {
-          setErr('email', 'err-email', 'MSG-REG-ERR-005: Por favor ingrese el correo electrónico en un formato válido. Ejemplo: juan@correo.com'); ok = false;
-        } else { clearErr('email', 'err-email'); }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim())) { setErr('email', 'err-email', 'MSG-REG-ERR-005: Formato inválido.'); ok = false; }
+        else clearErr('email', 'err-email');
       }
 
-      // V5 — Teléfono solo números
       var tel = document.getElementById('telefono');
       if (tel && tel.value.trim() !== '') {
-        if (!/^\d+$/.test(tel.value.trim())) {
-          setErr('telefono', 'err-telefono', 'MSG-REG-ERR-006: Por favor ingrese un número de teléfono válido. Solo se permiten números.'); ok = false;
-        } else { clearErr('telefono', 'err-telefono'); }
+        if (!/^\d+$/.test(tel.value.trim())) { setErr('telefono', 'err-telefono', 'MSG-REG-ERR-006: Solo números.'); ok = false; }
+        else clearErr('telefono', 'err-telefono');
       }
 
-      // V6 — Mayor de 18 años
       var fn = document.getElementById('fecha_nacimiento');
       if (fn && fn.value) {
         var hoy  = new Date();
@@ -2235,69 +1082,44 @@
         var edad = hoy.getFullYear() - fnac.getFullYear();
         var mm   = hoy.getMonth() - fnac.getMonth();
         if (mm < 0 || (mm === 0 && hoy.getDate() < fnac.getDate())) edad--;
-        if (edad < 18) {
-          setErr('fecha_nacimiento', 'err-fnac', 'MSG-REG-ERR-007: La fecha de nacimiento del funcionario debe corresponder a una persona mayor de 18 años.'); ok = false;
-        } else { clearErr('fecha_nacimiento', 'err-fnac'); }
+        if (edad < 18) { setErr('fecha_nacimiento', 'err-fnac', 'MSG-REG-ERR-007: Debe ser mayor de 18 años.'); ok = false; }
+        else clearErr('fecha_nacimiento', 'err-fnac');
       }
-
       return ok;
     }
 
-    // ─── Validación Paso 2 (V1,V7,V8,V9,V10) ────────────────────────────────
+    // ─── Validación Paso 2 ────────────────────────────────────────────────────
     function validateStep2() {
       var ok = true;
-
       [
-        { f: 'id_departamento',            e: 'err-depto'    },
-        { f: 'id_cargo',                   e: 'err-cargo'    },
-        { f: 'tipo_funcionario',            e: 'err-tipo'     },
-        { f: 'condicion',                  e: 'err-condicion'},
-        { f: 'codigo_administrativo',      e: 'err-codadmin' },
-        { f: 'fecha_ingreso_sector_publico',e: 'err-fsp'     },
-        { f: 'fecha_ingreso',              e: 'err-finicio'  },
-        { f: 'usuario',                    e: 'err-usuario'  }
+        { f: 'id_departamento',             e: 'err-depto'     },
+        { f: 'id_cargo',                    e: 'err-cargo'     },
+        { f: 'tipo_funcionario',            e: 'err-tipo'      },
+        { f: 'condicion',                   e: 'err-condicion' },
+        { f: 'codigo_administrativo',       e: 'err-codadmin'  },
+        { f: 'fecha_ingreso_sector_publico',e: 'err-fsp'       },
+        { f: 'fecha_ingreso',               e: 'err-finicio'   },
+        { f: 'usuario',                     e: 'err-usuario'   }
       ].forEach(function (r) {
         var el = document.getElementById(r.f);
-        if (!el || el.value === '' || el.value === null) {
-          setErr(r.f, r.e, 'MSG-REG-ERR-001: Por favor complete y/o seleccione todos los campos obligatorios.');
-          ok = false;
-        } else { clearErr(r.f, r.e); }
+        if (!el || el.value === '' || el.value === null) { setErr(r.f, r.e, 'MSG-REG-ERR-001: Campo obligatorio.'); ok = false; }
+        else clearErr(r.f, r.e);
       });
 
-      // V7 — Al menos 1 nombramiento
       if (!validateNombramientos()) ok = false;
 
-      // V8 — Fechas de ingreso ≤ hoy
       var hoy = new Date().toISOString().split('T')[0];
       [{ f: 'fecha_ingreso', e: 'err-finicio' }, { f: 'fecha_ingreso_sector_publico', e: 'err-fsp' }].forEach(function (r) {
         var fi = document.getElementById(r.f);
-        if (fi && fi.value && fi.value > hoy) {
-          setErr(r.f, r.e, 'MSG-REG-ERR-009: La fecha de ingreso no puede ser posterior a la fecha actual. Fecha de hoy: ' + hoy); ok = false;
-        }
+        if (fi && fi.value && fi.value > hoy) { setErr(r.f, r.e, 'MSG-REG-ERR-009: No puede ser posterior a hoy (' + hoy + ').'); ok = false; }
       });
 
-      // V9 — Vacaciones 0–30
-      ['dias_vacaciones_acumulados', 'dias_vacaciones_disponibles'].forEach(function (fid) {
-        var el = document.getElementById(fid);
-        if (el) {
-          var v = parseFloat(el.value);
-          if (isNaN(v) || v < 0 || v > 30) {
-            el.classList.add('error');
-            setErr('dias_vacaciones_acumulados', 'err-vac', 'MSG-REG-ERR-010: El saldo de vacaciones no puede ser un valor negativo ni mayor a 30 días.');
-            ok = false;
-          } else { el.classList.remove('error'); clearErr('dias_vacaciones_acumulados', 'err-vac'); }
-        }
-      });
-
-      // V10 — Código administrativo no negativo
       var cod = document.getElementById('codigo_administrativo');
       if (cod && cod.value !== '') {
         var cv = parseFloat(cod.value);
-        if (isNaN(cv) || cv < 0) {
-          setErr('codigo_administrativo', 'err-codadmin', 'MSG-REG-ERR-011: El código administrativo / número de carpeta no puede ser un valor negativo.'); ok = false;
-        } else { clearErr('codigo_administrativo', 'err-codadmin'); }
+        if (isNaN(cv) || cv < 0) { setErr('codigo_administrativo', 'err-codadmin', 'MSG-REG-ERR-011: No puede ser negativo.'); ok = false; }
+        else clearErr('codigo_administrativo', 'err-codadmin');
       }
-
       return ok;
     }
 
@@ -2322,28 +1144,26 @@
         fecha_ingreso_sector_publico: g('fecha_ingreso_sector_publico') || null,
         en_periodo_prueba:            parseInt(g('en_periodo_prueba')) || 0,
         fecha_fin_periodo_prueba:     g('fecha_fin_periodo_prueba') || null,
-        dias_vacaciones_acumulados:   parseFloat(g('dias_vacaciones_acumulados')) || 0,
-        dias_vacaciones_disponibles:  parseFloat(g('dias_vacaciones_disponibles')) || 0,
-        estado_contrato:              g('estado_contrato') || 'activo',
+        // El backend calcula el saldo; estos campos son solo fallback
+        dias_vacaciones_acumulados:   0,
+        dias_vacaciones_disponibles:  0,
+        estado_contrato:              'activo',
         usuario:                      g('usuario').trim(),
         role:                         g('role') || 'funcionario',
         estado:                       g('estado') || 'activo',
-        historial_nombramientos:      g('historial_nombramientos').trim() || null,
+        historial_nombramientos:      null,
         nombramientos:                getNomData()
       };
     }
 
     // ─── submitForm ───────────────────────────────────────────────────────────
     function submitForm() {
-      if (!validateStep2()) {
-        showToast('Corrija los errores marcados antes de finalizar.', 'err');
-        return;
-      }
+      if (!validateStep2()) { showToast('Corrija los errores marcados antes de finalizar.', 'err'); return; }
       var data = collectData();
       var btn  = document.getElementById('btnFinalizar');
       var orig = btn ? btn.innerHTML : '';
       if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
-      showToast('MSG-REG-INFO-002: Guardando datos del funcionario...', 'ok');
+      showToast('Guardando datos del funcionario...', 'ok');
 
       fetch(API_BASE + '/api/registro/funcionarios', {
         method: 'POST',
@@ -2353,19 +1173,19 @@
         .then(function (res) { return res.json().then(function (j) { return { ok: res.ok, json: j }; }); })
         .then(function (r) {
           if (r.ok) {
-            showModal(r.json.mensaje || 'El usuario fue creado exitosamente. El funcionario puede revisar su correo electrónico para obtener sus credenciales de acceso.');
+            showModal(r.json.mensaje || 'El usuario fue creado exitosamente.');
           } else {
             var msg    = r.json.error  || 'Error desconocido.';
             var codigo = r.json.codigo || '';
             showToast(msg, 'err');
-            if (codigo === 'MSG-REG-ERR-DUP-CED')   { wizardBack(); setTimeout(function () { setErr('cedula',  'err-cedula',  msg); }, 80); }
-            if (codigo === 'MSG-REG-ERR-DUP-EMAIL')  { wizardBack(); setTimeout(function () { setErr('email',   'err-email',   msg); }, 80); }
-            if (codigo === 'MSG-REG-ERR-DUP-USR')    { setErr('usuario', 'err-usuario', msg); }
+            if (codigo === 'MSG-REG-ERR-DUP-CED')  { wizardBack(); setTimeout(function () { setErr('cedula', 'err-cedula', msg); }, 80); }
+            if (codigo === 'MSG-REG-ERR-DUP-EMAIL') { wizardBack(); setTimeout(function () { setErr('email',  'err-email',  msg); }, 80); }
+            if (codigo === 'MSG-REG-ERR-DUP-USR')  { setErr('usuario', 'err-usuario', msg); }
           }
         })
         .catch(function (err) {
           console.error('[SIGEVAC] fetch error:', err);
-          showToast('MSG-REG-ERR-012: Error de red. Verifique que el servidor esté corriendo en ' + (API_BASE || 'este mismo host') + '.', 'err');
+          showToast('MSG-REG-ERR-012: Error de red. Verifique que el servidor esté corriendo.', 'err');
         })
         .finally(function () { if (btn) { btn.disabled = false; btn.innerHTML = orig; } });
     }
@@ -2378,19 +1198,15 @@
         el.classList.remove('error');
       });
       document.querySelectorAll('.field-error').forEach(function (e) { e.classList.remove('show'); });
-      // Reset nombramientos
       document.getElementById('nomBody').innerHTML = '';
       _nomRowId = 0;
       addNomRow();
-      // Reset chips
       var ep = document.getElementById('en_periodo_prueba'); if (ep) ep.value = '0';
       var ro = document.getElementById('role');              if (ro) ro.value = 'funcionario';
-      var ec = document.getElementById('estado_contrato');   if (ec) ec.value = 'activo';
       selectPrueba(0);
-      document.querySelectorAll('#roleGroup     .badge-chip').forEach(function (c, i) { c.classList.toggle('sel', i === 0); });
-      document.querySelectorAll('#contratoGroup .badge-chip').forEach(function (c, i) { c.classList.toggle('sel', i === 0); });
-      // Volver a paso 1
+      document.querySelectorAll('#roleGroup .badge-chip').forEach(function (c, i) { c.classList.toggle('sel', i === 0); });
       if (_wizardStep === 2) wizardBack();
+      renderSaldoPreview([]);
       updatePreview();
       updateProgress();
     }
@@ -2402,7 +1218,7 @@
       if (win) win.document.write('<pre style="background:#0f1a12;color:#8cc9a3;padding:20px;font-size:12px;font-family:monospace">' + JSON.stringify(data, null, 2) + '</pre>');
     }
 
-    // ─── autoFillUsuario (usuario = cédula) ───────────────────────────────────
+    // ─── autoFillUsuario ──────────────────────────────────────────────────────
     function autoFillUsuario() {
       var ced = document.getElementById('cedula');
       var usr = document.getElementById('usuario');
@@ -2440,12 +1256,9 @@
       }).length;
       var pf = document.getElementById('progressFill');
       var pl = document.getElementById('progressLabel');
-      if (pf) pf.style.width    = Math.round(filled / ids.length * 100) + '%';
-      if (pl) pl.textContent    = filled + ' / ' + ids.length + ' campos clave';
+      if (pf) pf.style.width  = Math.round(filled / ids.length * 100) + '%';
+      if (pl) pl.textContent  = filled + ' / ' + ids.length + ' campos clave';
     }
-
-    // ─── toggleInterino (compatibilidad) ──────────────────────────────────────
-    function toggleInterino() { }
 
     // ─── selectPrueba ─────────────────────────────────────────────────────────
     function selectPrueba(val) {
@@ -2458,16 +1271,11 @@
       if (fin) { fin.style.opacity = val ? '1' : '0.4'; fin.style.pointerEvents = val ? 'auto' : 'none'; }
     }
 
-    // ─── selectRole / selectContrato ──────────────────────────────────────────
+    // ─── selectRole ───────────────────────────────────────────────────────────
     function selectRole(el) {
       document.querySelectorAll('#roleGroup .badge-chip').forEach(function (c) { c.classList.remove('sel'); });
       el.classList.add('sel');
       var h = document.getElementById('role'); if (h) h.value = el.dataset.val;
-    }
-    function selectContrato(el) {
-      document.querySelectorAll('#contratoGroup .badge-chip').forEach(function (c) { c.classList.remove('sel'); });
-      el.classList.add('sel');
-      var h = document.getElementById('estado_contrato'); if (h) h.value = el.dataset.val;
     }
 
     // ─── scrollToSection ──────────────────────────────────────────────────────
@@ -2476,27 +1284,79 @@
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // ─── toggleGroup / toggleTheme ────────────────────────────────────────────
-    function toggleGroup(id) {
-      var grp  = document.getElementById('grp-' + id); if (!grp) return;
-      var open = grp.classList.contains('open');
-      document.querySelectorAll('.nav-group').forEach(function (g) { g.classList.remove('open'); });
-      if (!open) grp.classList.add('open');
-    }
+    // ─── toggleTheme ──────────────────────────────────────────────────────────
     function toggleTheme() {
       var html = document.documentElement;
       html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
 
+    // ─── Catálogos ────────────────────────────────────────────────────────────
+    function cargarDepartamentos() {
+      return fetch(API_BASE + '/api/catalogos/departamentos')
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (lista) {
+          var sel = document.getElementById('id_departamento'); if (!sel) return;
+          sel.innerHTML = '<option value="">— Seleccionar —</option>';
+          lista.forEach(function (d) {
+            var opt = document.createElement('option');
+            opt.value = d.id_departamento; opt.textContent = d.nombre_departamento;
+            sel.appendChild(opt);
+          });
+        }).catch(function () { console.warn('[SIGEVAC] No se pudieron cargar departamentos.'); });
+    }
+
+    function cargarCargos() {
+      return fetch(API_BASE + '/api/catalogos/cargos')
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (lista) {
+          var sel = document.getElementById('id_cargo'); if (!sel) return;
+          sel.innerHTML = '<option value="">— Seleccionar —</option>';
+          lista.forEach(function (c) {
+            var opt = document.createElement('option');
+            opt.value = c.id_cargo; opt.textContent = c.nombre_cargo;
+            sel.appendChild(opt);
+          });
+        }).catch(function () { console.warn('[SIGEVAC] No se pudieron cargar cargos.'); });
+    }
+
+    function cargarTiposNombramiento() {
+      return fetch(API_BASE + '/api/catalogos/tipos-nombramiento')
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (lista) { _tiposNombramiento = lista; })
+        .catch(function () { console.warn('[SIGEVAC] No se pudieron cargar tipos de nombramiento.'); });
+    }
+
+    function cargarPeriodosLectivos() {
+      return fetch(API_BASE + '/api/catalogos/periodos-lectivos')
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (lista) { _periodosLectivos = lista; })
+        .catch(function () { console.warn('[SIGEVAC] No se pudieron cargar períodos lectivos.'); });
+    }
+
+    function cargarSupervisores() {
+      fetch(API_BASE + '/api/registro/funcionarios/lista')
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (lista) {
+          var sel = document.getElementById('id_supervisor'); if (!sel) return;
+          sel.innerHTML = '<option value="">— Sin supervisor —</option>';
+          lista.forEach(function (f) {
+            var opt = document.createElement('option');
+            opt.value = f.id_funcionario;
+            opt.textContent = f.nombre + ' ' + f.apellido1 + ' — ' + (f.nombre_departamento || f.id_departamento);
+            sel.appendChild(opt);
+          });
+        }).catch(function () { });
+    }
+
     // ─── Scroll observer sidebar ──────────────────────────────────────────────
-    var _sids = ['s1', 's2', 's3', 's4', 's5', 's6'];
+    var _sids = ['s1', 's2', 's3', 's4', 's5'];
     var _obs  = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
         var idx = _sids.indexOf(e.target.id) + 1;
         _sids.forEach(function (_, i) {
           var step = document.getElementById('step-' + (i + 1)); if (!step) return;
-          if      (i + 1 < idx) { step.classList.add('done');   step.classList.remove('active'); }
+          if      (i + 1 < idx)  { step.classList.add('done');   step.classList.remove('active'); }
           else if (i + 1 === idx){ step.classList.add('active'); step.classList.remove('done');   }
           else                   { step.classList.remove('active', 'done'); }
         });
@@ -2508,103 +1368,36 @@
       if (!e.target.closest('.nav-group'))
         document.querySelectorAll('.nav-group').forEach(function (g) { g.classList.remove('open'); });
     });
+
     document.querySelectorAll('input, select, textarea').forEach(function (el) {
       el.addEventListener('input',  function () { updateProgress(); updatePreview(); });
       el.addEventListener('change', function () { updateProgress(); updatePreview(); });
     });
 
-    // ─── Marcar usuario como editado manualmente ──────────────────────────────
     var _usrEl = document.getElementById('usuario');
     if (_usrEl) _usrEl.addEventListener('input', function () { this.dataset.manualEdit = '1'; });
 
-    // ─── Protección de sesión (inline) ────────────────────────────────────────
+    // ─── Protección de sesión ─────────────────────────────────────────────────
     (function () {
       var LOGIN_URL      = '/frontend/pages/autenticacion/login.html';
       var INACTIVIDAD_MS = 10 * 60 * 1000;
-
       function getSesion() {
-        try {
-          return {
-            funcionario:      JSON.parse(localStorage.getItem('funcionario')      || 'null'),
-            tipoNombramiento: JSON.parse(localStorage.getItem('tipoNombramiento') || 'null'),
-            sessionToken:     localStorage.getItem('sessionToken'),
-            sessionExpiry:    parseInt(localStorage.getItem('sessionExpiry') || '0', 10)
-          };
-        } catch { return null; }
+        try { return { funcionario: JSON.parse(localStorage.getItem('funcionario') || 'null'), sessionToken: localStorage.getItem('sessionToken'), sessionExpiry: parseInt(localStorage.getItem('sessionExpiry') || '0', 10) }; }
+        catch { return null; }
       }
-
-      function limpiarSesion() {
-        ['funcionario', 'tipoNombramiento', 'nombramientos', 'sessionToken', 'sessionExpiry']
-          .forEach(function (k) { localStorage.removeItem(k); });
-      }
-
-      function cerrarSesion(motivo) {
-        clearTimeout(timerInac);
-        var sesion = getSesion() || {};
-        fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id_funcionario: sesion.funcionario ? sesion.funcionario.id_funcionario : null,
-            usuario:        sesion.funcionario ? sesion.funcionario.usuario        : null,
-            sessionToken:   sesion.sessionToken,
-            motivo:         motivo || 'manual'
-          })
-        }).catch(function () { }).finally(function () {
-          limpiarSesion();
-          window.location.href = LOGIN_URL + (motivo === 'inactividad' ? '?motivo=inactividad' : '');
-        });
-      }
-
+      function limpiarSesion() { ['funcionario', 'tipoNombramiento', 'nombramientos', 'sessionToken', 'sessionExpiry'].forEach(function (k) { localStorage.removeItem(k); }); }
+      function cerrarSesion(motivo) { clearTimeout(timerInac); limpiarSesion(); window.location.href = LOGIN_URL + (motivo === 'inactividad' ? '?motivo=inactividad' : ''); }
       window.logout = function () { cerrarSesion('manual'); };
-
       var timerInac = null;
-      function reiniciarTimer() {
-        clearTimeout(timerInac);
-        localStorage.setItem('sessionExpiry', String(Date.now() + INACTIVIDAD_MS));
-        timerInac = setTimeout(function () { cerrarSesion('inactividad'); }, INACTIVIDAD_MS);
-      }
-
-      ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click']
-        .forEach(function (ev) { document.addEventListener(ev, reiniciarTimer, { passive: true }); });
-
+      function reiniciarTimer() { clearTimeout(timerInac); localStorage.setItem('sessionExpiry', String(Date.now() + INACTIVIDAD_MS)); timerInac = setTimeout(function () { cerrarSesion('inactividad'); }, INACTIVIDAD_MS); }
+      ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(function (ev) { document.addEventListener(ev, reiniciarTimer, { passive: true }); });
       var sesion = getSesion();
-      if (!sesion || !sesion.funcionario || !sesion.sessionToken) {
-        limpiarSesion();
-        window.location.href = LOGIN_URL;
-      } else if (Date.now() > sesion.sessionExpiry) {
-        cerrarSesion('inactividad');
-      } else {
-        var f        = sesion.funcionario;
-        var iniciales = [f.nombre, f.apellido1].filter(Boolean).map(function (s) { return s[0].toUpperCase(); }).join('');
-        var avatarEl  = document.getElementById('navAvatar');
-        var nameEl    = document.getElementById('navName');
-        var pillNomEl = document.getElementById('pillNomLabel');
-        if (avatarEl)  avatarEl.textContent  = iniciales || '?';
-        if (nameEl)    nameEl.textContent    = f.nombre  || 'Usuario';
-        if (pillNomEl) pillNomEl.textContent = sesion.tipoNombramiento ? sesion.tipoNombramiento.nombre_tipo : (f.rol || '');
-        reiniciarTimer();
-      }
+      if (!sesion || !sesion.funcionario || !sesion.sessionToken) { limpiarSesion(); window.location.href = LOGIN_URL; }
+      else if (Date.now() > sesion.sessionExpiry) { cerrarSesion('inactividad'); }
+      else { reiniciarTimer(); }
     })();
 
-    // ─── cargarSupervisores ───────────────────────────────────────────────────
-    function cargarSupervisores() {
-      fetch(API_BASE + '/api/registro/funcionarios/lista')
-        .then(function (res) { return res.ok ? res.json() : []; })
-        .then(function (lista) {
-          var sel = document.getElementById('id_supervisor'); if (!sel) return;
-          sel.innerHTML = '<option value="">— Sin supervisor —</option>';
-          lista.forEach(function (f) {
-            var opt = document.createElement('option');
-            opt.value       = f.id_funcionario;
-            opt.textContent = f.nombre + ' ' + f.apellido1 + ' — ' + (f.nombre_departamento || f.id_departamento);
-            sel.appendChild(opt);
-          });
-        })
-        .catch(function () { });
-    }
-
-    // ─── Init — catálogos primero, luego formulario ───────────────────────────
+    // ─── Init ─────────────────────────────────────────────────────────────────
     Promise.all([
       cargarDepartamentos(),
       cargarCargos(),
@@ -2617,7 +1410,6 @@
       updateProgress();
       selectPrueba(0);
     }).catch(function () {
-      // Fallback: inicia el formulario aunque fallen los catálogos
       addNomRow();
       updatePreview();
       updateProgress();

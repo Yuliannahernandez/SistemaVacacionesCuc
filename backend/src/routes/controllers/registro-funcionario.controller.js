@@ -13,33 +13,67 @@ function generarContrasena() {
     return pass;
 }
 
-// ─── Calcula saldo según reglas PA-GIRH-10 ───────────────────────────────
-function calcularSaldoInicial(fecha_ingreso, id_tipo_nombramiento, tramo1, tramo2) {
-    const fechaIngreso = new Date(fecha_ingreso);
-    const hoy = new Date();
-    
-    // Años de servicio
-    const aniosServicio = (hoy - fechaIngreso) / (365.25 * 24 * 60 * 60 * 1000);
-    
-    // Regla 2023: si ingresó a partir del 2023
-    const desde2023 = fechaIngreso.getFullYear() >= 2023;
+function calcularSaldoParaNombramiento(nom, fecha_ingreso) {
+    const fechaRef = nom.fecha_nombramiento || fecha_ingreso;
+    if (!fechaRef) return { acumulados: 0, disponibles: 0 };
 
-    const esDocInterino = id_tipo_nombramiento === 6;
+    const hoy    = new Date();
+    const inicio = new Date(fechaRef);
 
-    if (esDocInterino) {
-        // Docente interino: acumula mensual
-        const mesesLaborados = Math.floor(aniosServicio * 12);
-        const diasPorMes = desde2023 ? 1.67
-                         : aniosServicio <= 5 ? tramo1   // 1.5
-                         : tramo2;                        // 2.5
-        return Math.min(30, Math.round(mesesLaborados * diasPorMes * 100) / 100);
-    } else {
-        // Administrativo / Docente en propiedad o interino
-        if (desde2023) return 20.00;
-        if (aniosServicio < 1)  return 0;   // aún no cumple el año
-        if (aniosServicio <= 5) return 5;   // colectivas + 5 días personales
-        return 30.00;                        // 6+ años
+    // Antigüedad en años completos (igual que saldo.controller)
+    let antiguedad = hoy.getFullYear() - inicio.getFullYear();
+    const dm = hoy.getMonth() - inicio.getMonth();
+    if (dm < 0 || (dm === 0 && hoy.getDate() < inicio.getDate())) antiguedad--;
+    antiguedad = Math.max(antiguedad, 0);
+
+    // Semanas laboradas
+    const semanasLaboradas = Math.floor((hoy - inicio) / (1000 * 60 * 60 * 24 * 7));
+    const semanasMinimas   = parseFloat(nom.semanas_antiguedad_minima) || 50;
+
+    // Sin derecho si no cumple mínimo de semanas
+    if (semanasLaboradas < semanasMinimas) {
+        return { acumulados: 0, disponibles: 0 };
     }
+
+    const max = parseFloat(nom.maximo_dias_acumulados) || 30;
+    let diasAcumulados = 0;
+
+    if (nom.es_docente_interino) {
+        // Acumulación mensual por tramo
+        const mesesTrabajados = Math.floor((hoy - inicio) / (1000 * 60 * 60 * 24 * 30.44));
+        
+        // Verificar si aplica regla 2023
+        const FECHA_CORTE_2023 = new Date('2023-01-01');
+        const usaRegla2023 = !!nom.aplica_regla_2023 || inicio >= FECHA_CORTE_2023;
+
+        let tasa;
+        if (usaRegla2023) {
+            tasa = parseFloat(nom.dias_acumulacion_mensual_regla2023) || 1.67;
+        } else if (antiguedad < 6) {
+            tasa = parseFloat(nom.dias_acumulacion_mensual_tramo1) || 1.5;
+        } else {
+            tasa = parseFloat(nom.dias_acumulacion_mensual_tramo2) || 2.5;
+        }
+
+        const acumBruto = mesesTrabajados * tasa;
+        const descCol   = parseFloat(nom.dias_colectivas_descontados) || 0;
+        diasAcumulados  = Math.min(
+            Math.round(Math.max(acumBruto - descCol, 0) * 100) / 100,
+            max
+        );
+    } else {
+        // No-interino: dotación anual por tramo (no acumulativa entre años)
+        if (antiguedad < 6) {
+            diasAcumulados = parseFloat(nom.dias_personales_tramo1) || 5;
+        } else {
+            diasAcumulados = parseFloat(nom.dias_totales_tramo2) || 30;
+        }
+    }
+
+    return {
+        acumulados:  diasAcumulados,
+        disponibles: diasAcumulados
+    };
 }
 
 // ─── Utilidad: envía credenciales por correo ─────────────────────────────────
@@ -74,36 +108,6 @@ async function enviarCredenciales(email, usuario, contrasena) {
     });
 }
 
-// ─── Utilidad: calcula saldo de vacaciones para interinos (PA-GIRH-10) ───────
-function calcularVacacionesInterino(fecha_ingreso) {
-    if (!fecha_ingreso) return 0;
-    const saldo = calcularSaldoInicial(
-    fecha_ingreso,
-    tipoNom,
-    nom.dias_acumulacion_mensual_tramo1,
-    nom.dias_acumulacion_mensual_tramo2
-);
-diasAcum = saldo;
-diasDisp = saldo;
-}
-
-// ─── Utilidad: calcula saldo de vacaciones por nombramiento ──────────────────
-function calcularSaldoPorNombramiento(nom, fecha_ingreso, dias_vacaciones_acumulados, dias_vacaciones_disponibles) {
-    const idTipo = parseInt(nom.id_tipo_nombramiento);
-    const esInterino = idTipo === 2 || idTipo === 4;
-
-    if (esInterino) {
-        // Interinos: saldo calculado según fecha de ingreso
-        const saldo = calcularVacacionesInterino(nom.fecha_nombramiento || fecha_ingreso);
-        return { acumulados: saldo, disponibles: saldo };
-    } else {
-        // Propiedad: usar el saldo ingresado manualmente
-        const acum = parseFloat(dias_vacaciones_acumulados) || 0;
-        const disp = parseFloat(dias_vacaciones_disponibles) || 0;
-        return { acumulados: acum, disponibles: disp };
-    }
-}
-
 // ─── POST /api/registro/funcionarios ─────────────────────────────────────────
 exports.registrarFuncionario = async (req, res) => {
     const {
@@ -122,15 +126,15 @@ exports.registrarFuncionario = async (req, res) => {
     } = req.body;
 
     // ── Extraer datos del nombramiento principal (primera fila) ───────────────
-    const nomRows = Array.isArray(nombramientos) ? nombramientos : [];
+    const nomRows      = Array.isArray(nombramientos) ? nombramientos : [];
     const nomPrincipal = nomRows.length > 0 ? nomRows[0] : null;
 
     const id_tipo_nombramiento = (nomPrincipal?.id_tipo_nombramiento && parseInt(nomPrincipal.id_tipo_nombramiento) > 0)
         ? parseInt(nomPrincipal.id_tipo_nombramiento)
         : null;
-    const fecha_nombramiento = nomPrincipal?.fecha_nombramiento || null;
-    const numero_nombramiento = nomPrincipal?.numero_nombramiento || null;
-    const fecha_fin_nombramiento = nomPrincipal?.fecha_fin_nombramiento || null;
+    const fecha_nombramiento        = nomPrincipal?.fecha_nombramiento       || null;
+    const numero_nombramiento       = nomPrincipal?.numero_nombramiento      || null;
+    const fecha_fin_nombramiento    = nomPrincipal?.fecha_fin_nombramiento   || null;
     const id_periodo_lectivo_activo = (nomPrincipal?.id_periodo_lectivo && parseInt(nomPrincipal.id_periodo_lectivo) > 0)
         ? parseInt(nomPrincipal.id_periodo_lectivo)
         : null;
@@ -234,24 +238,10 @@ exports.registrarFuncionario = async (req, res) => {
         });
     }
 
-    // ── V9: Saldo vacaciones del nombramiento principal ───────────────────────
+    // ── V9: Validar saldo manual solo para no-interinos (interinos se calculan) ──
+    // Nota: el saldo real se calcula más abajo luego de consultar los tipos en BD.
+    // Esta validación aplica solo al campo manual cuando el tipo aún no está resuelto.
     const tipoNom = parseInt(id_tipo_nombramiento);
-    const esInterinoPrincipal = tipoNom === 2 || tipoNom === 4;
-    let diasAcum, diasDisp;
-
-    if (esInterinoPrincipal) {
-        diasAcum = calcularVacacionesInterino(fecha_ingreso);
-        diasDisp = diasAcum;
-    } else {
-        diasAcum = parseFloat(dias_vacaciones_acumulados) || 0;
-        diasDisp = parseFloat(dias_vacaciones_disponibles) || 0;
-        if (diasAcum < 0 || diasAcum > 30 || diasDisp < 0 || diasDisp > 30) {
-            return res.status(400).json({
-                error: 'El saldo de vacaciones no puede ser un valor negativo ni mayor a 30 días.',
-                codigo: 'MSG-REG-ERR-010'
-            });
-        }
-    }
 
     // ── V10: Código administrativo no negativo (si se provee) ────────────────
     const codAdmin = (codigo_administrativo !== undefined && codigo_administrativo !== null && codigo_administrativo !== '')
@@ -265,9 +255,9 @@ exports.registrarFuncionario = async (req, res) => {
     }
 
     // ── Normalizar enums y opcionales ─────────────────────────────────────────
-    const rolFinal = (role && ['funcionario', 'jefe', 'admin', 'rrhh'].includes(role)) ? role : 'funcionario';
+    const rolFinal    = (role && ['funcionario', 'jefe', 'admin', 'rrhh'].includes(role)) ? role : 'funcionario';
     const estadoFinal = (estado && ['activo', 'inactivo', 'bloqueado'].includes(estado)) ? estado : 'activo';
-    const estadoCont = (estado_contrato && ['activo', 'inactivo', 'suspendido'].includes(estado_contrato)) ? estado_contrato : 'activo';
+    const estadoCont  = (estado_contrato && ['activo', 'inactivo', 'suspendido'].includes(estado_contrato)) ? estado_contrato : 'activo';
     const supervisorId = (id_supervisor && parseInt(id_supervisor) > 0) ? parseInt(id_supervisor) : null;
 
     try {
@@ -285,6 +275,35 @@ exports.registrarFuncionario = async (req, res) => {
                 return res.status(409).json({ error: 'Ya existe un funcionario registrado con ese correo electrónico.', codigo: 'MSG-REG-ERR-DUP-EMAIL' });
             return res.status(409).json({ error: 'Ya existe un funcionario registrado con ese nombre de usuario.', codigo: 'MSG-REG-ERR-DUP-USR' });
         }
+
+        // ── Obtener datos de tipos de nombramiento para calcular saldo ────────
+        const tiposIds = [...new Set(nomRows.map(n => parseInt(n.id_tipo_nombramiento)))];
+        const [tiposRows] = await db.query(
+            `SELECT id_tipo_nombramiento,
+                    es_docente_interino,
+                    dias_vacaciones_anuales,
+                    maximo_dias_acumulados,
+                    dias_acumulacion_mensual_tramo1,
+                    dias_acumulacion_mensual_tramo2
+             FROM tipos_nombramiento
+             WHERE id_tipo_nombramiento IN (?)`,
+            [tiposIds]
+        );
+        const tiposMap = Object.fromEntries(
+            tiposRows.map(t => [t.id_tipo_nombramiento, t])
+        );
+
+        // ── Calcular saldo del nombramiento principal para la tabla funcionarios ──
+        const tipoDataPrincipal = tiposMap[tipoNom] || {};
+        const saldoPrincipal    = calcularSaldoParaNombramiento(
+            { ...nomPrincipal, ...tipoDataPrincipal },
+            fecha_ingreso
+        );
+
+        // Validar rango del saldo calculado para no-interinos con saldo manual
+        const diasAcum = saldoPrincipal.acumulados;
+        const diasDisp = saldoPrincipal.disponibles;
+       
 
         const contrasenaGenerada = generarContrasena();
 
@@ -342,14 +361,12 @@ exports.registrarFuncionario = async (req, res) => {
 
         const id_funcionario = result.insertId;
 
-        // ── INSERT funcionarios_nombramientos (con saldo separado por nombramiento) ──
+        // ── INSERT funcionarios_nombramientos (saldo calculado por nombramiento) ──
         const inserts = nomRows.map(n => {
-            const saldo = calcularSaldoPorNombramiento(
-                n,
-                fecha_ingreso,
-                dias_vacaciones_acumulados,
-                dias_vacaciones_disponibles
-            );
+            const tipoData  = tiposMap[parseInt(n.id_tipo_nombramiento)] || {};
+            const nomConTipo = { ...n, ...tipoData };
+            const saldo     = calcularSaldoParaNombramiento(nomConTipo, fecha_ingreso);
+
             return [
                 id_funcionario,
                 parseInt(n.id_tipo_nombramiento),
@@ -358,10 +375,11 @@ exports.registrarFuncionario = async (req, res) => {
                 n.fecha_fin_nombramiento || null,
                 en_periodo_prueba ? 1 : 0,
                 fecha_fin_periodo_prueba || null,
-                (n.id_periodo_lectivo && parseInt(n.id_periodo_lectivo) > 0) ? parseInt(n.id_periodo_lectivo) : null,
+                (n.id_periodo_lectivo && parseInt(n.id_periodo_lectivo) > 0)
+                    ? parseInt(n.id_periodo_lectivo) : null,
                 1,  // es_activo
                 saldo.acumulados,
-                saldo.disponibles
+                saldo.disponibles // fecha_ultimo_calculo
             ];
         });
 
