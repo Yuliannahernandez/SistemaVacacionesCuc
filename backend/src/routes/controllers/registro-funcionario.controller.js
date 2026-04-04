@@ -52,6 +52,23 @@ function calcularVacacionesInterino(fecha_ingreso) {
     return Math.max(0, Math.min(30, Math.floor((diasTrabajados / 365) * 14 * 100) / 100));
 }
 
+// ─── Utilidad: calcula saldo de vacaciones por nombramiento ──────────────────
+function calcularSaldoPorNombramiento(nom, fecha_ingreso, dias_vacaciones_acumulados, dias_vacaciones_disponibles) {
+    const idTipo = parseInt(nom.id_tipo_nombramiento);
+    const esInterino = idTipo === 2 || idTipo === 4;
+
+    if (esInterino) {
+        // Interinos: saldo calculado según fecha de ingreso
+        const saldo = calcularVacacionesInterino(nom.fecha_nombramiento || fecha_ingreso);
+        return { acumulados: saldo, disponibles: saldo };
+    } else {
+        // Propiedad: usar el saldo ingresado manualmente
+        const acum = parseFloat(dias_vacaciones_acumulados) || 0;
+        const disp = parseFloat(dias_vacaciones_disponibles) || 0;
+        return { acumulados: acum, disponibles: disp };
+    }
+}
+
 // ─── POST /api/registro/funcionarios ─────────────────────────────────────────
 exports.registrarFuncionario = async (req, res) => {
     const {
@@ -182,11 +199,12 @@ exports.registrarFuncionario = async (req, res) => {
         });
     }
 
-    // ── V9: Saldo vacaciones (interinos: calculado; propiedad: 0–30) ──────────
+    // ── V9: Saldo vacaciones del nombramiento principal ───────────────────────
     const tipoNom = parseInt(id_tipo_nombramiento);
-    const esInterino = tipoNom === 2 || tipoNom === 4;
+    const esInterinoPrincipal = tipoNom === 2 || tipoNom === 4;
     let diasAcum, diasDisp;
-    if (esInterino) {
+
+    if (esInterinoPrincipal) {
         diasAcum = calcularVacacionesInterino(fecha_ingreso);
         diasDisp = diasAcum;
     } else {
@@ -289,24 +307,36 @@ exports.registrarFuncionario = async (req, res) => {
 
         const id_funcionario = result.insertId;
 
-        // ── INSERT funcionarios_nombramientos (todos los nombramientos) ────────
-        const inserts = nomRows.map(n => [
-            id_funcionario,
-            parseInt(n.id_tipo_nombramiento),
-            n.numero_nombramiento?.trim() || null,
-            n.fecha_nombramiento || null,
-            n.fecha_fin_nombramiento || null,
-            en_periodo_prueba ? 1 : 0,
-            fecha_fin_periodo_prueba || null,
-            (n.id_periodo_lectivo && parseInt(n.id_periodo_lectivo) > 0) ? parseInt(n.id_periodo_lectivo) : null,
-            1  // es_activo
-        ]);
+        // ── INSERT funcionarios_nombramientos (con saldo separado por nombramiento) ──
+        const inserts = nomRows.map(n => {
+            const saldo = calcularSaldoPorNombramiento(
+                n,
+                fecha_ingreso,
+                dias_vacaciones_acumulados,
+                dias_vacaciones_disponibles
+            );
+            return [
+                id_funcionario,
+                parseInt(n.id_tipo_nombramiento),
+                n.numero_nombramiento?.trim() || null,
+                n.fecha_nombramiento || null,
+                n.fecha_fin_nombramiento || null,
+                en_periodo_prueba ? 1 : 0,
+                fecha_fin_periodo_prueba || null,
+                (n.id_periodo_lectivo && parseInt(n.id_periodo_lectivo) > 0) ? parseInt(n.id_periodo_lectivo) : null,
+                1,  // es_activo
+                saldo.acumulados,
+                saldo.disponibles
+            ];
+        });
+
         await db.query(
             `INSERT INTO funcionarios_nombramientos
                 (id_funcionario, id_tipo_nombramiento,
                  numero_nombramiento, fecha_nombramiento, fecha_fin_nombramiento,
                  en_periodo_prueba, fecha_fin_periodo_prueba,
-                 id_periodo_lectivo, es_activo)
+                 id_periodo_lectivo, es_activo,
+                 dias_vacaciones_acumulados, dias_vacaciones_disponibles)
              VALUES ?`,
             [inserts]
         );

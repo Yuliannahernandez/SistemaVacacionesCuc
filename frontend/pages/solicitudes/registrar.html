@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
     :root {
       --g900:#001f52;--g800:#002D72;--g700:#1a5ba8;--g500:#2d7dd2;
       --g300:#7da6d8;--g100:#ccddf0;--g050:#e8f0fa;
@@ -23,265 +22,171 @@
       --g050:rgba(0,45,114,0.3);--g100:rgba(0,45,114,0.5);
       --gold:#c8a040;--gold-bg:rgba(185,150,60,0.15);
     }
+    html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bone);color:var(--text);overflow:hidden;transition:background .3s,color .3s}
+    .bg{position:fixed;inset:0;z-index:0;background:var(--bone);transition:background .3s}
+    .bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 75% 10%,rgba(45,125,210,0.08) 0%,transparent 60%),radial-gradient(ellipse 35% 50% at 8% 90%,rgba(26,91,168,0.05) 0%,transparent 55%)}
 
-    html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bone); color:var(--text); overflow:hidden; transition:background .3s,color .3s; }
-    .bg { position:fixed; inset:0; z-index:0; background:var(--bone); transition:background .3s; }
-    .bg::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 50% 40% at 75% 10%,rgba(45,125,210,0.08) 0%,transparent 60%),radial-gradient(ellipse 35% 50% at 8% 90%,rgba(26,91,168,0.05) 0%,transparent 55%); }
+    /* ── Layout ── */
+    .layout{position:relative;z-index:10;margin-top:var(--nav-h);height:calc(100vh - var(--nav-h));display:flex}
+    .main{flex:1;overflow-y:auto;overflow-x:hidden;padding:24px 24px 20px;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
 
-    /* ══ TOPNAV ══ */
-    .topnav {
-      position:fixed; top:0; left:0; right:0; height:var(--nav-h); z-index:200;
-      display:flex; align-items:center; padding:0 20px; gap:0;
-      background:rgba(0,45,114,0.96);
-      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-      border-bottom:1px solid rgba(255,255,255,0.05);
-    }
-    .nav-logo { display:flex; align-items:center; gap:10px; margin-right:20px; flex-shrink:0; }
-    .logo-icon { width:29px; height:29px; border-radius:8px; background:linear-gradient(135deg,#002D72,#7da6d8); display:flex; align-items:center; justify-content:center; }
-    .logo-icon svg { width:13px; height:13px; stroke:#fff; fill:none; stroke-width:1.8; stroke-linecap:round; }
-    .logo-text strong { font-family:'DM Mono',monospace; font-size:12px; font-weight:400; color:rgba(204,220,240,0.9); letter-spacing:.1em; display:block; line-height:1; }
-    .logo-text small { font-size:8px; font-weight:300; color:rgba(125,166,216,0.3); letter-spacing:.18em; text-transform:uppercase; }
-    .nav-vdiv { width:1px; height:18px; background:rgba(255,255,255,0.07); margin-right:16px; flex-shrink:0; }
-    .nav-sep { width:1px; height:14px; background:rgba(255,255,255,0.07); margin:0 4px; flex-shrink:0; }
+    /* ── Page header ── */
+    .page-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;animation:fadeUp .4s both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+    .page-back{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:8px;transition:var(--trans)}
+    .page-back svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+    .page-back:hover{background:var(--g050);color:var(--g700)}
+    .page-hdiv{width:1px;height:16px;background:var(--dim)}
+    .page-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text)}
+    .page-title em{font-style:italic;color:var(--g700)}
+    [data-theme="dark"] .page-title em{color:var(--g300)}
+    .page-tag{margin-left:auto;font-family:'DM Mono',monospace;font-size:9px;font-weight:300;padding:4px 10px;border-radius:6px;border:1px solid var(--dim);color:var(--muted)}
 
-    .nav-links { display:flex; align-items:center; gap:1px; flex:1; position:relative; }
-    .nav-link { display:flex; align-items:center; gap:7px; padding:6px 12px; border-radius:9px; font-size:11.5px; font-weight:300; color:rgba(204,220,240,0.4); text-decoration:none; cursor:pointer; transition:var(--trans); white-space:nowrap; position:relative; flex-shrink:0; }
-    .nav-link svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; flex-shrink:0; }
-    .nav-link:hover { background:rgba(255,255,255,0.06); color:rgba(204,220,240,0.7); }
-    .nav-link.active { background:rgba(125,166,216,0.11); color:var(--g300); border:1px solid rgba(125,166,216,0.13); }
+    /* ── Form layout ── */
+    .form-layout{display:grid;grid-template-columns:1fr 300px;gap:18px}
 
-    .nav-group { position:relative; flex-shrink:0; }
-    .nav-group-btn { display:flex; align-items:center; gap:7px; padding:6px 11px; border-radius:9px; font-size:11.5px; font-weight:300; color:rgba(204,220,240,0.4); cursor:pointer; transition:var(--trans); white-space:nowrap; user-select:none; }
-    .nav-group-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; flex-shrink:0; }
-    .nav-chevron { margin-left:2px; transition:transform .2s; opacity:.5; }
-    .nav-group-btn:hover { background:rgba(255,255,255,0.06); color:rgba(204,220,240,0.7); }
-    .nav-group.open .nav-group-btn { background:rgba(125,166,216,0.11); color:var(--g300); }
-    .nav-group.open .nav-chevron { transform:rotate(180deg); }
+    /* ── Glass card ── */
+    .glass-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:20px 22px;box-shadow:0 2px 14px rgba(0,0,0,0.05);transition:background .3s;animation:fadeUp .4s .08s both}
+    [data-theme="dark"] .glass-card{background:rgba(0,45,114,0.18);border-color:rgba(125,166,216,0.08)}
 
-    .nav-submenu { position:absolute; top:calc(100% + 6px); left:0; min-width:200px; background:rgba(0,31,82,0.97); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(125,166,216,0.1); border-radius:12px; padding:6px; box-shadow:0 12px 32px rgba(0,0,0,0.25); z-index:300; opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity .18s,transform .18s; }
-    .nav-group.open .nav-submenu { opacity:1; transform:translateY(0); pointer-events:all; }
-    .nav-sub-item { display:block; padding:8px 12px; border-radius:8px; font-size:11.5px; font-weight:300; color:rgba(204,220,240,0.5); text-decoration:none; cursor:pointer; transition:var(--trans); white-space:nowrap; }
-    .nav-sub-item:hover { background:rgba(125,166,216,0.1); color:rgba(204,220,240,0.85); }
-    .nav-sub-item.active { background:rgba(26,91,168,0.15); color:var(--g300); }
-
-    .nav-right { display:flex; align-items:center; gap:4px; margin-left:auto; flex-shrink:0; }
-    .nav-date { font-size:9.5px; font-weight:300; color:rgba(125,166,216,0.3); font-family:'DM Mono',monospace; margin-right:6px; white-space:nowrap; }
-    .nav-btn { width:30px; height:30px; border-radius:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--trans); }
-    .nav-btn:hover { background:rgba(255,255,255,0.09); }
-    .nav-btn svg { width:13px; height:13px; stroke:rgba(125,166,216,0.5); fill:none; stroke-width:1.5; stroke-linecap:round; }
-    .action-btn { display:flex; align-items:center; gap:5px; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:11px; font-weight:300; color:rgba(125,166,216,0.38); transition:var(--trans); white-space:nowrap; }
-    .action-btn svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; flex-shrink:0; }
-    .action-btn:hover { background:rgba(255,255,255,0.05); color:rgba(204,220,240,0.62); }
-    .action-btn.logout:hover { color:rgba(228,0,43,0.7); }
-    .user-wrap { position:relative; margin-left:3px; }
-    .user-pill { display:flex; align-items:center; gap:8px; padding:4px 10px 4px 5px; border-radius:20px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); cursor:pointer; transition:var(--trans); }
-    .user-pill:hover { background:rgba(255,255,255,0.08); }
-    .user-wrap.open .user-pill { background:rgba(125,166,216,0.1); border-color:rgba(125,166,216,0.15); }
-    .avatar { width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,var(--g800),var(--g700)); display:flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:500; color:#fff; flex-shrink:0; }
-    .user-pill-name { font-size:11px; font-weight:300; color:rgba(204,220,240,0.62); line-height:1.1; }
-    .user-pill-nom { font-size:8.5px; font-weight:300; color:rgba(125,166,216,0.35); letter-spacing:.04em; }
-    .user-dropdown { position:absolute; top:calc(100% + 7px); right:0; width:210px; background:rgba(0,31,82,0.97); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(125,166,216,0.1); border-radius:14px; padding:12px; box-shadow:0 12px 32px rgba(0,0,0,0.28); z-index:300; opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity .18s,transform .18s; }
-    .user-wrap.open .user-dropdown { opacity:1; transform:translateY(0); pointer-events:all; }
-    .ud-label { font-size:8px; font-weight:400; letter-spacing:.2em; text-transform:uppercase; color:rgba(125,166,216,0.3); margin-bottom:8px; padding:0 4px; }
-    .ud-pill { display:flex; flex-direction:column; padding:8px 10px; border-radius:9px; background:rgba(255,255,255,0.03); border:1px solid transparent; cursor:pointer; transition:var(--trans); margin-bottom:4px; }
-    .ud-pill:last-child { margin-bottom:0; }
-    .ud-pill:hover { background:rgba(125,166,216,0.08); }
-    .ud-pill.active { background:rgba(26,91,168,0.15); border-color:rgba(125,166,216,0.18); }
-    .ud-pill-name { font-size:11.5px; font-weight:300; color:rgba(204,220,240,0.55); }
-    .ud-pill.active .ud-pill-name { color:var(--g300); }
-    .ud-pill-sub { font-size:9px; font-weight:300; color:rgba(125,166,216,0.28); margin-top:1px; }
-
-    /* ══ LAYOUT ══ */
-    .layout { position:relative; z-index:10; margin-top:var(--nav-h); height:calc(100vh - var(--nav-h)); display:flex; }
-    .main { flex:1; overflow-y:auto; overflow-x:hidden; padding:24px 24px 20px; scrollbar-width:thin; scrollbar-color:var(--dim) transparent; }
-
-    /* ══ Encabezado página ══ */
-    .page-header { display:flex; align-items:center; gap:14px; margin-bottom:22px; animation:fadeUp .4s both; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
-    .page-back { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:300; color:var(--muted); text-decoration:none; padding:5px 10px; border-radius:8px; transition:var(--trans); }
-    .page-back svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
-    .page-back:hover { background:var(--g050); color:var(--g700); }
-    [data-theme="dark"] .page-back:hover { color:var(--g300); }
-    .page-hdiv { width:1px; height:16px; background:var(--dim); }
-    .page-title { font-family:'DM Serif Display',serif; font-size:22px; color:var(--text); }
-    .page-title em { font-style:italic; color:var(--g700); }
-    [data-theme="dark"] .page-title em { color:var(--g300); }
-    .page-tag { margin-left:auto; font-family:'DM Mono',monospace; font-size:9px; font-weight:300; padding:4px 10px; border-radius:6px; border:1px solid var(--dim); color:var(--muted); }
-
-    /* ══ Layout formulario ══ */
-    .form-layout { display:grid; grid-template-columns:1fr 300px; gap:18px; }
-
-    /* ══ Card base ══ */
-    .glass-card { background:rgba(255,255,255,0.44); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.7); border-radius:var(--radius); padding:20px 22px; box-shadow:0 2px 14px rgba(0,0,0,0.05); transition:background .3s; animation:fadeUp .4s .08s both; }
-    [data-theme="dark"] .glass-card { background:rgba(0,45,114,0.18); border-color:rgba(125,166,216,0.08); }
-
-    /* ══ Secciones del formulario ══ */
-    .form-section { margin-bottom:24px; }
-    .form-section:last-child { margin-bottom:0; }
-    .section-label {
-      font-size:9px; font-weight:400; letter-spacing:.18em; text-transform:uppercase;
-      color:var(--g700); margin-bottom:14px; padding-bottom:8px;
-      border-bottom:1px solid var(--g100);
-      display:flex; align-items:center; gap:8px;
-    }
-    [data-theme="dark"] .section-label { color:var(--g300); border-bottom-color:rgba(125,166,216,0.15); }
-    .section-label svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; }
-
-    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
-    .form-row.single { grid-template-columns:1fr; }
-
-    .field { display:flex; flex-direction:column; gap:5px; }
-    .field label { font-size:9.5px; font-weight:400; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; font-family:'DM Mono',monospace; }
-    .field label .req { color:var(--g500); margin-left:2px; }
-
-    .field input, .field select, .field textarea {
-      background:var(--g050); border:1px solid var(--g100);
-      border-radius:10px; padding:10px 13px;
-      color:var(--text); font-family:'DM Sans',sans-serif; font-size:12.5px; font-weight:300;
-      outline:none; transition:var(--trans); width:100%;
-    }
-    [data-theme="dark"] .field input,
-    [data-theme="dark"] .field select,
-    [data-theme="dark"] .field textarea {
-      background:rgba(0,45,114,0.25); border-color:rgba(125,166,216,0.15); color:var(--text);
-    }
-    .field input:focus, .field select:focus, .field textarea:focus {
-      border-color:var(--g500); background:rgba(255,255,255,0.8);
-      box-shadow:0 0 0 3px rgba(45,125,210,0.1);
-    }
-    [data-theme="dark"] .field input:focus,
-    [data-theme="dark"] .field select:focus,
-    [data-theme="dark"] .field textarea:focus {
-      background:rgba(0,45,114,0.4); border-color:var(--g300);
-    }
-    .field input:disabled { opacity:.55; cursor:not-allowed; }
-    .field textarea { resize:none; height:82px; line-height:1.6; }
-    .field select { appearance:none; -webkit-appearance:none; cursor:pointer;
+    /* ── Form sections ── */
+    .form-section{margin-bottom:24px}
+    .form-section:last-child{margin-bottom:0}
+    .section-label{font-size:9px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--g700);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:8px}
+    [data-theme="dark"] .section-label{color:var(--g300);border-bottom-color:rgba(125,166,216,0.15)}
+    .section-label svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+    .form-row.single{grid-template-columns:1fr}
+    .field{display:flex;flex-direction:column;gap:5px}
+    .field label{font-size:9.5px;font-weight:400;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-family:'DM Mono',monospace}
+    .field label .req{color:var(--g500);margin-left:2px}
+    .field input,.field select,.field textarea{background:var(--g050);border:1px solid var(--g100);border-radius:10px;padding:10px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:300;outline:none;transition:var(--trans);width:100%}
+    [data-theme="dark"] .field input,[data-theme="dark"] .field select,[data-theme="dark"] .field textarea{background:rgba(0,45,114,0.25);border-color:rgba(125,166,216,0.15);color:var(--text)}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g500);background:rgba(255,255,255,0.8);box-shadow:0 0 0 3px rgba(45,125,210,0.1)}
+    [data-theme="dark"] .field input:focus,[data-theme="dark"] .field select:focus,[data-theme="dark"] .field textarea:focus{background:rgba(0,45,114,0.4);border-color:var(--g300)}
+    .field input:disabled{opacity:.55;cursor:not-allowed}
+    .field textarea{resize:none;height:82px;line-height:1.6}
+    .field select{appearance:none;-webkit-appearance:none;cursor:pointer;
       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(45,125,210,0.6)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat:no-repeat; background-position:right 11px center; padding-right:30px;
-    }
-    .field .hint { font-size:9.5px; font-weight:300; color:var(--dim); font-family:'DM Mono',monospace; }
-    .field .err { font-size:9.5px; color:#E4002B; display:none; font-family:'DM Mono',monospace; }
-    .field.has-error input, .field.has-error select { border-color:#E4002B; box-shadow:0 0 0 3px rgba(228,0,43,0.08); }
-    .field.has-error .err { display:block; }
+      background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+    .field .hint{font-size:9.5px;font-weight:300;color:var(--dim);font-family:'DM Mono',monospace}
+    .field .err{font-size:9.5px;color:#E4002B;display:none;font-family:'DM Mono',monospace}
+    .field.has-error input,.field.has-error select{border-color:#E4002B;box-shadow:0 0 0 3px rgba(228,0,43,0.08)}
+    .field.has-error .err{display:block}
 
-    /* ══ Saldo visual ══ */
-    .saldo-box {
-      background:var(--g050); border:1px solid var(--g100); border-radius:12px;
-      padding:14px 18px; display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:14px; transition:var(--trans); display:none;
-    }
-    [data-theme="dark"] .saldo-box { background:rgba(0,45,114,0.25); border-color:rgba(125,166,216,0.15); }
-    .saldo-box.visible { display:flex; }
-    .saldo-box.warn { background:var(--gold-bg); border-color:rgba(185,150,60,0.3); }
-    .saldo-box.danger { background:rgba(228,0,43,0.05); border-color:rgba(228,0,43,0.2); }
-    .saldo-left .saldo-lbl { font-family:'DM Mono',monospace; font-size:8.5px; font-weight:300; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:4px; }
-    .saldo-left .saldo-val { font-family:'DM Serif Display',serif; font-size:28px; color:var(--text); line-height:1; }
-    [data-theme="dark"] .saldo-left .saldo-val { color:var(--g300); }
-    .saldo-left .saldo-val span { font-family:'DM Sans',sans-serif; font-size:13px; color:var(--muted); font-weight:300; }
-    .saldo-left .saldo-sub { font-size:10px; font-weight:300; color:var(--muted); margin-top:3px; }
-    .saldo-pill { padding:4px 11px; border-radius:20px; font-size:9.5px; font-weight:400; border:1px solid; font-family:'DM Mono',monospace; }
-    .saldo-pill.ok { color:var(--g700); background:rgba(45,125,210,0.08); border-color:rgba(45,125,210,0.22); }
-    [data-theme="dark"] .saldo-pill.ok { color:var(--g300); }
-    .saldo-pill.warn { color:var(--gold); background:var(--gold-bg); border-color:rgba(185,150,60,0.3); }
-    .saldo-pill.bad { color:#E4002B; background:rgba(228,0,43,0.06); border-color:rgba(228,0,43,0.2); }
+    /* ── Saldo box ── */
+    .saldo-box{background:var(--g050);border:1px solid var(--g100);border-radius:12px;padding:14px 18px;display:none;align-items:center;justify-content:space-between;margin-bottom:14px;transition:var(--trans)}
+    [data-theme="dark"] .saldo-box{background:rgba(0,45,114,0.25);border-color:rgba(125,166,216,0.15)}
+    .saldo-box.visible{display:flex}
+    .saldo-box.warn{background:var(--gold-bg);border-color:rgba(185,150,60,0.3)}
+    .saldo-box.danger{background:rgba(228,0,43,0.05);border-color:rgba(228,0,43,0.2)}
+    .saldo-lbl{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:300;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+    .saldo-val{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text);line-height:1}
+    [data-theme="dark"] .saldo-val{color:var(--g300)}
+    .saldo-val span{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);font-weight:300}
+    .saldo-sub{font-size:10px;font-weight:300;color:var(--muted);margin-top:3px}
+    .saldo-pill{padding:4px 11px;border-radius:20px;font-size:9.5px;font-weight:400;border:1px solid;font-family:'DM Mono',monospace}
+    .saldo-pill.ok{color:var(--g700);background:rgba(45,125,210,0.08);border-color:rgba(45,125,210,0.22)}
+    [data-theme="dark"] .saldo-pill.ok{color:var(--g300)}
+    .saldo-pill.warn{color:var(--gold);background:var(--gold-bg);border-color:rgba(185,150,60,0.3)}
+    .saldo-pill.bad{color:#E4002B;background:rgba(228,0,43,0.06);border-color:rgba(228,0,43,0.2)}
 
-    /* ══ Resumen días ══ */
-    .dias-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px; display:none; }
-    .dias-grid.visible { display:grid; }
-    .dias-item { background:var(--g050); border:1px solid var(--g100); border-radius:10px; padding:10px 12px; text-align:center; }
-    [data-theme="dark"] .dias-item { background:rgba(0,45,114,0.25); border-color:rgba(125,166,216,0.12); }
-    .dias-num { font-family:'DM Serif Display',serif; font-size:22px; color:var(--text); line-height:1; margin-bottom:3px; }
-    .dias-num.green { color:var(--g700); }
-    [data-theme="dark"] .dias-num.green { color:var(--g300); }
-    .dias-lbl { font-family:'DM Mono',monospace; font-size:8px; font-weight:300; color:var(--muted); letter-spacing:.06em; }
+    /* ── Días grid ── */
+    .dias-grid{display:none;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+    .dias-grid.visible{display:grid}
+    .dias-item{background:var(--g050);border:1px solid var(--g100);border-radius:10px;padding:10px 12px;text-align:center}
+    [data-theme="dark"] .dias-item{background:rgba(0,45,114,0.25);border-color:rgba(125,166,216,0.12)}
+    .dias-num{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);line-height:1;margin-bottom:3px}
+    .dias-num.green{color:var(--g700)}
+    [data-theme="dark"] .dias-num.green{color:var(--g300)}
+    .dias-lbl{font-family:'DM Mono',monospace;font-size:8px;font-weight:300;color:var(--muted);letter-spacing:.06em}
 
-    /* ══ Alertas ══ */
-    .alert { border-radius:10px; padding:10px 14px; margin-bottom:12px; font-size:11.5px; font-weight:300; display:none; align-items:flex-start; gap:9px; line-height:1.5; }
-    .alert.show { display:flex; }
-    .alert svg { width:13px; height:13px; flex-shrink:0; margin-top:2px; stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; }
-    .alert.info { background:rgba(45,125,210,0.06); border:1px solid rgba(45,125,210,0.15); color:var(--g700); }
-    [data-theme="dark"] .alert.info { color:var(--g300); }
-    .alert.warning { background:var(--gold-bg); border:1px solid rgba(185,150,60,0.2); color:#8a6800; }
-    [data-theme="dark"] .alert.warning { color:var(--gold); }
-    .alert.danger { background:rgba(228,0,43,0.05); border:1px solid rgba(228,0,43,0.16); color:#E4002B; }
+    /* ── Alerts ── */
+    .alert{border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:11.5px;font-weight:300;display:none;align-items:flex-start;gap:9px;line-height:1.5}
+    .alert.show{display:flex}
+    .alert svg{width:13px;height:13px;flex-shrink:0;margin-top:2px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+    .alert.info{background:rgba(45,125,210,0.06);border:1px solid rgba(45,125,210,0.15);color:var(--g700)}
+    [data-theme="dark"] .alert.info{color:var(--g300)}
+    .alert.warning{background:var(--gold-bg);border:1px solid rgba(185,150,60,0.2);color:#8a6800}
+    [data-theme="dark"] .alert.warning{color:var(--gold)}
+    .alert.danger{background:rgba(228,0,43,0.05);border:1px solid rgba(228,0,43,0.16);color:#E4002B}
 
-    /* ══ Modalidad radio ══ */
-    .modalidad-wrap { display:none; margin-bottom:0; }
-    .modalidad-wrap.show { display:block; }
-    .radio-group { display:flex; gap:10px; }
-    .radio-opt { flex:1; border:1px solid var(--g100); border-radius:10px; padding:11px 13px; cursor:pointer; transition:var(--trans); display:flex; align-items:center; gap:10px; background:var(--g050); }
-    [data-theme="dark"] .radio-opt { background:rgba(0,45,114,0.2); border-color:rgba(125,166,216,0.12); }
-    .radio-opt:hover { border-color:rgba(45,125,210,0.35); }
-    .radio-opt.selected { border-color:rgba(45,125,210,0.45); background:rgba(45,125,210,0.08); }
-    [data-theme="dark"] .radio-opt.selected { background:rgba(45,125,210,0.15); border-color:rgba(125,166,216,0.3); }
-    .radio-opt input[type="radio"] { accent-color:var(--g500); width:13px; height:13px; flex-shrink:0; }
-    .opt-title { font-size:12px; font-weight:400; color:var(--text); }
-    .opt-sub { font-size:9.5px; font-weight:300; color:var(--muted); margin-top:1px; }
+    /* ── Modalidad radio ── */
+    .modalidad-wrap{display:none;margin-bottom:0}
+    .modalidad-wrap.show{display:block}
+    .radio-group{display:flex;gap:10px}
+    .radio-opt{flex:1;border:1px solid var(--g100);border-radius:10px;padding:11px 13px;cursor:pointer;transition:var(--trans);display:flex;align-items:center;gap:10px;background:var(--g050)}
+    [data-theme="dark"] .radio-opt{background:rgba(0,45,114,0.2);border-color:rgba(125,166,216,0.12)}
+    .radio-opt:hover{border-color:rgba(45,125,210,0.35)}
+    .radio-opt.selected{border-color:rgba(45,125,210,0.45);background:rgba(45,125,210,0.08)}
+    [data-theme="dark"] .radio-opt.selected{background:rgba(45,125,210,0.15);border-color:rgba(125,166,216,0.3)}
+    .radio-opt input[type="radio"]{accent-color:var(--g500);width:13px;height:13px;flex-shrink:0}
+    .opt-title{font-size:12px;font-weight:400;color:var(--text)}
+    .opt-sub{font-size:9.5px;font-weight:300;color:var(--muted);margin-top:1px}
 
-    /* ══ Botones ══ */
-    .form-actions { display:flex; gap:9px; margin-top:20px; padding-top:18px; border-top:1px solid var(--g100); }
-    [data-theme="dark"] .form-actions { border-top-color:rgba(125,166,216,0.1); }
-    .btn-primary { flex:1; padding:11px; border-radius:10px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:11.5px; font-weight:400; letter-spacing:.08em; text-transform:uppercase; color:#fff; background:var(--g700); transition:var(--trans); box-shadow:0 3px 12px rgba(26,91,168,0.25); }
-    .btn-primary:hover { background:var(--g800); transform:translateY(-1px); box-shadow:0 5px 16px rgba(26,91,168,0.32); }
-    .btn-primary:active { transform:translateY(0); }
-    .btn-primary:disabled { background:var(--dim); box-shadow:none; cursor:not-allowed; transform:none; }
-    .btn-secondary { padding:11px 18px; border-radius:10px; border:1px solid var(--g100); cursor:pointer; font-family:'DM Sans',sans-serif; font-size:11.5px; font-weight:300; color:var(--muted); background:transparent; transition:var(--trans); }
-    .btn-secondary:hover { border-color:rgba(45,125,210,0.35); color:var(--g700); }
-    [data-theme="dark"] .btn-secondary:hover { color:var(--g300); }
+    /* ── Buttons ── */
+    .form-actions{display:flex;gap:9px;margin-top:20px;padding-top:18px;border-top:1px solid var(--g100)}
+    [data-theme="dark"] .form-actions{border-top-color:rgba(125,166,216,0.1)}
+    .btn-primary{flex:1;padding:11px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--g700);transition:var(--trans);box-shadow:0 3px 12px rgba(26,91,168,0.25)}
+    .btn-primary:hover{background:var(--g800);transform:translateY(-1px);box-shadow:0 5px 16px rgba(26,91,168,0.32)}
+    .btn-primary:disabled{background:var(--dim);box-shadow:none;cursor:not-allowed;transform:none}
+    .btn-secondary{padding:11px 18px;border-radius:10px;border:1px solid var(--g100);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:300;color:var(--muted);background:transparent;transition:var(--trans)}
+    .btn-secondary:hover{border-color:rgba(45,125,210,0.35);color:var(--g700)}
 
-    /* ══ Panel lateral ══ */
-    .side-panel { display:flex; flex-direction:column; gap:14px; }
-    .side-card { background:rgba(255,255,255,0.44); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.7); border-radius:var(--radius); padding:16px 18px; box-shadow:0 2px 12px rgba(0,0,0,0.05); transition:background .3s; animation:fadeUp .4s .12s both; }
-    [data-theme="dark"] .side-card { background:rgba(0,45,114,0.18); border-color:rgba(125,166,216,0.08); }
-    .side-lbl { font-family:'DM Mono',monospace; font-size:8.5px; font-weight:400; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-bottom:13px; }
+    /* ── Side panel ── */
+    .side-panel{display:flex;flex-direction:column;gap:14px}
+    .side-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:16px 18px;box-shadow:0 2px 12px rgba(0,0,0,0.05);transition:background .3s;animation:fadeUp .4s .12s both}
+    [data-theme="dark"] .side-card{background:rgba(0,45,114,0.18);border-color:rgba(125,166,216,0.08)}
+    .side-lbl{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:13px}
+    .rules-list{display:flex;flex-direction:column;gap:7px}
+    .rule-item{display:flex;align-items:flex-start;gap:8px}
+    .rule-dot{width:5px;height:5px;border-radius:50%;background:var(--g500);flex-shrink:0;margin-top:5px}
+    .rule-text{font-size:11px;font-weight:300;color:var(--muted);line-height:1.55}
+    .rule-text strong{color:var(--text);font-weight:400}
+    .steps-list{display:flex;flex-direction:column}
+    .step-item{display:flex;gap:11px;padding-bottom:12px;position:relative}
+    .step-item:last-child{padding-bottom:0}
+    .step-item:not(:last-child)::before{content:'';position:absolute;left:11px;top:22px;bottom:0;width:1px;background:var(--g100)}
+    [data-theme="dark"] .step-item:not(:last-child)::before{background:rgba(125,166,216,0.12)}
+    .step-n{width:23px;height:23px;border-radius:50%;background:var(--g050);border:1px solid var(--g100);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:9.5px;font-weight:400;color:var(--g500);flex-shrink:0}
+    [data-theme="dark"] .step-n{background:rgba(0,45,114,0.3);border-color:rgba(125,166,216,0.15)}
+    .step-t{font-size:11.5px;font-weight:400;color:var(--text);margin-bottom:1px}
+    .step-d{font-size:10px;font-weight:300;color:var(--muted);line-height:1.5}
 
-    .rules-list { display:flex; flex-direction:column; gap:7px; }
-    .rule-item { display:flex; align-items:flex-start; gap:8px; }
-    .rule-dot { width:5px; height:5px; border-radius:50%; background:var(--g500); flex-shrink:0; margin-top:5px; }
-    .rule-text { font-size:11px; font-weight:300; color:var(--muted); line-height:1.55; }
-    .rule-text strong { color:var(--text); font-weight:400; }
+    /* ── Feriado badge on date inputs ── */
+    .date-feriado-hint{font-size:9px;font-weight:300;color:var(--gold);font-family:'DM Mono',monospace;margin-top:2px;display:none}
+    .date-feriado-hint.show{display:block}
 
-    .steps-list { display:flex; flex-direction:column; }
-    .step-item { display:flex; gap:11px; padding-bottom:12px; position:relative; }
-    .step-item:last-child { padding-bottom:0; }
-    .step-item:not(:last-child)::before { content:''; position:absolute; left:11px; top:22px; bottom:0; width:1px; background:var(--g100); }
-    [data-theme="dark"] .step-item:not(:last-child)::before { background:rgba(125,166,216,0.12); }
-    .step-n { width:23px; height:23px; border-radius:50%; background:var(--g050); border:1px solid var(--g100); display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:9.5px; font-weight:400; color:var(--g500); flex-shrink:0; }
-    [data-theme="dark"] .step-n { background:rgba(0,45,114,0.3); border-color:rgba(125,166,216,0.15); }
-    .step-t { font-size:11.5px; font-weight:400; color:var(--text); margin-bottom:1px; }
-    .step-d { font-size:10px; font-weight:300; color:var(--muted); line-height:1.5; }
+    /* ── Modal ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,45,114,0.45);backdrop-filter:blur(8px);z-index:999;display:none;align-items:center;justify-content:center}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--bone);border:1px solid rgba(255,255,255,0.7);border-radius:18px;padding:26px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.15);animation:modalIn .3s cubic-bezier(.16,1,.3,1)}
+    [data-theme="dark"] .modal{background:rgba(0,31,82,0.97);border-color:rgba(125,166,216,0.1)}
+    @keyframes modalIn{from{transform:scale(0.95);opacity:0}to{transform:scale(1);opacity:1}}
+    .modal-icon{width:44px;height:44px;border-radius:12px;background:rgba(45,125,210,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+    .modal-icon svg{width:20px;height:20px;stroke:var(--g500);fill:none;stroke-width:1.5;stroke-linecap:round}
+    .modal-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:6px}
+    .modal-body{font-size:11.5px;font-weight:300;color:var(--muted);line-height:1.7;margin-bottom:16px}
+    .modal-sum{background:var(--g050);border-radius:10px;padding:13px 15px;margin-bottom:16px}
+    [data-theme="dark"] .modal-sum{background:rgba(0,45,114,0.3)}
+    .modal-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11.5px}
+    .ml{font-weight:300;color:var(--muted)}
+    .mr{font-weight:400;color:var(--text)}
+    .mr.green{color:var(--g700)}
+    [data-theme="dark"] .mr.green{color:var(--g300)}
+    .modal-adv{background:var(--gold-bg);border:1px solid rgba(185,150,60,0.2);border-radius:9px;padding:9px 13px;font-size:11px;font-weight:300;color:#8a6800;margin-bottom:14px;display:none;gap:7px;align-items:flex-start}
+    [data-theme="dark"] .modal-adv{color:var(--gold)}
+    .modal-adv.show{display:flex}
+    .modal-adv svg{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.5;margin-top:1px}
+    .modal-actions{display:flex;gap:9px}
 
-    /* ══ Modal ══ */
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,45,114,0.45); backdrop-filter:blur(8px); z-index:999; display:none; align-items:center; justify-content:center; }
-    .modal-overlay.show { display:flex; }
-    .modal { background:var(--bone); border:1px solid rgba(255,255,255,0.7); border-radius:18px; padding:26px 28px; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.15); animation:modalIn .3s cubic-bezier(.16,1,.3,1); }
-    [data-theme="dark"] .modal { background:rgba(0,31,82,0.97); border-color:rgba(125,166,216,0.1); }
-    @keyframes modalIn { from{transform:scale(0.95);opacity:0} to{transform:scale(1);opacity:1} }
-    .modal-icon { width:44px; height:44px; border-radius:12px; background:rgba(45,125,210,0.1); display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
-    .modal-icon svg { width:20px; height:20px; stroke:var(--g500); fill:none; stroke-width:1.5; stroke-linecap:round; }
-    .modal-title { font-family:'DM Serif Display',serif; font-size:20px; color:var(--text); margin-bottom:6px; }
-    .modal-body { font-size:11.5px; font-weight:300; color:var(--muted); line-height:1.7; margin-bottom:16px; }
-    .modal-sum { background:var(--g050); border-radius:10px; padding:13px 15px; margin-bottom:16px; }
-    [data-theme="dark"] .modal-sum { background:rgba(0,45,114,0.3); }
-    .modal-row { display:flex; justify-content:space-between; padding:3px 0; font-size:11.5px; }
-    .ml { font-weight:300; color:var(--muted); }
-    .mr { font-weight:400; color:var(--text); }
-    .mr.green { color:var(--g700); }
-    [data-theme="dark"] .mr.green { color:var(--g300); }
-    .modal-adv { background:var(--gold-bg); border:1px solid rgba(185,150,60,0.2); border-radius:9px; padding:9px 13px; font-size:11px; font-weight:300; color:#8a6800; margin-bottom:14px; display:none; gap:7px; align-items:flex-start; }
-    [data-theme="dark"] .modal-adv { color:var(--gold); }
-    .modal-adv.show { display:flex; }
-    .modal-adv svg { width:13px; height:13px; flex-shrink:0; stroke:currentColor; fill:none; stroke-width:1.5; margin-top:1px; }
-    .modal-actions { display:flex; gap:9px; }
+    /* ── Loading state ── */
+    .loading-nom{padding:10px 13px;font-size:11.5px;color:var(--muted);font-style:italic}
   </style>
 </head>
 <body>
 <div class="bg"></div>
 
-
-
-<!-- ══ LAYOUT ══ -->
 <div class="layout">
   <main class="main">
 
@@ -300,7 +205,7 @@
       <!-- ══ FORMULARIO ══ -->
       <div class="glass-card">
 
-        <!-- 1. Nombramiento -->
+        <!-- 1. Datos del nombramiento -->
         <div class="form-section">
           <div class="section-label">
             <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -310,11 +215,11 @@
           <div class="form-row">
             <div class="field">
               <label>Funcionario</label>
-              <input type="text" id="nombreFuncionario" disabled value="Yuliana Hernández López"/>
+              <input type="text" id="nombreFuncionario" disabled/>
             </div>
             <div class="field">
               <label>Cédula</label>
-              <input type="text" id="cedulaFuncionario" disabled value="1-1234-5678"/>
+              <input type="text" id="cedulaFuncionario" disabled/>
             </div>
           </div>
 
@@ -323,10 +228,7 @@
               <label>Tipo de nombramiento <span class="req">*</span></label>
               <select id="tipoNom" onchange="cambiarNom()">
                 <option value="">— Seleccione —</option>
-                <option value="admin_propiedad">Administrativo en Propiedad</option>
-                <option value="admin_interino">Administrativo Interino</option>
-                <option value="docente_propiedad">Docente en Propiedad</option>
-                <option value="docente_interino">Docente / Docente-Adm. Interino</option>
+                <!-- Se llena dinámicamente desde localStorage -->
               </select>
               <span class="err" id="errNom">Debe seleccionar un tipo válido</span>
             </div>
@@ -334,16 +236,15 @@
               <label>Período lectivo <span class="req">*</span></label>
               <select id="periodoLectivo">
                 <option value="">— Seleccione período —</option>
-                <option value="2026-I">2026 — I Semestre</option>
-                <option value="2026-II">2026 — II Semestre</option>
-                <option value="2025-II">2025 — II Semestre</option>
+                <option value="3">Período I-2026 (activo)</option>
+                <option value="4">Período II-2026</option>
               </select>
               <span class="hint">Solo nombramientos interinos docentes</span>
             </div>
           </div>
 
           <div class="saldo-box" id="saldoBox">
-            <div class="saldo-left">
+            <div>
               <div class="saldo-lbl">Saldo disponible</div>
               <div class="saldo-val"><span id="saldoNum">—</span> <span>días</span></div>
               <div class="saldo-sub" id="saldoSub">—</div>
@@ -367,14 +268,16 @@
           <div class="form-row">
             <div class="field" id="fieldFechaI">
               <label>Fecha de inicio <span class="req">*</span></label>
-              <input type="date" id="fechaInicio" onchange="calcDias()"/>
-              <span class="hint">Día hábil · anticipación mínima requerida</span>
+              <input type="date" id="fechaInicio" onchange="onFechaChange()"/>
+              <span class="hint">Solo días hábiles · feriados excluidos automáticamente</span>
+              <div class="date-feriado-hint" id="hintFechaI"></div>
               <span class="err" id="errFechaI">Fecha inválida</span>
             </div>
             <div class="field" id="fieldFechaF">
               <label>Fecha de fin <span class="req">*</span></label>
-              <input type="date" id="fechaFin" onchange="calcDias()"/>
-              <span class="hint">Debe ser posterior a la fecha de inicio</span>
+              <input type="date" id="fechaFin" onchange="onFechaChange()"/>
+              <span class="hint">Debe ser posterior o igual a la fecha de inicio</span>
+              <div class="date-feriado-hint" id="hintFechaF"></div>
               <span class="err" id="errFechaF">Fecha inválida</span>
             </div>
           </div>
@@ -402,9 +305,9 @@
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             <span id="alertRestMsg">—</span>
           </div>
-          <div class="alert warning" id="alertVenc" style="margin-top:10px">
+          <div class="alert warning" id="alertFeriado" style="margin-top:10px">
             <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            Sus vacaciones están próximas a vencer. Se recomienda planificar a la brevedad.
+            <span id="alertFeriadoMsg">—</span>
           </div>
         </div>
 
@@ -480,6 +383,7 @@
       <div class="modal-row"><span class="ml">Nombramiento</span><span class="mr" id="mTipo">—</span></div>
       <div class="modal-row"><span class="ml">Período</span><span class="mr" id="mPer">—</span></div>
       <div class="modal-row"><span class="ml">Días hábiles</span><span class="mr green" id="mDias">—</span></div>
+      <div class="modal-row"><span class="ml">Feriados en rango</span><span class="mr" id="mFeriados">—</span></div>
       <div class="modal-row"><span class="ml">Saldo después</span><span class="mr" id="mPost">—</span></div>
     </div>
     <div class="modal-adv" id="modalAdv">
@@ -495,145 +399,503 @@
 
 <script src="/frontend/components/navbar.js"></script>
 <script src="/frontend/js/session.js"></script>
-
 <app-navbar></app-navbar>
 
 <script>
-  const NOMS = {
-    admin_propiedad: { label:'Administrativo en Propiedad', saldo:15, acum:20, antig:true,
-      rules:[{t:'Antigüedad mínima',d:'50 semanas de servicio continuo'},{t:'Saldo aplicable',d:'Días acumulados del período vigente'},{t:'Anticipación',d:'Mínimo 3 días hábiles de anticipación'},{t:'Máximo',d:'No puede exceder el saldo disponible'}]},
-    admin_interino: { label:'Administrativo Interino', saldo:8, acum:10, antig:true,
-      rules:[{t:'Antigüedad mínima',d:'50 semanas desde inicio del contrato'},{t:'Saldo aplicable',d:'Días acumulados del contrato activo'},{t:'Vigencia',d:'Saldo válido durante la vigencia del contrato'},{t:'Anticipación',d:'Mínimo 3 días hábiles'}]},
-    docente_propiedad: { label:'Docente en Propiedad', saldo:20, acum:25, antig:true,
-      rules:[{t:'Antigüedad mínima',d:'50 semanas de servicio continuo'},{t:'Saldo aplicable',d:'Días acumulados del período lectivo'},{t:'Anticipación',d:'Mínimo 3 días hábiles'},{t:'Coordinación',d:'Sujeto a coordinación con jefatura'}]},
-    docente_interino: { label:'Docente / Docente-Adm. Interino', saldo:6, acum:6, antig:true,
-      rules:[{t:'Período lectivo',d:'Saldo corresponde al período lectivo activo'},{t:'Modalidad',d:'Puede elegir tiempo o liquidación en colones'},{t:'Acumulación',d:'Los días se acumulan durante el período lectivo'},{t:'Vencimiento',d:'El saldo vence al finalizar el período lectivo'}]},
+  const API_BASE = 'http://localhost:3000';
+
+  // ── Calendario laboral de la BD (es_laborable=1) ─────────────────────────
+  // Se carga desde la API al iniciar; mientras tanto usamos un set vacío
+  // La API expone: GET /api/calendario?anio=2026
+  // Si no hay API, usamos los datos embebidos de la BD (feriados conocidos 2026)
+  const FERIADOS_2026 = new Set([
+    '2026-01-01','2026-04-02','2026-04-03','2026-04-11',
+    '2026-05-01','2026-07-25','2026-08-02','2026-08-15',
+    '2026-09-15','2026-12-25'
+  ]);
+  // días no laborables = feriados + fines de semana
+  // La función esDiaLaboral() aplica ambas restricciones
+
+  function esDiaLaboral(fechaStr) {
+    const d = new Date(fechaStr + 'T00:00:00');
+    const dow = d.getDay(); // 0=dom, 6=sab
+    if (dow === 0 || dow === 6) return false;
+    if (FERIADOS_2026.has(fechaStr)) return false;
+    return true;
+  }
+
+  function nombreFeriado(fechaStr) {
+    const mapa = {
+      '2026-01-01':'Año Nuevo','2026-04-02':'Jueves Santo','2026-04-03':'Viernes Santo',
+      '2026-04-11':'Juan Santamaría','2026-05-01':'Día del Trabajo',
+      '2026-07-25':'Anexión de Nicoya','2026-08-02':'Virgen de los Ángeles',
+      '2026-08-15':'Día de la Madre','2026-09-15':'Independencia','2026-12-25':'Navidad'
+    };
+    return mapa[fechaStr] || null;
+  }
+
+  // Cuenta días hábiles entre dos fechas (inclusivo ambos extremos)
+  function contarDiasHabiles(desde, hasta) {
+    let count = 0;
+    let cur = new Date(desde + 'T00:00:00');
+    const fin = new Date(hasta + 'T00:00:00');
+    while (cur <= fin) {
+      const s = cur.toISOString().split('T')[0];
+      if (esDiaLaboral(s)) count++;
+      cur.setDate(cur.getDate() + 1);
+    }
+    return count;
+  }
+
+  // Cuenta feriados (no fin de semana, solo feriados nacionales) en el rango
+  function contarFeriadosEnRango(desde, hasta) {
+    let lista = [];
+    let cur = new Date(desde + 'T00:00:00');
+    const fin = new Date(hasta + 'T00:00:00');
+    while (cur <= fin) {
+      const s = cur.toISOString().split('T')[0];
+      const dow = cur.getDay();
+      if (dow !== 0 && dow !== 6 && FERIADOS_2026.has(s)) {
+        lista.push({ fecha: s, nombre: nombreFeriado(s) });
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+    return lista;
+  }
+
+  // ── Reglas por tipo de nombramiento ──────────────────────────────────────
+  const REGLAS = {
+    1: [ // Administrativo en Propiedad
+      {t:'Antigüedad mínima',d:'50 semanas de servicio continuo'},
+      {t:'Saldo aplicable',d:'Días acumulados del período vigente'},
+      {t:'Anticipación',d:'Mínimo 3 días hábiles de anticipación'},
+      {t:'Máximo',d:'No puede exceder el saldo disponible'}
+    ],
+    2: [ // Administrativo Interino
+      {t:'Antigüedad mínima',d:'50 semanas desde inicio del contrato'},
+      {t:'Saldo aplicable',d:'Días acumulados del contrato activo'},
+      {t:'Vigencia',d:'Saldo válido durante la vigencia del contrato'},
+      {t:'Anticipación',d:'Mínimo 3 días hábiles'}
+    ],
+    3: [ // Docente en Propiedad
+      {t:'Antigüedad mínima',d:'50 semanas de servicio continuo'},
+      {t:'Saldo aplicable',d:'Días acumulados del período lectivo'},
+      {t:'Anticipación',d:'Mínimo 3 días hábiles'},
+      {t:'Coordinación',d:'Sujeto a coordinación con jefatura'}
+    ],
+    4: [ // Docente / Docente-Adm. Interino
+      {t:'Período lectivo',d:'Saldo corresponde al período lectivo activo'},
+      {t:'Modalidad',d:'Puede elegir tiempo o liquidación en colones'},
+      {t:'Acumulación',d:'Los días se acumulan durante el período lectivo'},
+      {t:'Vencimiento',d:'El saldo vence al finalizar el período lectivo'}
+    ]
   };
 
-  const today = new Date();
-  document.getElementById('navDate').textContent = today.toLocaleDateString('es-CR',{weekday:'short',day:'numeric',month:'short'});
-  document.getElementById('fechaInicio').min = today.toISOString().split('T')[0];
-  document.getElementById('fechaFin').min = today.toISOString().split('T')[0];
+  // ── Estado global ─────────────────────────────────────────────────────────
+  let nomActivo = null; // objeto del nombramiento seleccionado en el select
+  let saldoActivo = 0;
 
-  try {
-    const f = JSON.parse(localStorage.getItem('funcionario')||'{}');
-    if(f.nombre){
-      document.getElementById('nombreFuncionario').value = f.nombre+' '+(f.apellido1||'')+' '+(f.apellido2||'');
-      document.getElementById('cedulaFuncionario').value = f.cedula||'—';
-      document.getElementById('navAvatar').textContent = f.nombre.charAt(0).toUpperCase();
-      document.getElementById('navName').textContent = f.nombre;
+  // ── Inicialización ────────────────────────────────────────────────────────
+  (function init() {
+    const f = JSON.parse(localStorage.getItem('funcionario') || '{}');
+    const nombramientos = JSON.parse(localStorage.getItem('nombramientos') || '[]');
+    const nomPrevio = JSON.parse(localStorage.getItem('tipoNombramiento') || 'null');
+
+    // Datos del funcionario
+    if (f.nombre) {
+      document.getElementById('nombreFuncionario').value =
+        [f.nombre, f.apellido1, f.apellido2].filter(Boolean).join(' ');
+      document.getElementById('cedulaFuncionario').value = f.cedula || '—';
     }
-  } catch(e){}
 
+    // Min fecha = hoy
+    const hoy = new Date().toISOString().split('T')[0];
+    document.getElementById('fechaInicio').min = hoy;
+    document.getElementById('fechaFin').min = hoy;
+
+    // Poblar select con nombramientos reales del funcionario
+    const sel = document.getElementById('tipoNom');
+    if (nombramientos.length === 0) {
+      // Sin nombramientos en BD → opción placeholder solamente
+      sel.innerHTML = '<option value="">— Sin nombramientos activos —</option>';
+      return;
+    }
+
+    sel.innerHTML = '<option value="">— Seleccione —</option>';
+    nombramientos.forEach((nom, i) => {
+      const opt = document.createElement('option');
+      opt.value = nom.id_nombramiento;
+      opt.textContent = nom.nombre_tipo || '—';
+      // Guardar datos en dataset para usarlos en cambiarNom()
+      opt.dataset.tipo = nom.id_tipo_nombramiento;
+      opt.dataset.esInterino = nom.es_docente_interino ? '1' : '0';
+      opt.dataset.saldo = nom.dias_vacaciones_disponibles
+        
+      opt.dataset.acum = 0;
+      opt.dataset.enPrueba = nom.en_periodo_prueba ? '1' : '0';
+      opt.dataset.numero = nom.numero_nombramiento || '';
+      sel.appendChild(opt);
+    });
+
+    // Si venía un nombramiento activo desde el navbar, preseleccionarlo
+    if (nomPrevio && nomPrevio.id_nombramiento) {
+      sel.value = nomPrevio.id_nombramiento;
+      if (sel.value) cambiarNom();
+    } else if (nombramientos.length === 1) {
+      sel.value = nombramientos[0].id_nombramiento;
+      cambiarNom();
+    }
+  })();
+
+  // ── Al cambiar el select de nombramiento ─────────────────────────────────
   function cambiarNom() {
-    const val = document.getElementById('tipoNom').value;
-    const d = NOMS[val];
-    document.getElementById('fieldPeriodo').style.display = val==='docente_interino'?'flex':'none';
-    document.getElementById('modalidadWrap').classList.toggle('show', val==='docente_interino');
-    if(!d){ document.getElementById('saldoBox').classList.remove('visible'); actualizarReglas([]); return; }
+    const sel = document.getElementById('tipoNom');
+    const opt = sel.options[sel.selectedIndex];
+    clearErr('fieldNom', 'errNom');
+
+    if (!sel.value) {
+      document.getElementById('saldoBox').classList.remove('visible');
+      actualizarReglas([]);
+      nomActivo = null;
+      return;
+    }
+
+    const esInterino   = opt.dataset.esInterino === '1';
+    const enPrueba     = opt.dataset.enPrueba === '1';
+    const saldo        = parseFloat(opt.dataset.saldo) || 0;
+    const acum         = parseFloat(opt.dataset.acum) || 0;
+    const idTipo       = parseInt(opt.dataset.tipo);
+    const numNom       = opt.dataset.numero;
+
+    nomActivo = {
+      id_nombramiento: parseInt(sel.value),
+      nombre_tipo: opt.textContent,
+      id_tipo_nombramiento: idTipo,
+      es_docente_interino: esInterino,
+      saldo, acum, enPrueba, numNom
+    };
+    saldoActivo = saldo;
+
+    // Mostrar/ocultar período lectivo
+    document.getElementById('fieldPeriodo').style.display = esInterino ? 'flex' : 'none';
+    document.getElementById('modalidadWrap').classList.toggle('show', esInterino);
+
+    // Saldo box
     const box = document.getElementById('saldoBox');
     box.classList.add('visible');
-    document.getElementById('saldoNum').textContent = d.saldo;
-    document.getElementById('dDisponibles').textContent = d.saldo;
-    document.getElementById('saldoSub').textContent = val==='docente_interino' ? `Período lectivo activo · ${d.acum} días acumulados` : `Período vigente · ${d.acum} días acumulados`;
+    document.getElementById('saldoNum').textContent = saldo % 1 === 0 ? saldo : saldo.toFixed(1);
+    document.getElementById('dDisponibles').textContent = saldo % 1 === 0 ? saldo : saldo.toFixed(1);
+    document.getElementById('saldoSub').textContent = esInterino
+      ? `Período lectivo activo`
+      : `Período vigente `;
+
     const pill = document.getElementById('saldoPill');
-    if(d.saldo===0){ pill.className='saldo-pill bad'; pill.textContent='Sin saldo'; box.className='saldo-box visible danger'; }
-    else if(d.saldo<=3){ pill.className='saldo-pill warn'; pill.textContent='Saldo bajo'; box.className='saldo-box visible warn'; }
-    else { pill.className='saldo-pill ok'; pill.textContent='Disponible'; box.className='saldo-box visible'; }
-    document.getElementById('alertAntig').classList.toggle('show', !d.antig);
-    actualizarReglas(d.rules);
+    if (saldo === 0) {
+      pill.className = 'saldo-pill bad'; pill.textContent = 'Sin saldo';
+      box.className = 'saldo-box visible danger';
+    } else if (saldo <= 3) {
+      pill.className = 'saldo-pill warn'; pill.textContent = 'Saldo bajo';
+      box.className = 'saldo-box visible warn';
+    } else {
+      pill.className = 'saldo-pill ok'; pill.textContent = 'Disponible';
+      box.className = 'saldo-box visible';
+    }
+
+    // Alerta antigüedad: solo si en_periodo_prueba
+    document.getElementById('alertAntig').classList.toggle('show', enPrueba);
+
+    // Reglas según id_tipo_nombramiento (1-4 mapeo estándar CUC)
+    actualizarReglas(REGLAS[idTipo] || []);
+
+    // Recalcular si ya hay fechas
     calcDias();
   }
 
-  function actualizarReglas(rules) {
-    const list = document.getElementById('rulesList');
-    if(!rules.length){ list.innerHTML='<div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Seleccione un tipo de nombramiento para ver las reglas aplicables.</div></div>'; return; }
-    list.innerHTML = rules.map(r=>`<div class="rule-item"><div class="rule-dot"></div><div class="rule-text"><strong>${r.t}:</strong> ${r.d}</div></div>`).join('');
+  // ── Validar fechas al cambiar ─────────────────────────────────────────────
+  function onFechaChange() {
+    const fi = document.getElementById('fechaInicio').value;
+    const ff = document.getElementById('fechaFin').value;
+
+    // Advertir si la fecha de inicio es feriado
+    const hintI = document.getElementById('hintFechaI');
+    if (fi) {
+      const nomF = nombreFeriado(fi);
+      const dow = new Date(fi + 'T00:00:00').getDay();
+      if (nomF) {
+        hintI.textContent = `⚠ ${nomF} es feriado nacional — no se contará como día hábil`;
+        hintI.classList.add('show');
+      } else if (dow === 0 || dow === 6) {
+        hintI.textContent = '⚠ Fin de semana — no se contará como día hábil';
+        hintI.classList.add('show');
+      } else {
+        hintI.classList.remove('show');
+      }
+    } else {
+      hintI.classList.remove('show');
+    }
+
+    // Advertir si la fecha de fin es feriado
+    const hintF = document.getElementById('hintFechaF');
+    if (ff) {
+      const nomF = nombreFeriado(ff);
+      const dow = new Date(ff + 'T00:00:00').getDay();
+      if (nomF) {
+        hintF.textContent = `⚠ ${nomF} es feriado nacional — no se contará como día hábil`;
+        hintF.classList.add('show');
+      } else if (dow === 0 || dow === 6) {
+        hintF.textContent = '⚠ Fin de semana — no se contará como día hábil';
+        hintF.classList.add('show');
+      } else {
+        hintF.classList.remove('show');
+      }
+    } else {
+      hintF.classList.remove('show');
+    }
+
+    calcDias();
   }
 
+  // ── Cálculo de días hábiles usando calendario real ────────────────────────
   function calcDias() {
-    const i = document.getElementById('fechaInicio').value;
-    const f = document.getElementById('fechaFin').value;
-    const tipo = document.getElementById('tipoNom').value;
-    if(!i||!f) return;
-    const dI=new Date(i+'T00:00:00'), dF=new Date(f+'T00:00:00'), hoy=new Date(); hoy.setHours(0,0,0,0);
-    if(dI<hoy){ setErr('fieldFechaI','errFechaI','La fecha de inicio no puede ser anterior a hoy'); return; } else clearErr('fieldFechaI','errFechaI');
-    if(dF<=dI){ setErr('fieldFechaF','errFechaF','La fecha de fin debe ser posterior al inicio'); return; } else clearErr('fieldFechaF','errFechaF');
-    let dias=0; let c=new Date(dI);
-    while(c<=dF){ if(c.getDay()!==0&&c.getDay()!==6) dias++; c.setDate(c.getDate()+1); }
-    const saldo = NOMS[tipo]?.saldo||0;
-    const rest = saldo-dias;
-    document.getElementById('dSolicitados').textContent=dias;
-    document.getElementById('dRestantes').textContent=rest>=0?rest:0;
+    const fi = document.getElementById('fechaInicio').value;
+    const ff = document.getElementById('fechaFin').value;
+    if (!fi || !ff) return;
+
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    const dI  = new Date(fi + 'T00:00:00');
+    const dF  = new Date(ff + 'T00:00:00');
+
+    // Validaciones de fecha
+    if (dI < hoy) {
+      setErr('fieldFechaI', 'errFechaI', 'La fecha de inicio no puede ser anterior a hoy');
+      return;
+    } else { clearErr('fieldFechaI', 'errFechaI'); }
+
+    if (dF < dI) {
+      setErr('fieldFechaF', 'errFechaF', 'La fecha de fin debe ser igual o posterior al inicio');
+      return;
+    } else { clearErr('fieldFechaF', 'errFechaF'); }
+
+    // Contar días hábiles con calendario real
+    const diasHabiles  = contarDiasHabiles(fi, ff);
+    const feriadosLista = contarFeriadosEnRango(fi, ff);
+
+    // Actualizar grid
+    document.getElementById('dSolicitados').textContent = diasHabiles;
     document.getElementById('diasGrid').classList.add('visible');
-    if(dias>saldo){ document.getElementById('alertSaldo').classList.add('show'); document.getElementById('alertSaldoMsg').textContent=`Saldo insuficiente. Solicitás ${dias} días pero solo tenés ${saldo} disponibles.`; document.getElementById('alertRest').classList.remove('show'); }
-    else { document.getElementById('alertSaldo').classList.remove('show'); document.getElementById('alertRestMsg').textContent=`Le quedarán ${rest} días disponibles después de esta solicitud.`; document.getElementById('alertRest').classList.add('show'); }
-    document.getElementById('alertVenc').classList.toggle('show', saldo<=5&&dias<=saldo);
+
+    // Alertas de feriados dentro del rango
+    const alertFer = document.getElementById('alertFeriado');
+    if (feriadosLista.length > 0) {
+      const nombres = feriadosLista.map(f => f.nombre).join(', ');
+      document.getElementById('alertFeriadoMsg').textContent =
+        `El rango incluye ${feriadosLista.length} feriado(s) que no cuentan como días hábiles: ${nombres}.`;
+      alertFer.classList.add('show');
+    } else {
+      alertFer.classList.remove('show');
+    }
+
+    if (!nomActivo) return;
+
+    const saldo = saldoActivo;
+    const rest  = saldo - diasHabiles;
+
+    document.getElementById('dDisponibles').textContent = saldo % 1 === 0 ? saldo : saldo.toFixed(1);
+    document.getElementById('dRestantes').textContent   = rest >= 0 ? (rest % 1 === 0 ? rest : rest.toFixed(1)) : 0;
+
+    if (diasHabiles === 0) {
+      document.getElementById('alertSaldo').classList.remove('show');
+      document.getElementById('alertRest').classList.remove('show');
+      return;
+    }
+
+    if (diasHabiles > saldo) {
+      document.getElementById('alertSaldo').classList.add('show');
+      document.getElementById('alertSaldoMsg').textContent =
+        `Saldo insuficiente. Solicitás ${diasHabiles} días hábiles pero solo tenés ${saldo} disponibles.`;
+      document.getElementById('alertRest').classList.remove('show');
+    } else {
+      document.getElementById('alertSaldo').classList.remove('show');
+      document.getElementById('alertRestMsg').textContent =
+        `Le quedarán ${rest % 1 === 0 ? rest : rest.toFixed(1)} días disponibles después de esta solicitud.`;
+      document.getElementById('alertRest').classList.add('show');
+    }
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function actualizarReglas(rules) {
+    const list = document.getElementById('rulesList');
+    if (!rules.length) {
+      list.innerHTML = '<div class="rule-item"><div class="rule-dot"></div><div class="rule-text">Seleccione un tipo de nombramiento para ver las reglas aplicables.</div></div>';
+      return;
+    }
+    list.innerHTML = rules.map(r =>
+      `<div class="rule-item"><div class="rule-dot"></div><div class="rule-text"><strong>${r.t}:</strong> ${r.d}</div></div>`
+    ).join('');
   }
 
   function contarChar() {
-    const v=document.getElementById('motivo').value;
-    document.getElementById('charCount').textContent=`${v.length} / 500 caracteres`;
-    if(v.length>500) setErr('fieldMotivo','errMotivo','El motivo excede 500 caracteres');
-    else clearErr('fieldMotivo','errMotivo');
+    const v = document.getElementById('motivo').value;
+    document.getElementById('charCount').textContent = `${v.length} / 500 caracteres`;
+    if (v.length > 500) setErr('fieldMotivo', 'errMotivo', 'El motivo excede 500 caracteres');
+    else clearErr('fieldMotivo', 'errMotivo');
   }
 
-  function selModal(el) { document.querySelectorAll('.radio-opt').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); }
+  function selModal(el) {
+    document.querySelectorAll('.radio-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
 
+  function setErr(fId, eId, msg) {
+    document.getElementById(fId).classList.add('has-error');
+    const e = document.getElementById(eId);
+    if (e) { e.textContent = msg; e.style.display = 'block'; }
+  }
+
+  function clearErr(fId, eId) {
+    document.getElementById(fId).classList.remove('has-error');
+    const e = document.getElementById(eId);
+    if (e) e.style.display = 'none';
+  }
+
+  function fmt(s) {
+    if (!s) return '—';
+    const [y, m, d] = s.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  // ── Validar y abrir modal ─────────────────────────────────────────────────
   function validarEnviar() {
-    let ok=true;
-    const tipo=document.getElementById('tipoNom').value;
-    const i=document.getElementById('fechaInicio').value;
-    const f=document.getElementById('fechaFin').value;
-    if(!tipo){ setErr('fieldNom','errNom','Debe seleccionar un tipo válido'); ok=false; } else clearErr('fieldNom','errNom');
-    if(!i){ setErr('fieldFechaI','errFechaI','La fecha de inicio es obligatoria'); ok=false; }
-    if(!f){ setErr('fieldFechaF','errFechaF','La fecha de fin es obligatoria'); ok=false; }
-    if(document.getElementById('motivo').value.length>500) ok=false;
-    if(!ok) return;
-    const dI=new Date(i+'T00:00:00'), dF=new Date(f+'T00:00:00');
-    let dias=0; let c=new Date(dI);
-    while(c<=dF){ if(c.getDay()!==0&&c.getDay()!==6) dias++; c.setDate(c.getDate()+1); }
-    const d=NOMS[tipo];
-    const rest=(d?d.saldo:0)-dias;
-    document.getElementById('mNom').textContent=document.getElementById('nombreFuncionario').value;
-    document.getElementById('mTipo').textContent=d?d.label:tipo;
-    document.getElementById('mPer').textContent=fmt(i)+' — '+fmt(f);
-    document.getElementById('mDias').textContent=dias+' días hábiles';
-    document.getElementById('mPost').textContent=rest+' días restantes';
-    const adv=document.getElementById('modalAdv');
-    if(rest<=3&&rest>=0){ adv.classList.add('show'); document.getElementById('modalAdvMsg').textContent=`Después de esta solicitud le quedarán solo ${rest} días disponibles.`; } else adv.classList.remove('show');
+    let ok = true;
+    const tipo = document.getElementById('tipoNom').value;
+    const fi   = document.getElementById('fechaInicio').value;
+    const ff   = document.getElementById('fechaFin').value;
+
+    if (!tipo) { setErr('fieldNom', 'errNom', 'Debe seleccionar un tipo válido'); ok = false; }
+    else clearErr('fieldNom', 'errNom');
+    if (!fi) { setErr('fieldFechaI', 'errFechaI', 'La fecha de inicio es obligatoria'); ok = false; }
+    if (!ff) { setErr('fieldFechaF', 'errFechaF', 'La fecha de fin es obligatoria'); ok = false; }
+    if (document.getElementById('motivo').value.length > 500) ok = false;
+    if (!ok) return;
+
+    const diasHabiles   = contarDiasHabiles(fi, ff);
+    const feriadosLista = contarFeriadosEnRango(fi, ff);
+    const saldo = saldoActivo;
+    const rest  = saldo - diasHabiles;
+
+    if (diasHabiles === 0) {
+      setErr('fieldFechaF', 'errFechaF', 'El rango seleccionado no contiene días hábiles');
+      return;
+    }
+    if (diasHabiles > saldo) {
+      document.getElementById('alertSaldo').classList.add('show');
+      document.getElementById('alertSaldoMsg').textContent =
+        `Saldo insuficiente. Solicitás ${diasHabiles} días hábiles pero solo tenés ${saldo} disponibles.`;
+      return;
+    }
+
+    const f = JSON.parse(localStorage.getItem('funcionario') || '{}');
+    document.getElementById('mNom').textContent   = [f.nombre, f.apellido1, f.apellido2].filter(Boolean).join(' ');
+    document.getElementById('mTipo').textContent  = nomActivo?.nombre_tipo || '—';
+    document.getElementById('mPer').textContent   = fmt(fi) + ' — ' + fmt(ff);
+    document.getElementById('mDias').textContent  = diasHabiles + ' días hábiles';
+    document.getElementById('mFeriados').textContent = feriadosLista.length > 0
+      ? feriadosLista.length + ' feriado(s) excluido(s)'
+      : 'Ninguno en el rango';
+    document.getElementById('mPost').textContent  = (rest % 1 === 0 ? rest : rest.toFixed(1)) + ' días restantes';
+
+    const adv = document.getElementById('modalAdv');
+    if (rest <= 3 && rest >= 0) {
+      adv.classList.add('show');
+      document.getElementById('modalAdvMsg').textContent =
+        `Después de esta solicitud le quedarán solo ${rest % 1 === 0 ? rest : rest.toFixed(1)} días disponibles.`;
+    } else {
+      adv.classList.remove('show');
+    }
+
     document.getElementById('modalOverlay').classList.add('show');
   }
 
-  function cerrarModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
-  function confirmar(){
-    const btn=document.getElementById('btnConfirmar');
-    btn.textContent='Enviando...'; btn.disabled=true;
-    setTimeout(()=>{ cerrarModal(); btn.textContent='Confirmar y enviar'; btn.disabled=false; alert('✅ Solicitud registrada. Estado: Pendiente de aprobación.'); limpiar(); },1400);
+  function cerrarModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+
+  async function confirmar() {
+    const btn = document.getElementById('btnConfirmar');
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+
+    const fi = document.getElementById('fechaInicio').value;
+    const ff = document.getElementById('fechaFin').value;
+    const diasHabiles = contarDiasHabiles(fi, ff);
+    const f = JSON.parse(localStorage.getItem('funcionario') || '{}');
+
+    const payload = {
+      id_funcionario:   f.id_funcionario,
+      id_nombramiento:  nomActivo?.id_nombramiento,
+      fecha_inicio:     fi,
+      fecha_fin:        ff,
+      motivo:           document.getElementById('motivo').value || null,
+      modalidad:        nomActivo?.es_docente_interino
+        ? document.querySelector('input[name="modalidad"]:checked')?.value
+        : 'tiempo'
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/api/solicitudes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      cerrarModal();
+      if (res.ok) {
+        alert(` Solicitud registrada.\nNúmero: ${data.numero_solicitud || '—'}\nEstado: Pendiente de aprobación.`);
+        limpiar();
+      } else {
+        alert(` Error: ${data.error || 'No se pudo registrar la solicitud.'}`);
+      }
+    } catch (err) {
+      cerrarModal();
+      alert(' No se pudo conectar con el servidor.');
+    }
+
+    btn.textContent = 'Confirmar y enviar';
+    btn.disabled = false;
   }
 
-  function limpiar(){
-    ['tipoNom','fechaInicio','fechaFin','motivo'].forEach(id=>document.getElementById(id).value='');
+  function limpiar() {
+    ['tipoNom','fechaInicio','fechaFin','motivo'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('saldoBox').classList.remove('visible');
     document.getElementById('diasGrid').classList.remove('visible');
-    document.getElementById('fieldPeriodo').style.display='none';
+    document.getElementById('fieldPeriodo').style.display = 'none';
     document.getElementById('modalidadWrap').classList.remove('show');
-    document.getElementById('charCount').textContent='0 / 500 caracteres';
-    ['alertAntig','alertSaldo','alertRest','alertVenc'].forEach(id=>document.getElementById(id).classList.remove('show'));
+    document.getElementById('charCount').textContent = '0 / 500 caracteres';
+    ['alertAntig','alertSaldo','alertRest','alertFeriado'].forEach(id =>
+      document.getElementById(id).classList.remove('show'));
+    ['hintFechaI','hintFechaF'].forEach(id =>
+      document.getElementById(id).classList.remove('show'));
     actualizarReglas([]);
+    nomActivo = null;
+    saldoActivo = 0;
   }
 
-  function setErr(fId,eId,msg){ document.getElementById(fId).classList.add('has-error'); const e=document.getElementById(eId); if(e){e.textContent=msg;e.style.display='block';} }
-  function clearErr(fId,eId){ document.getElementById(fId).classList.remove('has-error'); const e=document.getElementById(eId); if(e)e.style.display='none'; }
-  function fmt(s){ if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; }
+  // ── Navbar helpers ────────────────────────────────────────────────────────
+  function toggleGroup(id){const g=document.getElementById('grp-'+id);const open=g.classList.contains('open');document.querySelectorAll('.nav-group').forEach(x=>x.classList.remove('open'));document.getElementById('userWrap').classList.remove('open');if(!open)g.classList.add('open')}
+  document.addEventListener('click',e=>{if(!e.target.closest('.nav-group'))document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open'));if(!e.target.closest('.user-wrap'))document.getElementById('userWrap').classList.remove('open')});
+  function toggleUserMenu(){const w=document.getElementById('userWrap');const o=w.classList.contains('open');document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open'));w.classList.toggle('open',!o)}
+  function toggleTheme(){const h=document.documentElement;const d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');const i=document.getElementById('themeIcon');i.innerHTML=d?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>':'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'}
+  function logout(){if(confirm('¿Cerrar sesión?'))window.location.href='../autenticacion/login.html'}
 
-  function toggleGroup(id){ const g=document.getElementById('grp-'+id); const open=g.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(x=>x.classList.remove('open')); document.getElementById('userWrap').classList.remove('open'); if(!open)g.classList.add('open'); }
-  document.addEventListener('click',e=>{ if(!e.target.closest('.nav-group'))document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open')); if(!e.target.closest('.user-wrap'))document.getElementById('userWrap').classList.remove('open'); });
-  function toggleUserMenu(){ const w=document.getElementById('userWrap'); const o=w.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open')); w.classList.toggle('open',!o); }
-  function selectNomFromPill(el){ document.querySelectorAll('.ud-pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); document.getElementById('pillNomLabel').textContent=el.querySelector('.ud-pill-name').textContent; document.getElementById('userWrap').classList.remove('open'); }
-  function toggleTheme(){ const h=document.documentElement; const d=h.getAttribute('data-theme')==='dark'; h.setAttribute('data-theme',d?'light':'dark'); const i=document.getElementById('themeIcon'); i.innerHTML=d?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>':'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'; }
-  function logout(){ if(confirm('¿Cerrar sesión?'))window.location.href='../autenticacion/login.html'; }
+  // Sincronizar si el nombramiento cambia desde el navbar
+  document.addEventListener('nombramiento-changed', (e) => {
+    const nom = e.detail;
+    const sel = document.getElementById('tipoNom');
+    if (sel && nom.id_nombramiento) {
+      sel.value = nom.id_nombramiento;
+      if (sel.value) cambiarNom();
+    }
+  });
 </script>
-
 </body>
 </html>

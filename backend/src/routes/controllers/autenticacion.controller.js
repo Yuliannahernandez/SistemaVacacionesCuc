@@ -158,11 +158,14 @@ exports.login = async (req, res) => {
         }
 
         // Cambio Yuliana
-        // Nombramientos activos del funcionario
+        
+        // Nombramientos activos del funcionario — incluye saldo separado por nombramiento
         const [nombramientos] = await db.query(
             `SELECT fn.id_nombramiento, fn.numero_nombramiento,
             fn.fecha_nombramiento, fn.fecha_fin_nombramiento,
             fn.en_periodo_prueba, fn.es_activo,
+            fn.dias_vacaciones_acumulados,
+            fn.dias_vacaciones_disponibles,
             tn.id_tipo_nombramiento, tn.nombre_tipo,
             tn.es_docente_interino, tn.dias_vacaciones_anuales,
             tn.dias_acumulacion_mensual_tramo1,

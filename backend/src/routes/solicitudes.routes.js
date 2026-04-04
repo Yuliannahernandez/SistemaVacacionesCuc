@@ -1,30 +1,11 @@
-const express = require("express");
-const router = express.Router();
-const {
-  registrarSolicitud,
-  misSolicitudes,
-  consultarSolicitud,
-  modificarSolicitud,
-  cancelarSolicitud,
-  historialSolicitudesDepartamento,
-} = require("./controllers/solicitudes.controller");
+// src/routes/solicitudes.routes.js
+'use strict';
 
+const express    = require('express');
+const router     = express.Router();
+const solicitudes = require('./controllers/solicitudes.controller');
 
-router.get("/mis-solicitudes", misSolicitudes);
-
-
-router.get("/consultar", consultarSolicitud);
-
-
-router.get("/historial", historialSolicitudesDepartamento);
-
-
-router.post("/registrar", registrarSolicitud);
-
-
-router.put("/modificar/:id", modificarSolicitud);
-
-
-router.put("/cancelar/:id", cancelarSolicitud);
+router.post('/',   solicitudes.registrar);
+router.get('/',    solicitudes.consultar);
 
 module.exports = router;

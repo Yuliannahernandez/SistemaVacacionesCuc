@@ -1,26 +1,32 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
 
+// ── Middlewares PRIMERO ───────────────────────────────────────────────────
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type']
 }));
-app.use(express.json());
+app.use(express.json());  // ← esto debe ir antes del static
 
+// ── Frontend estático ─────────────────────────────────────────────────────
+app.use('/frontend', express.static(path.join(__dirname, '../frontend')));
+
+app.get("/", (req, res) => {
+  res.redirect('/frontend/pages/autenticacion/login.html');
+});
+
+// ── DB ────────────────────────────────────────────────────────────────────
 const db = require("./src/routes/controllers/db");
-
 db.query("SELECT 1")
   .then(() => console.log(" Conectado a MySQL Aiven"))
   .catch((err) => console.error(" Error de conexión:", err.message));
 
-app.get("/", (req, res) => {
-  res.json({ mensaje: "API funcionando correctamente" });
-});
-
+// ── Rutas API ─────────────────────────────────────────────────────────────
 const autenticacionRoutes = require('./src/routes/autenticacion.routes');
 app.use('/api/auth', autenticacionRoutes);
 
@@ -38,6 +44,8 @@ app.use('/api/registro', registroRoutes);
 
 const catalogosRoutes = require('./src/routes/catalogos.routes');
 app.use('/api/catalogos', catalogosRoutes);
+
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
