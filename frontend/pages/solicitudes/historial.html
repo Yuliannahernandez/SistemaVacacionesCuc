@@ -35,7 +35,6 @@
     .logo-text strong{font-family:'DM Mono',monospace;font-size:12px;font-weight:400;color:rgba(204,220,240,0.9);letter-spacing:.1em;display:block;line-height:1}
     .logo-text small{font-size:8px;font-weight:300;color:rgba(125,166,216,0.3);letter-spacing:.18em;text-transform:uppercase}
     .nav-vdiv{width:1px;height:18px;background:rgba(255,255,255,0.07);margin-right:16px;flex-shrink:0}
-    .nav-sep{width:1px;height:14px;background:rgba(255,255,255,0.07);margin:0 4px;flex-shrink:0}
     .nav-links{display:flex;align-items:center;gap:1px;flex:1}
     .nav-link{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:9px;font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.4);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap;flex-shrink:0}
     .nav-link svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;flex-shrink:0}
@@ -47,7 +46,7 @@
     .nav-group-btn:hover{background:rgba(255,255,255,0.06);color:rgba(204,220,240,0.7)}
     .nav-group.open .nav-group-btn{background:rgba(125,166,216,0.11);color:var(--g300)}
     .nav-group.open .nav-chevron{transform:rotate(180deg)}
-    .nav-submenu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,0.25);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+    .nav-submenu{position:absolute;top:calc(100% + 6px);left:0;min-width:200px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:12px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,0.25);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
     .nav-group.open .nav-submenu{opacity:1;transform:translateY(0);pointer-events:all}
     .nav-sub-item{display:block;padding:8px 12px;border-radius:8px;font-size:11.5px;font-weight:300;color:rgba(204,220,240,0.5);text-decoration:none;cursor:pointer;transition:var(--trans);white-space:nowrap}
     .nav-sub-item:hover{background:rgba(125,166,216,0.1);color:rgba(204,220,240,0.85)}
@@ -68,7 +67,7 @@
     .avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--g800),var(--g700));display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:500;color:#fff;flex-shrink:0}
     .user-pill-name{font-size:11px;font-weight:300;color:rgba(204,220,240,0.62);line-height:1.1}
     .user-pill-nom{font-size:8.5px;font-weight:300;color:rgba(125,166,216,0.35);letter-spacing:.04em}
-    .user-dropdown{position:absolute;top:calc(100% + 7px);right:0;width:210px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:14px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,0.28);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
+    .user-dropdown{position:absolute;top:calc(100% + 7px);right:0;width:210px;background:rgba(0,31,82,0.97);backdrop-filter:blur(16px);border:1px solid rgba(125,166,216,0.1);border-radius:14px;padding:12px;box-shadow:0 12px 32px rgba(0,0,0,0.28);z-index:300;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s}
     .user-wrap.open .user-dropdown{opacity:1;transform:translateY(0);pointer-events:all}
     .ud-label{font-size:8px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(125,166,216,0.3);margin-bottom:8px;padding:0 4px}
     .ud-pill{display:flex;flex-direction:column;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid transparent;cursor:pointer;transition:var(--trans);margin-bottom:4px}
@@ -84,6 +83,7 @@
     .main{flex:1;overflow-y:auto;overflow-x:hidden;padding:22px 24px 20px;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
 
     @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
     /* ══ Header ══ */
     .page-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;animation:fadeUp .4s both}
@@ -98,9 +98,18 @@
     .result-count{font-family:'DM Mono',monospace;font-size:10px;font-weight:300;color:var(--muted);padding:4px 10px;border-radius:6px;background:var(--g050);border:1px solid var(--g100)}
     [data-theme="dark"] .result-count{background:rgba(0,45,114,0.25);border-color:rgba(125,166,216,0.12)}
 
+    /* ══ Loading ══ */
+    .loading-state{display:flex;align-items:center;gap:10px;padding:40px 24px;justify-content:center;color:var(--muted);font-size:12px;font-weight:300}
+    .loading-spinner{width:18px;height:18px;border:2px solid var(--g100);border-top-color:var(--g500);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+
+    /* ══ Error banner ══ */
+    .error-banner{display:none;align-items:center;gap:10px;padding:10px 16px;background:var(--red-bg);border:1px solid rgba(228,0,43,0.2);border-radius:10px;margin-bottom:14px;font-size:11.5px;font-weight:300;color:var(--red)}
+    .error-banner.show{display:flex}
+    .error-banner svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+
     /* ══ Saldo resumen ══ */
     .saldo-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;animation:fadeUp .4s .04s both}
-    .saldo-item{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:13px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);transition:var(--trans)}
+    .saldo-item{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:13px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.04);transition:var(--trans)}
     [data-theme="dark"] .saldo-item{background:rgba(0,45,114,0.18);border-color:rgba(125,166,216,0.08)}
     .saldo-item.featured{background:rgba(45,125,210,0.08);border-color:rgba(45,125,210,0.2)}
     .si-label{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:300;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
@@ -110,7 +119,7 @@
     .si-sub{font-size:10px;font-weight:300;color:var(--muted);margin-top:3px}
 
     /* ══ Filtros ══ */
-    .filters-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:14px 18px;box-shadow:0 2px 14px rgba(0,0,0,0.05);margin-bottom:14px;animation:fadeUp .4s .06s both;transition:background .3s}
+    .filters-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);padding:14px 18px;box-shadow:0 2px 14px rgba(0,0,0,0.05);margin-bottom:14px;animation:fadeUp .4s .06s both;transition:background .3s}
     [data-theme="dark"] .filters-card{background:rgba(0,45,114,0.18);border-color:rgba(125,166,216,0.08)}
     .filters-row{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
     .f-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px}
@@ -137,9 +146,8 @@
     .export-sep{width:1px;height:18px;background:var(--dim)}
 
     /* ══ TABLA ══ */
-    .table-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);box-shadow:0 2px 14px rgba(0,0,0,0.05);overflow:hidden;animation:fadeUp .4s .1s both;transition:background .3s}
+    .table-card{background:rgba(255,255,255,0.44);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:var(--radius);box-shadow:0 2px 14px rgba(0,0,0,0.05);overflow:hidden;animation:fadeUp .4s .1s both;transition:background .3s}
     [data-theme="dark"] .table-card{background:rgba(0,45,114,0.18);border-color:rgba(125,166,216,0.08)}
-
     .table-hdr{display:grid;grid-template-columns:130px 1fr 1fr 110px 60px 100px 90px 90px 80px;padding:10px 16px;border-bottom:1px solid var(--g100);gap:8px}
     [data-theme="dark"] .table-hdr{border-bottom-color:rgba(125,166,216,0.1)}
     .th{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -149,14 +157,12 @@
     .th.sorted{color:var(--g700)}
     [data-theme="dark"] .th.sorted{color:var(--g300)}
     .th svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2;opacity:.45}
-
     .table-body{max-height:calc(100vh - 440px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
     .table-row{display:grid;grid-template-columns:130px 1fr 1fr 110px 60px 100px 90px 90px 80px;padding:11px 16px;border-bottom:1px solid rgba(0,0,0,0.04);gap:8px;align-items:center;cursor:pointer;transition:var(--trans)}
     [data-theme="dark"] .table-row{border-bottom-color:rgba(125,166,216,0.05)}
     .table-row:last-child{border-bottom:none}
     .table-row:hover{background:rgba(45,125,210,0.05)}
     [data-theme="dark"] .table-row:hover{background:rgba(45,125,210,0.1)}
-
     .td{font-size:11.5px;font-weight:300;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .td.mono{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--g700)}
     [data-theme="dark"] .td.mono{color:var(--g300)}
@@ -190,7 +196,6 @@
     .modal{background:var(--bone);border:1px solid rgba(255,255,255,0.7);border-radius:18px;max-width:680px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.15);animation:modalIn .3s cubic-bezier(.16,1,.3,1);margin:auto;overflow:hidden}
     [data-theme="dark"] .modal{background:rgba(0,20,60,0.98);border-color:rgba(125,166,216,0.1)}
     @keyframes modalIn{from{transform:scale(0.96);opacity:0}to{transform:scale(1);opacity:1}}
-
     .modal-head{padding:18px 22px 16px;border-bottom:1px solid var(--g100);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
     [data-theme="dark"] .modal-head{border-bottom-color:rgba(125,166,216,0.1)}
     .m-num{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--g500);margin-bottom:3px}
@@ -199,9 +204,7 @@
     .m-close:hover{background:var(--red-bg);border-color:rgba(228,0,43,0.2)}
     .m-close svg{width:13px;height:13px;stroke:var(--muted);fill:none;stroke-width:2}
     [data-theme="dark"] .m-close{border-color:rgba(125,166,216,0.15)}
-
     .modal-body{padding:18px 22px;max-height:68vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
-
     .m-section{margin-bottom:18px}
     .m-section:last-child{margin-bottom:0}
     .m-sec-title{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:7px}
@@ -216,8 +219,6 @@
     .m-val.mono{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--g700)}
     [data-theme="dark"] .m-val.mono{color:var(--g300)}
     .m-val.muted{color:var(--muted);font-style:italic}
-
-    /* Saldo proyectado */
     .saldo-impact{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--g050);border-radius:10px;border:1px solid var(--g100)}
     [data-theme="dark"] .saldo-impact{background:rgba(0,45,114,0.25);border-color:rgba(125,166,216,0.12)}
     .si-n{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);line-height:1}
@@ -226,8 +227,6 @@
     .si-n.red{color:var(--red)}
     .si-l{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
     .si-arrow{font-size:16px;color:var(--dim)}
-
-    /* Historial de cambios */
     .hist-timeline{display:flex;flex-direction:column}
     .ht-item{display:flex;gap:12px;padding-bottom:12px;position:relative}
     .ht-item:last-child{padding-bottom:0}
@@ -244,13 +243,9 @@
     .ht-meta{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted)}
     .ht-comment{font-size:11px;font-weight:300;color:var(--muted);margin-top:5px;padding:7px 11px;background:var(--g050);border-radius:8px;border-left:2px solid var(--g100);line-height:1.55}
     [data-theme="dark"] .ht-comment{background:rgba(0,45,114,0.2);border-left-color:rgba(125,166,216,0.2)}
-
-    /* Modal info box */
     .m-info-box{background:rgba(45,125,210,0.06);border:1px solid rgba(45,125,210,0.15);border-radius:9px;padding:9px 13px;font-size:11px;font-weight:300;color:var(--g700);display:flex;gap:7px;align-items:flex-start;margin-bottom:12px}
     [data-theme="dark"] .m-info-box{color:var(--g300)}
     .m-info-box svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0;margin-top:1px}
-
-    /* Modal footer */
     .modal-foot{padding:12px 22px 16px;border-top:1px solid var(--g100);display:flex;align-items:center;gap:8px}
     [data-theme="dark"] .modal-foot{border-top-color:rgba(125,166,216,0.1)}
     .btn-close-m{margin-left:auto;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:300;color:var(--muted);background:var(--g050);transition:var(--trans)}
@@ -260,42 +255,46 @@
 </head>
 <body>
 <div class="bg"></div>
-</body>
-</html>
 
-
-<!-- ══ LAYOUT ══ -->
 <div class="layout">
   <main class="main">
 
     <div class="page-header">
-      <a class="page-back" href="../dashboard.html"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver</a>
+      <a class="page-back" href="../dashboard.html">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver
+      </a>
       <div class="page-hdiv"></div>
       <div class="page-title">Historial <em>de Solicitudes</em></div>
       <div class="result-count" id="resultCount">Cargando...</div>
       <div class="page-tag">RQ-SVC-2026-05</div>
     </div>
 
-    <!-- Saldo resumen por nombramiento -->
+    <!-- Error banner -->
+    <div class="error-banner" id="errorBanner">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="errorMsg">No se pudo conectar con el servidor.</span>
+    </div>
+
+    <!-- Saldo resumen -->
     <div class="saldo-bar">
       <div class="saldo-item featured">
         <div class="si-label">Días disponibles</div>
-        <div class="si-val" id="sDisp">15</div>
-        <div class="si-sub">Propiedad — vigente</div>
+        <div class="si-val" id="sDisp">—</div>
+        <div class="si-sub" id="sDispSub">Nombramiento activo</div>
       </div>
       <div class="saldo-item">
         <div class="si-label">Días acumulados</div>
-        <div class="si-val" id="sAcum">20</div>
+        <div class="si-val" id="sAcum">—</div>
         <div class="si-sub">Total del período</div>
       </div>
       <div class="saldo-item">
         <div class="si-label">Días utilizados</div>
-        <div class="si-val" id="sUsados">5</div>
+        <div class="si-val" id="sUsados">0</div>
         <div class="si-sub">Solicitudes aprobadas</div>
       </div>
       <div class="saldo-item">
         <div class="si-label">Total solicitudes</div>
-        <div class="si-val" id="sTotal">6</div>
+        <div class="si-val" id="sTotal">0</div>
         <div class="si-sub">En el historial</div>
       </div>
     </div>
@@ -311,10 +310,10 @@
           <span class="f-label">Estado</span>
           <select id="fEstado">
             <option value="">Todos</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Aprobada">Aprobada</option>
-            <option value="Rechazada">Rechazada</option>
-            <option value="Cancelada">Cancelada</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="aprobada">Aprobada</option>
+            <option value="rechazada">Rechazada</option>
+            <option value="cancelada">Cancelada</option>
           </select>
         </div>
         <div class="f-group">
@@ -325,10 +324,10 @@
           <span class="f-label">Nombramiento</span>
           <select id="fNom" onchange="togglePeriodo()">
             <option value="">Todos</option>
-            <option value="admin_propiedad">Adm. Propiedad</option>
-            <option value="admin_interino">Adm. Interino</option>
-            <option value="docente_propiedad">Docente Propiedad</option>
-            <option value="docente_interino">Docente Interino</option>
+            <option value="Administrativo en Propiedad">Adm. Propiedad</option>
+            <option value="Administrativo Interino">Adm. Interino</option>
+            <option value="Docente en Propiedad">Docente Propiedad</option>
+            <option value="Docente / Docente-Adm. Interino">Docente Interino</option>
           </select>
         </div>
         <div class="f-group hidden" id="fGroupPeriodo">
@@ -364,26 +363,31 @@
       <button class="btn-export" onclick="window.print()"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
     </div>
 
-    <!-- Tabla historial -->
+    <!-- Tabla -->
     <div class="table-card">
       <div class="table-hdr">
-        <div class="th sortable" onclick="sortBy('num')">N.° Solicitud <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="th sortable" onclick="sortBy('numero_solicitud')">N.° Solicitud <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="th">Nombramiento</div>
-        <div class="th sortable" onclick="sortBy('periodo')">Período <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
-        <div class="th sortable" onclick="sortBy('creacion')">Fecha registro <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="th sortable" onclick="sortBy('fecha_inicio')">Período <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="th sortable" onclick="sortBy('fecha_creacion')">Fecha registro <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
         <div class="th center">Días</div>
         <div class="th">Estado</div>
         <div class="th">Modalidad</div>
         <div class="th">Gestor GIRH</div>
         <div class="th center">Detalle</div>
       </div>
-      <div class="table-body" id="tableBody"></div>
+      <div class="table-body" id="tableBody">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          Cargando solicitudes...
+        </div>
+      </div>
     </div>
 
   </main>
 </div>
 
-<!-- ══ MODAL DETALLE ══ -->
+<!-- MODAL DETALLE -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-head">
@@ -397,14 +401,10 @@
       </div>
     </div>
     <div class="modal-body">
-
-      <!-- Info modalidad docente interino -->
       <div class="m-info-box" id="mInfoMod" style="display:none">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <span id="mInfoModMsg">—</span>
       </div>
-
-      <!-- Funcionario -->
       <div class="m-section">
         <div class="m-sec-title"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Funcionario</div>
         <div class="m-grid three">
@@ -416,8 +416,6 @@
           <div class="m-item"><span class="m-lbl">Modalidad</span><span class="m-val" id="mModalidad">—</span></div>
         </div>
       </div>
-
-      <!-- Período solicitado -->
       <div class="m-section">
         <div class="m-sec-title"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Período solicitado</div>
         <div class="m-grid three">
@@ -434,8 +432,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Motivo -->
       <div class="m-section">
         <div class="m-sec-title"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Motivo</div>
         <div class="m-val" id="mMotivo" style="font-size:12px;line-height:1.6">—</div>
@@ -444,8 +440,6 @@
           <span class="m-val muted" id="mMotivoCan">—</span>
         </div>
       </div>
-
-      <!-- Resolución -->
       <div class="m-section" id="mSecResolucion" style="display:none">
         <div class="m-sec-title"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Resolución del GIRH</div>
         <div class="m-grid">
@@ -454,13 +448,10 @@
           <div class="m-item full"><span class="m-lbl">Comentarios</span><span class="m-val" id="mComentarios">—</span></div>
         </div>
       </div>
-
-      <!-- Historial de cambios -->
       <div class="m-section">
         <div class="m-sec-title"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>Historial de cambios de estado</div>
         <div class="hist-timeline" id="mHistorial"></div>
       </div>
-
     </div>
     <div class="modal-foot">
       <button class="btn-export" onclick="exportar('pdf')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</button>
@@ -472,188 +463,518 @@
 
 <script src="/frontend/components/navbar.js"></script>
 <script src="/frontend/js/session.js"></script>
-
 <app-navbar></app-navbar>
 
 <script>
-  // ══ Historial completo simulado ══
-  const HISTORIAL = [
-    { num:'SVC-2026-0042', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2026-04-14', ff:'2026-04-18', dias:5, estado:'Pendiente', modalidad:'—', creacion:'2026-03-18 09:14', motivo:'Asuntos personales familiares.', motivoCan:null, saldoAntes:15, saldoDespues:10, girh:null, fRes:null, comentarios:null, periodo:null,
-      historial:[{estado:'Pendiente',fecha:'2026-03-18 09:14',usuario:'Yuliana Hernández',comentario:null}]},
-    { num:'SVC-2026-0031', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2026-03-03', ff:'2026-03-07', dias:5, estado:'Aprobada', modalidad:'—', creacion:'2026-02-20 14:32', motivo:'Vacaciones planificadas.', motivoCan:null, saldoAntes:20, saldoDespues:15, girh:'Lic. María Solís (GIRH)', fRes:'2026-02-22 10:05', comentarios:'Aprobado según saldo disponible.', periodo:null,
-      historial:[{estado:'Pendiente',fecha:'2026-02-20 14:32',usuario:'Yuliana Hernández',comentario:null},{estado:'Aprobada',fecha:'2026-02-22 10:05',usuario:'Lic. María Solís',comentario:'Aprobado según saldo disponible.'}]},
-    { num:'SVC-2026-0019', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2026-01-20', ff:'2026-01-23', dias:4, estado:'Rechazada', modalidad:'—', creacion:'2026-01-10 08:45', motivo:'Trámite personal.', motivoCan:null, saldoAntes:20, saldoDespues:20, girh:'Lic. María Solís (GIRH)', fRes:'2026-01-12 16:20', comentarios:'Traslape con período de cierre administrativo.', periodo:null,
-      historial:[{estado:'Pendiente',fecha:'2026-01-10 08:45',usuario:'Yuliana Hernández',comentario:null},{estado:'Rechazada',fecha:'2026-01-12 16:20',usuario:'Lic. María Solís',comentario:'Traslape con período de cierre administrativo.'}]},
-    { num:'SVC-2026-0008', nom:'docente_interino', nomLabel:'Docente / Docente-Adm. Interino', fi:'2026-02-10', ff:'2026-02-14', dias:5, estado:'Aprobada', modalidad:'Disfrute en tiempo', creacion:'2026-01-28 11:20', motivo:'—', motivoCan:null, saldoAntes:6, saldoDespues:1, girh:'Lic. María Solís (GIRH)', fRes:'2026-01-30 09:00', comentarios:'Aprobado. Período lectivo 2026-I.', periodo:'2026-I',
-      historial:[{estado:'Pendiente',fecha:'2026-01-28 11:20',usuario:'Yuliana Hernández',comentario:null},{estado:'Aprobada',fecha:'2026-01-30 09:00',usuario:'Lic. María Solís',comentario:'Aprobado para disfrute en tiempo.'}]},
-    { num:'SVC-2025-0088', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2025-11-10', ff:'2025-11-14', dias:5, estado:'Cancelada', modalidad:'—', creacion:'2025-10-25 10:00', motivo:'Vacaciones fin de año.', motivoCan:'Cambio de planes personales.', saldoAntes:18, saldoDespues:18, girh:'Lic. María Solís (GIRH)', fRes:'2025-10-27 09:00', comentarios:'Aprobado inicialmente.', periodo:null,
-      historial:[{estado:'Pendiente',fecha:'2025-10-25 10:00',usuario:'Yuliana Hernández',comentario:null},{estado:'Aprobada',fecha:'2025-10-27 09:00',usuario:'Lic. María Solís',comentario:'Aprobado inicialmente.'},{estado:'Cancelada',fecha:'2025-11-01 08:30',usuario:'Yuliana Hernández',comentario:'Cambio de planes personales.'}]},
-    { num:'SVC-2025-0061', nom:'admin_propiedad', nomLabel:'Administrativo en Propiedad', fi:'2025-08-04', ff:'2025-08-08', dias:5, estado:'Aprobada', modalidad:'—', creacion:'2025-07-20 09:30', motivo:'Vacaciones de verano.', motivoCan:null, saldoAntes:23, saldoDespues:18, girh:'Lic. María Solís (GIRH)', fRes:'2025-07-22 11:00', comentarios:'Aprobado sin observaciones.', periodo:null,
-      historial:[{estado:'Pendiente',fecha:'2025-07-20 09:30',usuario:'Yuliana Hernández',comentario:null},{estado:'Aprobada',fecha:'2025-07-22 11:00',usuario:'Lic. María Solís',comentario:'Aprobado sin observaciones.'}]},
-  ];
+// ══════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════
+const API_BASE = '/api';
 
-  let filtered = [...HISTORIAL];
-  let sortField = 'creacion'; let sortAsc = false;
-  const NOM_SHORT = {admin_propiedad:'Adm. Propiedad',admin_interino:'Adm. Interino',docente_propiedad:'Docente Propiedad',docente_interino:'Docente Interino'};
+// Mapeo modalidad BD → etiqueta UI
+const MODALIDAD_LABEL = {
+  disfrute_en_tiempo: 'Disfrute en tiempo',
+  liquidacion_colones: 'Liquidación en colones',
+  null: '—', undefined: '—', '': '—'
+};
 
-  // Init
-  document.getElementById('navDate').textContent = new Date().toLocaleDateString('es-CR',{weekday:'short',day:'numeric',month:'short'});
-  try { const f=JSON.parse(localStorage.getItem('funcionario')||'{}'); if(f.nombre){document.getElementById('navAvatar').textContent=f.nombre.charAt(0).toUpperCase();document.getElementById('navName').textContent=f.nombre;} } catch(e){}
+// Mapeo nombre_tipo backend → clave interna (para filtros)
+const TIPO_NOM_MAP = {
+  'Administrativo en Propiedad': 'admin_propiedad',
+  'Administrativo Interino': 'admin_interino',
+  'Docente en Propiedad': 'docente_propiedad',
+  'Docente / Docente-Adm. Interino': 'docente_interino'
+};
 
-  renderTabla(filtered);
-  actualizarStats(filtered);
+// Capitaliza primera letra del estado
+const CAP = s => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '—';
 
-  function actualizarStats(data) {
-    document.getElementById('sTotal').textContent = data.length;
-    const aprobadas = data.filter(s=>s.estado==='Aprobada');
-    const usados = aprobadas.reduce((a,s)=>a+s.dias,0);
-    document.getElementById('sUsados').textContent = usados;
-    document.getElementById('resultCount').textContent = `${data.length} solicitud${data.length!==1?'es':''}`;
+// ══════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ══════════════════════════════════════════════════════════════
+let HISTORIAL_RAW = [];   // datos crudos del backend
+let filtered = [];         // datos filtrados activos
+let sortField = 'fecha_creacion';
+let sortAsc = false;
+let SESSION = {};          // datos de sesión
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Leer sesión
+  try { SESSION = JSON.parse(localStorage.getItem('funcionario') || '{}'); } catch(e) {}
+  cargarDatos();
+});
+
+// ══════════════════════════════════════════════════════════════
+// CARGA DE DATOS DESDE EL BACKEND
+// Endpoint: GET /api/solicitudes?id_funcionario=X
+// ══════════════════════════════════════════════════════════════
+async function cargarDatos() {
+  const idFuncionario = SESSION.id_funcionario || SESSION.id;
+  if (!idFuncionario) {
+    mostrarError('No se encontró la sesión del funcionario. Por favor, iniciá sesión nuevamente.');
+    renderTabla([]);
+    return;
   }
 
-  function renderTabla(data) {
-    const body = document.getElementById('tableBody');
-    actualizarStats(data);
-    if(!data.length){
-      body.innerHTML=`<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg></div><div class="empty-title">Sin registros</div><div class="empty-sub">No se encontraron solicitudes con los filtros aplicados.</div></div>`;
-      return;
+  try {
+    const resp = await fetch(`${API_BASE}/solicitudes?id_funcionario=${idFuncionario}`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.error || `HTTP ${resp.status}`);
     }
-    body.innerHTML = data.map(s=>`
-      <div class="table-row" onclick="verDetalle('${s.num}')">
-        <div class="td mono">${s.num}</div>
-        <div class="td">${NOM_SHORT[s.nom]}</div>
-        <div class="td">${fmt(s.fi)} — ${fmt(s.ff)}</div>
-        <div class="td muted">${s.creacion.split(' ')[0]}</div>
-        <div class="td center">${s.dias}</div>
-        <div class="td"><span class="badge ${s.estado.toLowerCase()}">${s.estado}</span></div>
-        <div class="td">${s.modalidad!=='—'?`<span class="badge-mod">${s.modalidad}</span>`:'<span style="color:var(--dim)">—</span>'}</div>
-        <div class="td muted" style="font-size:10.5px">${s.girh||'—'}</div>
-        <div class="td center"><button class="btn-ver" onclick="event.stopPropagation();verDetalle('${s.num}')">Ver</button></div>
-      </div>`).join('');
-  }
 
-  function filtrar() {
-    const num = document.getElementById('fNum').value.trim().toLowerCase();
-    const est = document.getElementById('fEstado').value;
-    const year = document.getElementById('fYear').value;
-    const nom = document.getElementById('fNom').value;
-    const periodo = document.getElementById('fPeriodo').value;
-    const desde = document.getElementById('fDesde').value;
-    const hasta = document.getElementById('fHasta').value;
+    const data = await resp.json();
+    // El endpoint devuelve { solicitudes: [...] }
+    HISTORIAL_RAW = (data.solicitudes || []).map(normalizarSolicitud);
+    filtered = [...HISTORIAL_RAW];
 
-    filtered = HISTORIAL.filter(s=>{
-      if(num && !s.num.toLowerCase().includes(num)) return false;
-      if(est && s.estado!==est) return false;
-      if(year && !s.fi.startsWith(year)) return false;
-      if(nom && s.nom!==nom) return false;
-      if(periodo && s.periodo!==periodo) return false;
-      if(desde && s.fi<desde) return false;
-      if(hasta && s.fi>hasta) return false;
-      return true;
-    });
+    ocultarError();
+    cargarSaldoFuncionario(idFuncionario);
     renderTabla(filtered);
-  }
 
-  function limpiarFiltros(){
-    ['fNum','fEstado','fYear','fNom','fPeriodo','fDesde','fHasta'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('fGroupPeriodo').classList.add('hidden');
-    filtered=[...HISTORIAL]; renderTabla(filtered);
+  } catch (err) {
+    console.error('[historial] Error al cargar solicitudes:', err);
+    mostrarError(`Error al conectar con el servidor: ${err.message}`);
+    renderTabla([]);
   }
+}
 
-  function togglePeriodo(){
-    const val=document.getElementById('fNom').value;
-    document.getElementById('fGroupPeriodo').classList.toggle('hidden', val!=='docente_interino');
-  }
+// ── Normaliza un registro del backend al formato esperado por la UI ──
+function normalizarSolicitud(s) {
+  const estadoNorm = (s.estado || '').toLowerCase(); // backend: 'pendiente','aprobada','rechazada','cancelada'
+  const modalidadLabel = MODALIDAD_LABEL[s.modalidad] ?? '—';
+  const esDocenteInterino = (s.nombre_tipo || '').includes('Interino') && (s.nombre_tipo || '').includes('Docente');
 
-  function sortBy(f){
-    if(sortField===f)sortAsc=!sortAsc; else{sortField=f;sortAsc=true;}
-    filtered.sort((a,b)=>{
-      let va,vb;
-      if(f==='num'){va=a.num;vb=b.num;}
-      else if(f==='creacion'){va=a.creacion;vb=b.creacion;}
-      else{va=a.fi;vb=b.fi;}
-      return sortAsc?(va<vb?-1:1):(va>vb?-1:1);
+  return {
+    // Identificadores
+    id: s.id_solicitud,
+    num: s.numero_solicitud,
+
+    // Nombramiento
+    nom: TIPO_NOM_MAP[s.nombre_tipo] || 'admin_propiedad',
+    nomLabel: s.nombre_tipo || '—',
+    esDocenteInterino,
+
+    // Fechas
+    fi: s.fecha_inicio ? s.fecha_inicio.slice(0, 10) : null,
+    ff: s.fecha_fin   ? s.fecha_fin.slice(0, 10)   : null,
+    creacion: s.fecha_creacion
+      ? s.fecha_creacion.replace('T', ' ').slice(0, 16)
+      : '—',
+
+    // Datos
+    dias: s.dias_solicitados || 0,
+    estado: estadoNorm,
+    estadoCap: CAP(s.estado),
+    modalidad: modalidadLabel,
+    motivo: s.motivo || '—',
+
+    // Saldo
+    saldoAntes: s.saldo_antes ?? null,
+    saldoDespues: s.saldo_despues ?? null,
+
+    // Resolución GIRH
+    girh: s.comentarios_aprobador ? 'Gestor GIRH' : null,
+    fRes: s.fecha_aprobacion
+      ? s.fecha_aprobacion.replace('T', ' ').slice(0, 16)
+      : null,
+    comentarios: s.comentarios_aprobador || null,
+
+    // Período lectivo (si backend lo trae en el futuro)
+    periodo: s.id_periodo_lectivo || null,
+
+    // Historial de cambios: se construye desde los campos disponibles
+    // El endpoint GET /api/solicitudes no devuelve historial_solicitudes,
+    // así que lo reconstruimos desde los datos presentes.
+    historial: construirHistorial(s)
+  };
+}
+
+// ── Reconstruye el historial de cambios a partir de los campos del registro ──
+// (El endpoint /api/solicitudes no expone historial_solicitudes directamente;
+//  si se agrega un endpoint de detalle, se puede reemplazar esto.)
+function construirHistorial(s) {
+  const hist = [];
+  const estadoFinal = (s.estado || '').toLowerCase();
+
+  // Paso 1: creación → siempre Pendiente
+  if (s.fecha_creacion) {
+    hist.push({
+      estado: 'Pendiente',
+      fecha: s.fecha_creacion.replace('T', ' ').slice(0, 16),
+      usuario: SESSION.nombre || 'Funcionario',
+      comentario: null
     });
-    renderTabla(filtered);
   }
 
-  function verDetalle(num) {
-    const s = HISTORIAL.find(x=>x.num===num);
-    if(!s) return;
+  // Paso 2: si tiene fecha_aprobacion y el estado no es pendiente,
+  // entonces hubo una acción del GIRH
+  if (s.fecha_aprobacion && estadoFinal !== 'pendiente') {
+    const accionLabel = estadoFinal === 'aprobada' ? 'Aprobada'
+                      : estadoFinal === 'rechazada' ? 'Rechazada'
+                      : 'Modificada';
+    hist.push({
+      estado: accionLabel,
+      fecha: s.fecha_aprobacion.replace('T', ' ').slice(0, 16),
+      usuario: 'Gestor GIRH',
+      comentario: s.comentarios_aprobador || null
+    });
+  }
 
-    document.getElementById('mNum').textContent = s.num;
-    document.getElementById('mEstadoBadge').innerHTML = `<span class="badge ${s.estado.toLowerCase()}">${s.estado}</span>`;
-    document.getElementById('mNombre').textContent = 'Yuliana Hernández López';
-    document.getElementById('mCedula').textContent = '1-1234-5678';
-    document.getElementById('mCorreo').textContent = 'yuliana@cuc.ac.cr';
-    document.getElementById('mNomLabel').textContent = s.nomLabel;
-    document.getElementById('mModalidad').textContent = s.modalidad!=='—' ? s.modalidad : 'No aplica';
-    document.getElementById('mFechaI').textContent = fmt(s.fi);
-    document.getElementById('mFechaF').textContent = fmt(s.ff);
-    document.getElementById('mDias').textContent = s.dias+' días hábiles';
-    document.getElementById('mSaldoA').textContent = s.saldoAntes+' días';
-    document.getElementById('mSaldoD').textContent = s.saldoDespues+' días';
-    document.getElementById('mMotivo').textContent = s.motivo||'Sin motivo especificado.';
+  // Paso 3: si está cancelada y ya fue aprobada antes, agregar cancelación
+  if (estadoFinal === 'cancelada' && s.fecha_aprobacion) {
+    hist.push({
+      estado: 'Cancelada',
+      fecha: s.fecha_aprobacion.replace('T', ' ').slice(0, 16),
+      usuario: SESSION.nombre || 'Funcionario',
+      comentario: null
+    });
+  } else if (estadoFinal === 'cancelada' && !s.fecha_aprobacion) {
+    // Cancelada sin aprobación previa (el funcionario la anuló)
+    hist.push({
+      estado: 'Cancelada',
+      fecha: s.fecha_creacion
+        ? s.fecha_creacion.replace('T', ' ').slice(0, 16)
+        : '—',
+      usuario: SESSION.nombre || 'Funcionario',
+      comentario: null
+    });
+  }
 
-    // Período lectivo
-    const ip=document.getElementById('mItemPeriodo');
-    if(s.nom==='docente_interino'&&s.periodo){ip.style.display='flex';document.getElementById('mPeriodo').textContent=s.periodo;}else ip.style.display='none';
+  return hist;
+}
 
-    // Info modalidad docente interino
-    const iMod=document.getElementById('mInfoMod');
-    if(s.nom==='docente_interino'){
-      iMod.style.display='flex';
-      document.getElementById('mInfoModMsg').textContent = s.modalidad==='Disfrute en tiempo'
+// ══════════════════════════════════════════════════════════════
+// CARGA DE SALDO DESDE EL NOMBRAMIENTO ACTIVO
+// ══════════════════════════════════════════════════════════════
+async function cargarSaldoFuncionario(idFuncionario) {
+  try {
+    const resp = await fetch(`${API_BASE}/funcionarios/${idFuncionario}/saldo`);
+    if (!resp.ok) throw new Error('Sin endpoint de saldo');
+    const data = await resp.json();
+
+    document.getElementById('sDisp').textContent = data.dias_vacaciones_disponibles ?? '—';
+    document.getElementById('sAcum').textContent = data.dias_vacaciones_acumulados ?? '—';
+    if (data.nombre_tipo) {
+      document.getElementById('sDispSub').textContent = data.nombre_tipo + ' — vigente';
+    }
+  } catch {
+    // Fallback: calcular desde las solicitudes cargadas
+    const aprobadas = HISTORIAL_RAW.filter(s => s.estado === 'aprobada');
+    const usados = aprobadas.reduce((a, s) => a + s.dias, 0);
+    // Si el último registro aprobado tiene saldo_despues, usarlo
+    const ultimaAprobada = [...HISTORIAL_RAW]
+      .filter(s => s.estado === 'aprobada' && s.saldoDespues !== null)
+      .sort((a, b) => b.creacion.localeCompare(a.creacion))[0];
+
+    if (ultimaAprobada) {
+      document.getElementById('sDisp').textContent = ultimaAprobada.saldoDespues;
+    } else {
+      document.getElementById('sDisp').textContent = '—';
+    }
+    document.getElementById('sAcum').textContent = '—';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER TABLA
+// ══════════════════════════════════════════════════════════════
+function actualizarStats(data) {
+  document.getElementById('sTotal').textContent = data.length;
+  const usados = data
+    .filter(s => s.estado === 'aprobada')
+    .reduce((a, s) => a + s.dias, 0);
+  document.getElementById('sUsados').textContent = usados;
+  document.getElementById('resultCount').textContent =
+    `${data.length} solicitud${data.length !== 1 ? 'es' : ''}`;
+}
+
+function renderTabla(data) {
+  actualizarStats(data);
+  const body = document.getElementById('tableBody');
+
+  if (!data.length) {
+    body.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+        </div>
+        <div class="empty-title">Sin registros</div>
+        <div class="empty-sub">No se encontraron solicitudes con los filtros aplicados.</div>
+      </div>`;
+    return;
+  }
+
+  body.innerHTML = data.map(s => `
+    <div class="table-row" onclick="verDetalle(${s.id})">
+      <div class="td mono">${s.num || '—'}</div>
+      <div class="td">${nomCorto(s.nomLabel)}</div>
+      <div class="td">${fmt(s.fi)} — ${fmt(s.ff)}</div>
+      <div class="td muted">${s.creacion.slice(0, 10)}</div>
+      <div class="td center">${s.dias}</div>
+      <div class="td"><span class="badge ${s.estado}">${s.estadoCap}</span></div>
+      <div class="td">${s.modalidad !== '—'
+        ? `<span class="badge-mod">${s.modalidad}</span>`
+        : `<span style="color:var(--dim)">—</span>`}</div>
+      <div class="td muted" style="font-size:10.5px">${s.girh || '—'}</div>
+      <div class="td center">
+        <button class="btn-ver"
+          onclick="event.stopPropagation();verDetalle(${s.id})">Ver</button>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// FILTROS
+// ══════════════════════════════════════════════════════════════
+function filtrar() {
+  const num     = document.getElementById('fNum').value.trim().toLowerCase();
+  const est     = document.getElementById('fEstado').value;
+  const year    = document.getElementById('fYear').value;
+  const nom     = document.getElementById('fNom').value;
+  const periodo = document.getElementById('fPeriodo').value;
+  const desde   = document.getElementById('fDesde').value;
+  const hasta   = document.getElementById('fHasta').value;
+
+  filtered = HISTORIAL_RAW.filter(s => {
+    if (num && !(s.num || '').toLowerCase().includes(num)) return false;
+    if (est && s.estado !== est) return false;
+    if (year && !(s.fi || '').startsWith(year)) return false;
+    if (nom && s.nomLabel !== nom) return false;
+    if (periodo && s.periodo !== periodo) return false;
+    if (desde && s.fi < desde) return false;
+    if (hasta && s.fi > hasta) return false;
+    return true;
+  });
+  renderTabla(filtered);
+}
+
+function limpiarFiltros() {
+  ['fNum','fEstado','fYear','fNom','fPeriodo','fDesde','fHasta']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fGroupPeriodo').classList.add('hidden');
+  filtered = [...HISTORIAL_RAW];
+  renderTabla(filtered);
+}
+
+function togglePeriodo() {
+  const val = document.getElementById('fNom').value;
+  document.getElementById('fGroupPeriodo').classList.toggle(
+    'hidden', val !== 'Docente / Docente-Adm. Interino'
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+// ORDENAMIENTO
+// ══════════════════════════════════════════════════════════════
+function sortBy(f) {
+  if (sortField === f) sortAsc = !sortAsc;
+  else { sortField = f; sortAsc = true; }
+
+  filtered.sort((a, b) => {
+    let va, vb;
+    if (f === 'numero_solicitud') { va = a.num; vb = b.num; }
+    else if (f === 'fecha_creacion') { va = a.creacion; vb = b.creacion; }
+    else { va = a.fi; vb = b.fi; }
+    return sortAsc ? (va < vb ? -1 : 1) : (va > vb ? -1 : 1);
+  });
+  renderTabla(filtered);
+}
+
+// ══════════════════════════════════════════════════════════════
+// MODAL DETALLE
+// ══════════════════════════════════════════════════════════════
+function verDetalle(idSolicitud) {
+  const s = HISTORIAL_RAW.find(x => x.id === idSolicitud);
+  if (!s) return;
+
+  document.getElementById('mNum').textContent = s.num || '—';
+  document.getElementById('mEstadoBadge').innerHTML =
+    `<span class="badge ${s.estado}">${s.estadoCap}</span>`;
+
+  // Funcionario (desde sesión)
+  document.getElementById('mNombre').textContent = SESSION.nombre || '—';
+  document.getElementById('mCedula').textContent = SESSION.cedula || '—';
+  document.getElementById('mCorreo').textContent = SESSION.correo || '—';
+  document.getElementById('mNomLabel').textContent = s.nomLabel;
+  document.getElementById('mModalidad').textContent =
+    s.modalidad !== '—' ? s.modalidad : 'No aplica';
+
+  // Período solicitado
+  document.getElementById('mFechaI').textContent = fmt(s.fi);
+  document.getElementById('mFechaF').textContent = fmt(s.ff);
+  document.getElementById('mDias').textContent = s.dias + ' días hábiles';
+  document.getElementById('mSaldoA').textContent =
+    s.saldoAntes !== null ? s.saldoAntes + ' días' : '—';
+  document.getElementById('mSaldoD').textContent =
+    s.saldoDespues !== null ? s.saldoDespues + ' días' : '—';
+
+  // Período lectivo (docente interino)
+  const ip = document.getElementById('mItemPeriodo');
+  if (s.esDocenteInterino && s.periodo) {
+    ip.style.display = 'flex';
+    document.getElementById('mPeriodo').textContent = s.periodo;
+  } else {
+    ip.style.display = 'none';
+  }
+
+  // Info box modalidad docente interino
+  const iMod = document.getElementById('mInfoMod');
+  if (s.esDocenteInterino) {
+    iMod.style.display = 'flex';
+    document.getElementById('mInfoModMsg').textContent =
+      s.modalidad === 'Disfrute en tiempo'
         ? 'Esta solicitud corresponde a vacaciones para disfrute en tiempo.'
         : 'Esta solicitud corresponde a vacaciones pendientes de liquidación en colones.';
-    } else iMod.style.display='none';
-
-    // Motivo cancelación
-    const imc=document.getElementById('mItemMotivoCan');
-    if(s.estado==='Cancelada'&&s.motivoCan){imc.style.display='flex';document.getElementById('mMotivoCan').textContent=s.motivoCan;}else imc.style.display='none';
-
-    // Resolución
-    const secRes=document.getElementById('mSecResolucion');
-    if(s.girh){
-      secRes.style.display='block';
-      document.getElementById('mGirh').textContent=s.girh;
-      document.getElementById('mFechaRes').textContent=s.fRes||'—';
-      document.getElementById('mComentarios').textContent=s.comentarios||'Sin comentarios.';
-    } else secRes.style.display='none';
-
-    // Historial cronológico
-    const dotCfg = {
-      Pendiente:{cls:'pendiente',icon:'<path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>'},
-      Aprobada:{cls:'aprobada',icon:'<path d="M9 11l3 3L22 4"/>'},
-      Rechazada:{cls:'rechazada',icon:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'},
-      Cancelada:{cls:'cancelada',icon:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'},
-      Modificada:{cls:'modificada',icon:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'},
-    };
-    document.getElementById('mHistorial').innerHTML = s.historial.map(h=>{
-      const cfg=dotCfg[h.estado]||dotCfg.Pendiente;
-      return `<div class="ht-item">
-        <div class="ht-dot ${cfg.cls}"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" fill="none">${cfg.icon}</svg></div>
-        <div>
-          <div class="ht-estado">${h.estado}</div>
-          <div class="ht-meta">${h.fecha} · ${h.usuario}</div>
-          ${h.comentario?`<div class="ht-comment">${h.comentario}</div>`:''}
-        </div>
-      </div>`;
-    }).join('');
-
-    document.getElementById('modalOverlay').classList.add('show');
+  } else {
+    iMod.style.display = 'none';
   }
 
-  function cerrarModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
-  function exportar(tipo){ alert(`Documento ${tipo.toUpperCase()} exportado exitosamente.`); }
-  function fmt(s){ if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; }
+  // Motivo
+  document.getElementById('mMotivo').textContent =
+    s.motivo && s.motivo !== '—' ? s.motivo : 'Sin motivo especificado.';
 
-  function toggleGroup(id){ const g=document.getElementById('grp-'+id); const open=g.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(x=>x.classList.remove('open')); document.getElementById('userWrap').classList.remove('open'); if(!open)g.classList.add('open'); }
-  document.addEventListener('click',e=>{ if(!e.target.closest('.nav-group'))document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open')); if(!e.target.closest('.user-wrap'))document.getElementById('userWrap').classList.remove('open'); if(!e.target.closest('.modal')&&e.target.closest('.modal-overlay'))cerrarModal(); });
-  function toggleUserMenu(){ const w=document.getElementById('userWrap'); const o=w.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(g=>g.classList.remove('open')); w.classList.toggle('open',!o); }
-  function selectNomFromPill(el){ document.querySelectorAll('.ud-pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); document.getElementById('pillNomLabel').textContent=el.querySelector('.ud-pill-name').textContent; document.getElementById('userWrap').classList.remove('open'); }
-  function toggleTheme(){ const h=document.documentElement; const d=h.getAttribute('data-theme')==='dark'; h.setAttribute('data-theme',d?'light':'dark'); const i=document.getElementById('themeIcon'); i.innerHTML=d?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>':'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'; }
-  function logout(){ if(confirm('¿Cerrar sesión?'))window.location.href='../autenticacion/login.html'; }
+  // Motivo cancelación (no disponible directamente del backend actual)
+  document.getElementById('mItemMotivoCan').style.display = 'none';
+
+  // Resolución GIRH
+  const secRes = document.getElementById('mSecResolucion');
+  if (s.fRes || s.comentarios) {
+    secRes.style.display = 'block';
+    document.getElementById('mGirh').textContent = s.girh || 'Gestor GIRH';
+    document.getElementById('mFechaRes').textContent = s.fRes || '—';
+    document.getElementById('mComentarios').textContent =
+      s.comentarios || 'Sin comentarios.';
+  } else {
+    secRes.style.display = 'none';
+  }
+
+  // Historial cronológico
+  const dotCfg = {
+    Pendiente: {
+      cls: 'pendiente',
+      icon: '<path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>'
+    },
+    Aprobada: {
+      cls: 'aprobada',
+      icon: '<path d="M9 11l3 3L22 4"/>'
+    },
+    Rechazada: {
+      cls: 'rechazada',
+      icon: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'
+    },
+    Cancelada: {
+      cls: 'cancelada',
+      icon: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>'
+    },
+    Modificada: {
+      cls: 'modificada',
+      icon: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'
+    }
+  };
+
+  document.getElementById('mHistorial').innerHTML = s.historial.map(h => {
+    const cfg = dotCfg[h.estado] || dotCfg.Pendiente;
+    return `<div class="ht-item">
+      <div class="ht-dot ${cfg.cls}">
+        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" fill="none">${cfg.icon}</svg>
+      </div>
+      <div>
+        <div class="ht-estado">${h.estado}</div>
+        <div class="ht-meta">${h.fecha} · ${h.usuario}</div>
+        ${h.comentario ? `<div class="ht-comment">${h.comentario}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function cerrarModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
+function fmt(s) {
+  if (!s) return '—';
+  const [y, m, d] = s.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function nomCorto(nombre) {
+  const MAP = {
+    'Administrativo en Propiedad': 'Adm. Propiedad',
+    'Administrativo Interino': 'Adm. Interino',
+    'Docente en Propiedad': 'Docente Propiedad',
+    'Docente / Docente-Adm. Interino': 'Docente Interino'
+  };
+  return MAP[nombre] || nombre || '—';
+}
+
+function mostrarError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('errorBanner').classList.add('show');
+  document.getElementById('resultCount').textContent = 'Error';
+}
+
+function ocultarError() {
+  document.getElementById('errorBanner').classList.remove('show');
+}
+
+function exportar(tipo) {
+  alert(`Documento ${tipo.toUpperCase()} exportado exitosamente.`);
+}
+
+// ══════════════════════════════════════════════════════════════
+// NAV / THEME / UTILS
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-group'))
+    document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
+  const uw = document.getElementById('userWrap');
+  if (uw && !e.target.closest('.user-wrap')) uw.classList.remove('open');
+  if (!e.target.closest('.modal') && e.target.closest('.modal-overlay'))
+    cerrarModal();
+});
+
+function toggleGroup(id) {
+  const g = document.getElementById('grp-' + id);
+  const open = g.classList.contains('open');
+  document.querySelectorAll('.nav-group').forEach(x => x.classList.remove('open'));
+  const uw = document.getElementById('userWrap');
+  if (uw) uw.classList.remove('open');
+  if (!open) g.classList.add('open');
+}
+
+function toggleUserMenu() {
+  const w = document.getElementById('userWrap');
+  if (!w) return;
+  const o = w.classList.contains('open');
+  document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
+  w.classList.toggle('open', !o);
+}
+
+function toggleTheme() {
+  const h = document.documentElement;
+  const d = h.getAttribute('data-theme') === 'dark';
+  h.setAttribute('data-theme', d ? 'light' : 'dark');
+  const i = document.getElementById('themeIcon');
+  if (i) i.innerHTML = d
+    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+
+function logout() {
+  if (confirm('¿Cerrar sesión?')) window.location.href = '../autenticacion/login.html';
+}
 </script>
 </body>
 </html>

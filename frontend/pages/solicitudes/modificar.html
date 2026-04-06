@@ -33,8 +33,6 @@
     .layout{position:relative;z-index:10;margin-top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden}
     .main{height:100%;overflow-y:auto;overflow-x:hidden;padding:22px 24px 28px;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
     @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-
-    /* ══ Page header ══ */
     .page-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;animation:fadeUp .35s both}
     .page-back{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:300;color:var(--muted);text-decoration:none;padding:5px 10px;border-radius:8px;transition:var(--trans)}
     .page-back svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
@@ -45,18 +43,12 @@
     .page-title em{font-style:italic;color:var(--g700)}
     [data-theme="dark"] .page-title em{color:var(--g300)}
     .page-tag{margin-left:auto;font-family:'DM Mono',monospace;font-size:9px;font-weight:300;padding:4px 10px;border-radius:6px;border:1px solid var(--dim);color:var(--muted)}
-
-    /* ══ Cards base ══ */
     .card{background:var(--card-bg);backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius);box-shadow:0 2px 14px rgba(0,0,0,0.05);transition:background .3s}
     .card-pad{padding:18px 22px}
-
-    /* ══ Stepper chip ══ */
     .step-chip{display:inline-flex;align-items:center;gap:8px;margin-bottom:13px}
     .step-num{width:20px;height:20px;border-radius:50%;background:var(--g700);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;flex-shrink:0}
     [data-theme="dark"] .step-num{background:var(--g500)}
     .step-chip-lbl{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-
-    /* ══ PASO 1: Lista pendientes ══ */
     .pending-list{display:flex;flex-direction:column;gap:7px}
     .pending-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:11px;border:1.5px solid var(--g100);background:var(--g050);cursor:pointer;transition:var(--trans);position:relative}
     [data-theme="dark"] .pending-item{background:rgba(0,45,114,0.18);border-color:rgba(125,166,216,0.12)}
@@ -78,11 +70,7 @@
     .badge-pend::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold)}
     .no-pending{padding:28px;text-align:center;color:var(--muted);font-size:12px;font-weight:300}
     .no-pending svg{width:28px;height:28px;stroke:var(--dim);fill:none;stroke-width:1.5;display:block;margin:0 auto 10px}
-
-    /* ══ PASO 2: Formulario de modificación ══ */
     .form-layout{display:grid;grid-template-columns:1fr 292px;gap:16px}
-
-    /* Sección interna del form */
     .form-section{margin-bottom:22px}
     .form-section:last-child{margin-bottom:0}
     .sec-title{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:13px;padding-bottom:7px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:8px}
@@ -91,8 +79,6 @@
     .sec-editable-tag{font-size:8.5px;color:var(--g500);font-family:'DM Mono',monospace;font-weight:300;margin-left:2px}
     .lock-badge{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:4px;font-size:8px;font-family:'DM Mono',monospace;background:rgba(100,100,100,0.05);border:1px solid var(--dim);color:var(--muted);margin-left:auto}
     .lock-badge svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:1.5}
-
-    /* Fields */
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
     .form-row.triple{grid-template-columns:1fr 1fr 1fr}
     .form-row.single{grid-template-columns:1fr}
@@ -110,16 +96,12 @@
     .field .ferr{font-size:9px;color:var(--red);display:none;font-family:'DM Mono',monospace}
     .field.has-error input,.field.has-error select,.field.has-error textarea{border-color:var(--red)}
     .field.has-error .ferr{display:block}
-
-    /* Comparación original vs nuevo */
     .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:13px;align-items:start}
     .compare-side{display:flex;flex-direction:column;gap:4px}
     .compare-lbl{font-family:'DM Mono',monospace;font-size:8px;font-weight:300;color:var(--dim);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:5px;margin-bottom:4px}
     .compare-lbl svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:1.5}
     .orig-val{padding:9px 12px;border-radius:9px;background:rgba(0,0,0,0.025);border:1px solid var(--dim);font-size:12px;font-weight:300;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.45;min-height:40px}
     [data-theme="dark"] .orig-val{background:rgba(0,0,0,0.18)}
-
-    /* Resumen de días */
     .dias-resumen{display:none;grid-template-columns:repeat(3,1fr);gap:10px;margin:13px 0}
     .dias-resumen.show{display:grid}
     .dias-box{background:var(--g050);border:1px solid var(--g100);border-radius:10px;padding:10px 12px;text-align:center}
@@ -129,8 +111,6 @@
     .dias-n.green{color:var(--green)}[data-theme="dark"] .dias-n.green{color:#4ade80}
     .dias-n.red{color:var(--red)}
     .dias-lbl{font-family:'DM Mono',monospace;font-size:8px;font-weight:300;color:var(--muted);letter-spacing:.04em}
-
-    /* Alertas */
     .alert{border-radius:10px;padding:10px 14px;font-size:11.5px;font-weight:300;display:none;align-items:flex-start;gap:9px;line-height:1.5;margin-top:10px}
     .alert.show{display:flex}
     .alert svg{width:13px;height:13px;flex-shrink:0;margin-top:2px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
@@ -138,14 +118,10 @@
     .alert.warning{background:var(--gold-bg);border:1px solid rgba(185,150,60,0.22);color:#8a6800}[data-theme="dark"] .alert.warning{color:var(--gold)}
     .alert.danger{background:var(--red-bg);border:1px solid rgba(228,0,43,0.18);color:var(--red)}
     .alert.success{background:var(--green-bg);border:1px solid rgba(21,128,61,0.20);color:var(--green)}[data-theme="dark"] .alert.success{color:#4ade80}
-
-    /* Char counter */
     .char-row{display:flex;justify-content:space-between;align-items:center}
     .char-count{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--dim)}
     .char-count.near{color:var(--gold)}
     .char-count.over{color:var(--red)}
-
-    /* Acciones del formulario */
     .form-actions{display:flex;gap:9px;margin-top:20px;padding-top:16px;border-top:1px solid var(--g100)}
     [data-theme="dark"] .form-actions{border-top-color:rgba(125,166,216,0.10)}
     .btn-primary{flex:1;padding:11px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--g700);transition:var(--trans);display:flex;align-items:center;justify-content:center;gap:7px}
@@ -155,8 +131,6 @@
     .btn-secondary{padding:11px 18px;border-radius:10px;border:1px solid var(--g100);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:300;color:var(--muted);background:transparent;transition:var(--trans)}
     [data-theme="dark"] .btn-secondary{border-color:rgba(125,166,216,0.15)}
     .btn-secondary:hover{border-color:rgba(45,125,210,0.35);color:var(--g700)}[data-theme="dark"] .btn-secondary:hover{color:var(--g300)}
-
-    /* ══ Panel lateral ══ */
     .side-panel{display:flex;flex-direction:column;gap:13px}
     .side-lbl{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
     .info-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--g100)}
@@ -165,8 +139,6 @@
     .info-key{font-family:'DM Mono',monospace;font-size:9px;font-weight:300;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
     .info-val{font-size:11.5px;font-weight:300;color:var(--text)}
     .info-val.mono{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--g700)}[data-theme="dark"] .info-val.mono{color:var(--g300)}
-
-    /* Cambios detectados */
     .cambios-wrap{display:flex;flex-direction:column;gap:6px}
     .cambio-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:9px;background:rgba(45,125,210,0.05);border:1px solid rgba(45,125,210,0.12)}
     [data-theme="dark"] .cambio-item{background:rgba(45,125,210,0.10)}
@@ -174,8 +146,6 @@
     .cambio-text{font-size:10.5px;font-weight:300;color:var(--muted);line-height:1.5}
     .cambio-text strong{color:var(--text);font-weight:400}
     .no-cambios{font-size:11px;font-weight:300;color:var(--dim);font-style:italic;text-align:center;padding:10px 0}
-
-    /* Historial lateral */
     .hist-list{display:flex;flex-direction:column}
     .hist-item{display:flex;gap:10px;padding-bottom:11px;position:relative}
     .hist-item:last-child{padding-bottom:0}
@@ -192,17 +162,11 @@
     .hist-m{font-family:'DM Mono',monospace;font-size:8.5px;color:var(--muted);margin-top:1px}
     .hist-c{font-size:10px;font-weight:300;color:var(--muted);margin-top:3px;padding:5px 8px;background:var(--g050);border-radius:6px}
     [data-theme="dark"] .hist-c{background:rgba(0,45,114,0.18)}
-
-    /* ══ API Error banner ══ */
     .api-error{border-radius:10px;padding:10px 14px;background:var(--red-bg);border:1px solid rgba(228,0,43,0.18);font-size:11.5px;font-weight:300;color:var(--red);display:none;align-items:center;gap:10px;margin-bottom:12px}
     .api-error.show{display:flex}
     .api-error svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
-
-    /* Spinner */
     @keyframes spin{to{transform:rotate(360deg)}}
     .spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
-
-    /* ══ MODAL CONFIRMACIÓN ══ */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,30,80,0.46);backdrop-filter:blur(8px);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
     .modal-overlay.show{display:flex}
     .modal{background:var(--bone);border:1px solid rgba(255,255,255,0.72);border-radius:18px;padding:26px 28px;max-width:440px;width:100%;box-shadow:0 22px 64px rgba(0,0,0,0.18);animation:modalIn .28s cubic-bezier(.16,1,.3,1)}
@@ -234,7 +198,6 @@
 <script src="/frontend/js/session.js"></script>
 <app-navbar></app-navbar>
 
-<!-- ══ LAYOUT ══ -->
 <div class="layout">
   <main class="main">
 
@@ -245,13 +208,12 @@
       <div class="page-tag">RQ-SVC-2026-03</div>
     </div>
 
-    <!-- Error API global -->
     <div class="api-error" id="apiError">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <span id="apiErrorMsg">Error de comunicación con el servidor.</span>
     </div>
 
-    <!-- ══ PASO 1 ══ -->
+    <!-- PASO 1 -->
     <div class="card card-pad" id="stepSeleccion" style="margin-bottom:14px;animation:fadeUp .35s both">
       <div class="step-chip">
         <div class="step-num">1</div>
@@ -259,7 +221,6 @@
         <span style="font-size:10px;color:var(--muted);font-weight:200;margin-left:4px">— Solo solicitudes en estado Pendiente</span>
       </div>
       <div id="pendingList">
-        <!-- skeleton -->
         <div style="display:flex;flex-direction:column;gap:7px" id="pendingSkeleton">
           <div style="height:58px;border-radius:11px;background:var(--g050);border:1px solid var(--g100);animation:pulse 1.4s infinite"></div>
           <div style="height:58px;border-radius:11px;background:var(--g050);border:1px solid var(--g100);animation:pulse 1.4s infinite .2s"></div>
@@ -267,7 +228,7 @@
       </div>
     </div>
 
-    <!-- ══ PASO 2 ══ -->
+    <!-- PASO 2 -->
     <div id="stepFormulario" style="display:none">
       <div class="step-chip" style="margin-bottom:14px">
         <div class="step-num">2</div>
@@ -275,10 +236,8 @@
       </div>
       <div class="form-layout">
 
-        <!-- FORMULARIO PRINCIPAL -->
         <div class="card card-pad" style="animation:fadeUp .35s .05s both">
 
-          <!-- Datos no editables -->
           <div class="form-section">
             <div class="sec-title">
               <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -297,7 +256,6 @@
             </div>
           </div>
 
-          <!-- Fechas editables -->
           <div class="form-section">
             <div class="sec-title">
               <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
@@ -305,7 +263,6 @@
               <span class="sec-editable-tag">editable</span>
             </div>
 
-            <!-- Fecha inicio: comparación -->
             <div class="compare-grid">
               <div class="compare-side">
                 <div class="compare-lbl"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/></svg>Fecha inicio original</div>
@@ -319,7 +276,6 @@
               </div>
             </div>
 
-            <!-- Fecha fin: comparación -->
             <div class="compare-grid">
               <div class="compare-side">
                 <div class="compare-lbl"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/></svg>Fecha fin original</div>
@@ -333,7 +289,6 @@
               </div>
             </div>
 
-            <!-- Resumen días -->
             <div class="dias-resumen" id="diasResumen">
               <div class="dias-box"><div class="dias-n" id="dOrig">—</div><div class="dias-lbl">Días originales</div></div>
               <div class="dias-box"><div class="dias-n gold" id="dNuevo">—</div><div class="dias-lbl">Días nuevos</div></div>
@@ -358,7 +313,6 @@
             </div>
           </div>
 
-          <!-- Motivo editable -->
           <div class="form-section">
             <div class="sec-title">
               <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -392,22 +346,18 @@
 
         <!-- PANEL LATERAL -->
         <div class="side-panel">
-
           <div class="card card-pad" style="animation:fadeUp .35s .08s both">
             <div class="side-lbl">Solicitud seleccionada</div>
             <div id="panelInfo"></div>
           </div>
-
           <div class="card card-pad" style="animation:fadeUp .35s .12s both">
             <div class="side-lbl">Cambios detectados</div>
             <div id="panelCambios"><div class="no-cambios">Sin cambios aún</div></div>
           </div>
-
           <div class="card card-pad" style="animation:fadeUp .35s .16s both">
             <div class="side-lbl">Historial</div>
             <div class="hist-list" id="panelHistorial"></div>
           </div>
-
         </div>
       </div>
     </div>
@@ -415,7 +365,7 @@
   </main>
 </div>
 
-<!-- ══ MODAL CONFIRMACIÓN ══ -->
+<!-- MODAL CONFIRMACIÓN -->
 <div class="modal-overlay" id="modalOverlay" onclick="onOverlayClick(event)">
   <div class="modal">
     <div class="modal-icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
@@ -443,20 +393,15 @@
 </div>
 
 <script>
-  // ══ Config ══
   const API_BASE = '/api';
 
-  // ══ Estado ══
   let idFuncionario = null;
   let nombreFuncionario = '';
-  let solicitudActual = null;   // datos completos precargados del API
+  let solicitudActual = null;
   let diasNuevosCalc = 0;
-  let saldoReal = 0;            // saldo_actual + dias_originales (para validar)
+  let saldoReal = 0;
 
-  // ══ Init ══
-  document.addEventListener('DOMContentLoaded', () => {
-    cargarSesion();
-  });
+  document.addEventListener('DOMContentLoaded', () => { cargarSesion(); });
 
   function cargarSesion() {
     try {
@@ -464,7 +409,6 @@
       idFuncionario = f.id_funcionario || f.id || null;
       nombreFuncionario = `${f.nombre || ''} ${f.apellido1 || ''}`.trim();
     } catch(e) {}
-
     if (!idFuncionario) {
       mostrarApiError('No hay sesión activa. Redirigiendo al login…');
       setTimeout(() => window.location.href = '../autenticacion/login.html', 2000);
@@ -473,16 +417,12 @@
     cargarPendientes();
   }
 
-  // ══ Cargar solicitudes pendientes desde el API ══
   async function cargarPendientes() {
     ocultarApiError();
     try {
-      const res = await fetch(`${API_BASE}/solicitudes?id_funcionario=${idFuncionario}`, {
-        credentials: 'include'
-      });
+      const res = await fetch(`${API_BASE}/solicitudes?id_funcionario=${idFuncionario}`, { credentials: 'include' });
       if (!res.ok) throw new Error(`Error ${res.status}`);
       const data = await res.json();
-
       const pendientes = (data.solicitudes || []).filter(s => s.estado === 'pendiente');
       renderPendientes(pendientes);
     } catch(err) {
@@ -507,31 +447,30 @@
           <div class="pi-periodo">${fmt(s.fecha_inicio)} — ${fmt(s.fecha_fin)}</div>
           <div class="pi-sub">${s.nombre_tipo || s.numero_nombramiento || '—'} · Creada: ${fmtDate(s.fecha_creacion)}</div>
         </div>
-        <div class="pi-days"><div class="pi-days-n">${s.dias_solicitados}</div><div class="pi-days-lbl">días</div></div>
+        <div class="pi-days">
+          <div class="pi-days-n">${Number(s.dias_solicitados)}</div>
+          <div class="pi-days-lbl">días</div>
+        </div>
         <span class="badge-pend">Pendiente</span>
       </div>`).join('') + `</div>`;
   }
 
-  // ══ Al seleccionar una solicitud ══
   async function seleccionarSolicitud(idSolicitud) {
-    // Marcar visualmente
     document.querySelectorAll('.pending-item').forEach(el => el.classList.remove('selected'));
     const el = document.getElementById('pi-' + idSolicitud);
     if (el) { el.classList.add('selected'); el.querySelector('input').checked = true; }
-
     ocultarApiError();
     try {
-      const res = await fetch(`${API_BASE}/solicitudes/${idSolicitud}?id_funcionario=${idFuncionario}`, {
-        credentials: 'include'
-      });
+      const res = await fetch(`${API_BASE}/solicitudes/${idSolicitud}?id_funcionario=${idFuncionario}`, { credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
-
       solicitudActual = data.solicitud;
       const historial = data.historial || [];
 
-      // saldoReal = lo que tiene disponible + lo que tomó la solicitud (para recalcular)
-      saldoReal = parseFloat(solicitudActual.saldo_actual || 0) + (solicitudActual.dias_solicitados || 0);
+      // ✅ FIX PRINCIPAL: Number() en dias_solicitados evita concatenación de strings.
+      // Sin este fix: parseFloat("55.00") + "2" = "552" (JavaScript concatena en vez de sumar)
+      // Con este fix: parseFloat("55.00") + Number("2") = 57 (suma numérica correcta)
+      saldoReal = parseFloat(solicitudActual.saldo_actual || 0) + Number(solicitudActual.dias_solicitados || 0);
 
       poblarFormulario(historial);
     } catch(err) {
@@ -542,28 +481,23 @@
 
   function poblarFormulario(historial) {
     const s = solicitudActual;
-
-    // Campos no editables
     document.getElementById('fNombreFuncionario').value = s.nombre_funcionario || nombreFuncionario;
     document.getElementById('fNumSolicitud').value = s.numero_solicitud;
     document.getElementById('fTipoNom').value = s.nombre_tipo || '—';
-    document.getElementById('fSaldo').value = `${saldoReal} días disponibles`;
+    document.getElementById('fSaldo').value = `${saldoReal} días disponibles`; // ✅ saldoReal ya correcto
     document.getElementById('fCreacion').value = fmtDateHour(s.fecha_creacion);
 
-    // Período lectivo (docente interino)
     const fieldPer = document.getElementById('fFieldPeriodo');
     if (s.es_docente_interino && s.id_periodo_lectivo) {
       fieldPer.style.display = 'flex';
       document.getElementById('fPeriodo').value = s.id_periodo_lectivo;
     } else fieldPer.style.display = 'none';
 
-    // Valores originales (comparación)
     document.getElementById('origFechaI').textContent = fmt(s.fecha_inicio);
     document.getElementById('origFechaF').textContent = fmt(s.fecha_fin);
     document.getElementById('origMotivo').textContent = s.motivo || 'Sin motivo especificado.';
-    document.getElementById('dOrig').textContent = s.dias_solicitados;
+    document.getElementById('dOrig').textContent = Number(s.dias_solicitados); // ✅ FIX: Number() elimina ".00"
 
-    // Pre-rellenar con valores actuales
     const hoy = new Date().toISOString().split('T')[0];
     document.getElementById('fechaInicio').min = hoy;
     document.getElementById('fechaFin').min = hoy;
@@ -572,16 +506,17 @@
     document.getElementById('motivo').value = s.motivo || '';
     actualizarCharCount();
 
-    // Panel lateral: info
     document.getElementById('panelInfo').innerHTML = `
       <div class="info-row"><span class="info-key">N.°</span><span class="info-val mono">${s.numero_solicitud}</span></div>
       <div class="info-row"><span class="info-key">Nombramiento</span><span class="info-val">${s.nombre_tipo || '—'}</span></div>
       <div class="info-row"><span class="info-key">Período</span><span class="info-val">${fmt(s.fecha_inicio)} — ${fmt(s.fecha_fin)}</span></div>
-      <div class="info-row"><span class="info-key">Días</span><span class="info-val">${s.dias_solicitados} hábiles</span></div>
+      <div class="info-row"><span class="info-key">Días</span><span class="info-val">${Number(s.dias_solicitados)} hábiles</span></div>
       <div class="info-row"><span class="info-key">Saldo disponible</span><span class="info-val">${saldoReal} días</span></div>`;
 
-    // Panel historial
-    const dotIcon = { pendiente: '<path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>', modificacion: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>' };
+    const dotIcon = {
+      pendiente: '<path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>',
+      modificacion: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'
+    };
     document.getElementById('panelHistorial').innerHTML = historial.map(h => {
       const tipo = h.accion === 'modificacion' ? 'modificacion' : 'pendiente';
       return `<div class="hist-item">
@@ -594,21 +529,16 @@
       </div>`;
     }).join('');
 
-    // Mostrar formulario
     document.getElementById('stepFormulario').style.display = 'block';
     document.getElementById('stepFormulario').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    // Calcular días con valores precargados
     onFechasChange();
     actualizarCambios();
   }
 
-  // ══ Cálculo de días en tiempo real ══
   function onFechasChange() {
     clearErr('fieldFechaI', 'errFechaI');
     clearErr('fieldFechaF', 'errFechaF');
     ocultarAlertas();
-
     if (!solicitudActual) return;
     const fi = document.getElementById('fechaInicio').value;
     const ff = document.getElementById('fechaFin').value;
@@ -621,33 +551,31 @@
     if (dI < hoy) { setErr('fieldFechaI', 'errFechaI', 'La fecha de inicio no puede ser anterior a hoy'); return; }
     if (dF < dI)  { setErr('fieldFechaF', 'errFechaF', 'La fecha fin debe ser igual o posterior al inicio'); return; }
 
-    // Calcular días hábiles (estimado en frontend: lunes-viernes)
     let dias = 0; let c = new Date(dI);
     while (c <= dF) { if (c.getDay() !== 0 && c.getDay() !== 6) dias++; c.setDate(c.getDate() + 1); }
     diasNuevosCalc = dias;
 
     const restantes = saldoReal - dias;
-
     document.getElementById('dNuevo').textContent = dias;
     document.getElementById('dRestantes').textContent = restantes >= 0 ? restantes : 0;
     document.getElementById('dRestantes').className = 'dias-n ' + (restantes < 0 ? 'red' : 'green');
     document.getElementById('diasResumen').classList.add('show');
 
     const sinCambioFechas = fi === solicitudActual.fecha_inicio && ff === solicitudActual.fecha_fin;
+    const diasOriginales = Number(solicitudActual.dias_solicitados); // ✅ FIX: comparación numérica correcta
 
     if (dias > saldoReal) {
       document.getElementById('alertSaldoMsg').textContent = `Saldo insuficiente. Necesitás ${dias} días pero solo tenés ${saldoReal} disponibles.`;
       document.getElementById('alertSaldo').classList.add('show');
     } else if (sinCambioFechas) {
       document.getElementById('alertSinCambioFechas').classList.add('show');
-    } else if (dias !== solicitudActual.dias_solicitados) {
-      document.getElementById('alertDiasCambianMsg').textContent = `El número de días cambiará de ${solicitudActual.dias_solicitados} a ${dias} días hábiles.`;
+    } else if (dias !== diasOriginales) { // ✅ FIX: Number() vs Number() — no string vs number
+      document.getElementById('alertDiasCambianMsg').textContent = `El número de días cambiará de ${diasOriginales} a ${dias} días hábiles.`;
       document.getElementById('alertDiasCambian').classList.add('show');
     } else {
       document.getElementById('alertOkMsg').textContent = `Quedarán ${restantes} días disponibles tras la modificación.`;
       document.getElementById('alertOk').classList.add('show');
     }
-
     actualizarCambios();
   }
 
@@ -671,11 +599,12 @@
     const fi = document.getElementById('fechaInicio').value;
     const ff = document.getElementById('fechaFin').value;
     const mot = document.getElementById('motivo').value.trim();
+    const diasOriginales = Number(solicitudActual.dias_solicitados); // ✅ FIX
     const cambios = [];
     if (fi && fi !== solicitudActual.fecha_inicio) cambios.push({ t: 'Fecha inicio', a: fmt(solicitudActual.fecha_inicio), b: fmt(fi) });
     if (ff && ff !== solicitudActual.fecha_fin)   cambios.push({ t: 'Fecha fin',    a: fmt(solicitudActual.fecha_fin),   b: fmt(ff) });
-    if (diasNuevosCalc && diasNuevosCalc !== solicitudActual.dias_solicitados)
-      cambios.push({ t: 'Días hábiles', a: solicitudActual.dias_solicitados, b: diasNuevosCalc });
+    if (diasNuevosCalc && diasNuevosCalc !== diasOriginales) // ✅ FIX: comparación numérica
+      cambios.push({ t: 'Días hábiles', a: diasOriginales, b: diasNuevosCalc });
     if (mot !== (solicitudActual.motivo || '').trim()) cambios.push({ t: 'Motivo', a: 'actualizado', b: '—' });
 
     const wrap = document.getElementById('panelCambios');
@@ -684,17 +613,14 @@
       : '<div class="no-cambios">Sin cambios aún</div>';
   }
 
-  // ══ Validar y abrir modal ══
   function validarYConfirmar() {
     if (!solicitudActual) return;
     clearErr('fieldFechaI', 'errFechaI'); clearErr('fieldFechaF', 'errFechaF');
     clearErr('fieldMotivo', 'errMotivo');
-
     const fi  = document.getElementById('fechaInicio').value;
     const ff  = document.getElementById('fechaFin').value;
     const mot = document.getElementById('motivo').value;
     let ok = true;
-
     if (!fi) { setErr('fieldFechaI', 'errFechaI', 'La fecha de inicio es obligatoria'); ok = false; }
     if (!ff) { setErr('fieldFechaF', 'errFechaF', 'La fecha de fin es obligatoria'); ok = false; }
     if (mot.length > 500) { setErr('fieldMotivo', 'errMotivo', 'El motivo no puede superar 500 caracteres'); ok = false; }
@@ -706,20 +632,20 @@
       mostrarApiError('No se detectaron cambios respecto a la solicitud original.');
       return;
     }
-
     if (diasNuevosCalc > saldoReal) { return; }
 
-    // Poblar modal
+    const diasOriginales = Number(solicitudActual.dias_solicitados); // ✅ FIX
+
     document.getElementById('mNum').textContent = solicitudActual.numero_solicitud;
     document.getElementById('mPeriodoAntes').textContent = `${fmt(solicitudActual.fecha_inicio)} — ${fmt(solicitudActual.fecha_fin)}`;
     document.getElementById('mPeriodoNuevo').textContent = `${fmt(fi)} — ${fmt(ff)}`;
-    document.getElementById('mDiasAntes').textContent = `${solicitudActual.dias_solicitados} días`;
+    document.getElementById('mDiasAntes').textContent = `${diasOriginales} días`; // ✅ FIX
     document.getElementById('mDiasNuevo').textContent = `${diasNuevosCalc} días`;
 
     const adv = document.getElementById('modalAdv');
-    if (diasNuevosCalc !== solicitudActual.dias_solicitados) {
+    if (diasNuevosCalc !== diasOriginales) { // ✅ FIX: comparación número vs número
       adv.classList.add('show');
-      document.getElementById('modalAdvMsg').textContent = `El número de días cambiará de ${solicitudActual.dias_solicitados} a ${diasNuevosCalc}. El GIRH deberá revisarlo nuevamente.`;
+      document.getElementById('modalAdvMsg').textContent = `El número de días cambiará de ${diasOriginales} a ${diasNuevosCalc}. El GIRH deberá revisarlo nuevamente.`;
     } else adv.classList.remove('show');
 
     document.getElementById('modalOverlay').classList.add('show');
@@ -728,46 +654,30 @@
   function cerrarModal() { document.getElementById('modalOverlay').classList.remove('show'); }
   function onOverlayClick(e) { if (e.target === document.getElementById('modalOverlay')) cerrarModal(); }
 
-  // ══ Confirmar — llamada al API PUT ══
   async function confirmar() {
     const btn = document.getElementById('btnConfirmar');
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner"></div> Guardando…';
     ocultarApiError();
-
     const fi  = document.getElementById('fechaInicio').value;
     const ff  = document.getElementById('fechaFin').value;
     const mot = document.getElementById('motivo').value.trim() || null;
-
     try {
       const res = await fetch(`${API_BASE}/solicitudes/${solicitudActual.id_solicitud}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({
-          id_funcionario: idFuncionario,
-          fecha_inicio: fi,
-          fecha_fin: ff,
-          motivo: mot
-        })
+        body: JSON.stringify({ id_funcionario: idFuncionario, fecha_inicio: fi, fecha_fin: ff, motivo: mot })
       });
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error || `Error ${res.status} — ${data.codigo || ''}`);
-
       cerrarModal();
-
-      // Mostrar advertencias del API si las hay
       let msgExtra = '';
       if (data.advertencias && data.advertencias.length)
         msgExtra = '\n\nAdvertencias: ' + data.advertencias.join(' ');
-
       alert(`✓ ${data.mensaje}${msgExtra}\n\nNúmero: ${data.numero_solicitud}\nDías anteriores: ${data.dias_anteriores} → Días nuevos: ${data.dias_nuevos}`);
-
-      // Recargar vista
       cancelarEdicion();
       await cargarPendientes();
-
     } catch(err) {
       cerrarModal();
       mostrarApiError(err.message);
@@ -791,7 +701,6 @@
       document.getElementById(id).classList.remove('show'));
   }
 
-  // ══ UI helpers ══
   function mostrarApiError(msg) {
     document.getElementById('apiErrorMsg').textContent = msg;
     document.getElementById('apiError').classList.add('show');
@@ -806,7 +715,6 @@
     const e = document.getElementById(eId); if (e) e.style.display = 'none';
   }
 
-  // ══ Formateo ══
   function fmt(s) {
     if (!s) return '—';
     const [y, m, d] = s.split('T')[0].split('-');
