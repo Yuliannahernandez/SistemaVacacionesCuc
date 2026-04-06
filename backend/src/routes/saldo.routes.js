@@ -3,6 +3,9 @@
 
 const express = require('express');
 const router  = express.Router();
+const { requireAuth } = require('../middleware/auth');
+const { authorize } = require('../middleware/authorize');
+const { PERMISOS } = require('../security/permissions');
 const {
   obtenerSaldoPropio,
   historialPorDepartamento,
@@ -20,6 +23,9 @@ const {
   getSaldoDisponible,
   getSimulacionLiquidacion,
 } = require('./controllers/saldo.controller');
+
+router.use(requireAuth);
+router.use(authorize(PERMISOS.SALDO));
 
 // ── Saldo propio (legacy) ─────────────────────────────────────────────────────
 router.get('/mio', obtenerSaldoPropio);

@@ -4,6 +4,12 @@
 const express = require('express');
 const router  = express.Router();
 const ctrl    = require('./controllers/catalogos.controller');
+const { requireAuth } = require('../middleware/auth');
+const { authorize } = require('../middleware/authorize');
+const { PERMISOS } = require('../security/permissions');
+
+router.use(requireAuth);
+router.use(authorize(PERMISOS.CATALOGOS));
 
 // GET /api/catalogos/departamentos
 router.get('/departamentos',       ctrl.getDepartamentos);

@@ -570,6 +570,8 @@
         localStorage.setItem('nombramientos',     JSON.stringify(data.nombramientos));
         localStorage.setItem('sessionToken',      data.sessionToken);
         localStorage.setItem('sessionExpiry',     String(data.sessionExpiry));
+        if (data.token) localStorage.setItem('token', data.token);
+        if (data.tokenExpiry) localStorage.setItem('tokenExpiry', String(data.tokenExpiry));
         window.location.href = '../dashboard.html';
         return;
       }

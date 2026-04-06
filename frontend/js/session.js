@@ -26,6 +26,8 @@
                 nombramientos: JSON.parse(localStorage.getItem('nombramientos') || '[]'),
                 sessionToken: localStorage.getItem('sessionToken'),
                 sessionExpiry: parseInt(localStorage.getItem('sessionExpiry') || '0', 10),
+                token: localStorage.getItem('token'),
+                tokenExpiry: parseInt(localStorage.getItem('tokenExpiry') || '0', 10),
             };
         } catch {
             return null;
@@ -34,8 +36,40 @@
 
     // ── Limpiar sesión del localStorage ──────────────────────────────────────
     function limpiarSesion() {
-        ['funcionario', 'tipoNombramiento', 'nombramientos', 'sessionToken', 'sessionExpiry']
+        ['funcionario', 'tipoNombramiento', 'nombramientos', 'sessionToken', 'sessionExpiry', 'token', 'tokenExpiry']
             .forEach(k => localStorage.removeItem(k));
+    }
+
+    // ── Hook fetch: añade Authorization: Bearer <JWT> a llamadas /api/* ────────
+    const _fetch = window.fetch ? window.fetch.bind(window) : null;
+    if (_fetch) {
+        window.fetch = function (input, init) {
+            try {
+                const sesion = getSesion();
+                const token = sesion?.token;
+
+                const url = (typeof input === 'string')
+                    ? input
+                    : (input && typeof input.url === 'string' ? input.url : '');
+
+                const esApi = url.startsWith(API_BASE + '/api/');
+                if (!esApi || !token) return _fetch(input, init);
+                if (url.includes('/api/auth/login')) return _fetch(input, init);
+
+                if (typeof Request !== 'undefined' && input instanceof Request) {
+                    const headers = new Headers(input.headers);
+                    if (!headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`);
+                    const req = new Request(input, { headers });
+                    return _fetch(req, init);
+                }
+
+                const headers = new Headers((init && init.headers) ? init.headers : undefined);
+                if (!headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`);
+                return _fetch(input, { ...(init || {}), headers });
+            } catch {
+                return _fetch(input, init);
+            }
+        };
     }
 
     // ── Cerrar sesión (manual o por inactividad) ─────────────────────────────
@@ -86,7 +120,7 @@
     function validarSesion() {
         const sesion = getSesion();
 
-        if (!sesion || !sesion.funcionario || !sesion.sessionToken) {
+        if (!sesion || !sesion.funcionario || !sesion.sessionToken || !sesion.token) {
             // No hay sesión — redirigir al login
             limpiarSesion();
             window.location.href = LOGIN_URL;

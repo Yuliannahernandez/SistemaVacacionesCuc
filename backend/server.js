@@ -9,7 +9,7 @@ const app = express();
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Access-Token']
 }));
 app.use(express.json());  // ← esto debe ir antes del static
 
@@ -25,6 +25,12 @@ const db = require("./src/routes/controllers/db");
 db.query("SELECT 1")
   .then(() => console.log(" Conectado a MySQL Aiven"))
   .catch((err) => console.error(" Error de conexión:", err.message));
+
+// ── Init tablas de seguridad (auditoría / confirmaciones) ───────────────────
+const { initSecurityTables } = require('./src/db/init');
+initSecurityTables(db)
+  .then(() => console.log(' Tablas de seguridad verificadas'))
+  .catch((err) => console.warn(' Aviso: no se pudieron inicializar tablas de seguridad:', err.message));
 
 // ── Rutas API ─────────────────────────────────────────────────────────────
 const autenticacionRoutes = require('./src/routes/autenticacion.routes');
@@ -44,6 +50,9 @@ app.use('/api/registro', registroRoutes);
 
 const catalogosRoutes = require('./src/routes/catalogos.routes');
 app.use('/api/catalogos', catalogosRoutes);
+
+const usuariosRoutes = require('./src/routes/usuarios.routes');
+app.use('/api/usuarios', usuariosRoutes);
 
 
 

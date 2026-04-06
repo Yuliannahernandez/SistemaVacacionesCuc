@@ -3,6 +3,7 @@
 
 const db = require('./db');
 const crypto = require('crypto');
+const { createToken } = require('../../security/jwt');
 
 const MAX_INTENTOS = 3; // V4: bloquear al superar 3 intentos fallidos
 
@@ -136,6 +137,14 @@ exports.login = async (req, res) => {
         const sessionToken = crypto.randomUUID();
         const sessionExpiry = Date.now() + (10 * 60 * 1000);
 
+        // JWT (RQ-SVC-2026-01 Tipos de Usuario / token válido)
+        const jwtExpiresInSeconds = 8 * 60 * 60; // 8 horas
+        const token = createToken(
+            { sub: funcionario.id_funcionario, usuario: funcionario.usuario, rol: funcionario.rol },
+            { expiresInSeconds: jwtExpiresInSeconds }
+        );
+        const tokenExpiry = Date.now() + (jwtExpiresInSeconds * 1000);
+
         // Registrar inicio de sesión exitoso (Paso 7 del RQ)
         await registrarAuditoria({
             usuario: usuarioLimpio, id_funcionario: funcionario.id_funcionario,
@@ -185,6 +194,8 @@ exports.login = async (req, res) => {
             codigo: 'MSG-SEG-001',
             sessionToken,
             sessionExpiry,
+            token,
+            tokenExpiry,
             funcionario: funcionarioPublico,
             tipoNombramiento,
             nombramientos

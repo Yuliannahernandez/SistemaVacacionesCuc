@@ -1,11 +1,17 @@
 const express = require("express");
 const router = express.Router();
+const { requireAuth } = require('../middleware/auth');
+const { authorize } = require('../middleware/authorize');
+const { PERMISOS } = require('../security/permissions');
 const {
   listarPendientes,
   aprobarSolicitud,
   rechazarSolicitud,
   todasLasSolicitudes,
 } = require("./controllers/aprobacion.controller");
+
+router.use(requireAuth);
+router.use(authorize(PERMISOS.APROBACION));
 
 // GET  /api/aprobacion/pendientes?id_departamento=X
 router.get("/pendientes", listarPendientes);

@@ -2025,7 +2025,7 @@
       window.toggleGroup = function (id) { const g = document.getElementById('grp-' + id); const o = g.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(x => x.classList.remove('open')); document.getElementById('userWrap').classList.remove('open'); if (!o) g.classList.add('open') };
       document.addEventListener('click', e => { if (!e.target.closest('.nav-group')) document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open')); if (!e.target.closest('.user-wrap')) document.getElementById('userWrap')?.classList.remove('open') });
       window.toggleUserMenu = function () { const w = document.getElementById('userWrap'); const o = w.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open')); w.classList.toggle('open', !o) };
-      window.logout = function () { if (confirm('¿Cerrar sesión?')) { localStorage.clear(); window.location.href = '../autenticacion/login.html'; } };
+      // `logout()` lo expone `frontend/js/session.js` para registrar auditoría y limpiar sesión.
 
       // ── Arranque ──────────────────────────────────────────────────────────
       calcSim();

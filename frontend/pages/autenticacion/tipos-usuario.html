@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGEVAC • Gestión de Tipos de Usuario</title>
+  <style>
+    :root { --bg:#06162d; --card:rgba(255,255,255,0.06); --stroke:rgba(125,166,216,0.14); --txt:rgba(204,220,240,0.9); --mut:rgba(204,220,240,0.55); --pri:#7da6d8; }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:radial-gradient(1200px 700px at 20% 0%, rgba(125,166,216,0.18), transparent 55%), var(--bg); color:var(--txt);}
+    .wrap{padding:88px 20px 28px; max-width:1100px; margin:0 auto;}
+    .card{background:var(--card); border:1px solid var(--stroke); border-radius:14px; padding:16px;}
+    h1{font-size:18px;margin:0 0 12px; font-weight:600;}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    input,select,button{border-radius:10px;border:1px solid rgba(255,255,255,0.12); background:rgba(0,0,0,0.15); color:var(--txt); padding:10px 12px; font-size:13px;}
+    input{min-width:280px; flex:1;}
+    button{cursor:pointer; background:rgba(125,166,216,0.14); border-color:rgba(125,166,216,0.2);}
+    button:disabled{opacity:.5; cursor:not-allowed;}
+    .msg{margin-top:10px; font-size:12.5px; color:var(--mut);}
+    .msg.err{color:#ffb4b4;}
+    .msg.ok{color:#b8ffd2;}
+    table{width:100%; border-collapse:separate; border-spacing:0; margin-top:14px; font-size:12.5px;}
+    th,td{padding:10px 10px; border-bottom:1px solid rgba(255,255,255,0.08); vertical-align:middle;}
+    th{color:rgba(204,220,240,0.6); font-weight:600; text-align:left;}
+    td small{color:rgba(204,220,240,0.5);}
+    .pill{display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid rgba(125,166,216,0.2); color:rgba(125,166,216,0.9); font-size:11px;}
+    .pager{display:flex; gap:8px; justify-content:flex-end; margin-top:12px; align-items:center; color:rgba(204,220,240,0.6); font-size:12px;}
+  </style>
+</head>
+<body>
+  <script src="/frontend/components/navbar.js"></script>
+  <script src="/frontend/js/session.js"></script>
+  <app-navbar></app-navbar>
+
+  <div class="wrap">
+    <div class="card">
+      <h1>Gestión de Tipos de Usuario</h1>
+      <div class="row">
+        <input id="search" placeholder="Buscar por nombre, cédula, usuario o correo…" />
+        <button id="btnBuscar">Buscar</button>
+        <button id="btnRefrescar" title="Recargar">Recargar</button>
+      </div>
+      <div id="msg" class="msg"></div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Código</th>
+            <th>Área</th>
+            <th>Estado</th>
+            <th>Tipo</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+
+      <div class="pager">
+        <button id="prev">Anterior</button>
+        <span id="pageInfo">Página 1</span>
+        <button id="next">Siguiente</button>
+      </div>
+      <div class="msg" id="confirmHint" style="display:none;"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+    const tbody = document.getElementById('tbody');
+    const msgEl = document.getElementById('msg');
+    const confirmHint = document.getElementById('confirmHint');
+
+    let tipos = [];
+    let page = 1;
+    let total = 0;
+    const pageSize = 20;
+
+    function setMsg(text, type) {
+      msgEl.textContent = text || '';
+      msgEl.className = 'msg' + (type ? (' ' + type) : '');
+    }
+
+    function showConfirmHint(confirmationId) {
+      confirmHint.style.display = '';
+      confirmHint.className = 'msg';
+      confirmHint.textContent = `MSG-TU-ADV-001: Se generó una confirmación (ID: ${confirmationId}). Un segundo Administrador debe confirmar en 120s usando la API POST /api/usuarios/confirmaciones/${confirmationId}/confirmar.`;
+    }
+
+    function tipoLabel(value) {
+      const t = tipos.find(x => x.value === value);
+      return t ? t.label : value;
+    }
+
+    async function cargarTipos() {
+      const res = await fetch(`${API_BASE}/api/usuarios/tipos`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'No se pudo cargar el catálogo.');
+      tipos = data.tipos || [];
+    }
+
+    async function cargarUsuarios() {
+      const search = (document.getElementById('search').value || '').trim();
+      confirmHint.style.display = 'none';
+      setMsg('MSG-TU-INFO-001: Cargando listado de usuarios...', '');
+
+      const url = new URL(`${API_BASE}/api/usuarios`);
+      url.searchParams.set('page', String(page));
+      if (search) url.searchParams.set('search', search);
+
+      const res = await fetch(url.toString());
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Error al cargar.');
+
+      total = data.total || 0;
+      render(data.usuarios || []);
+      const maxPage = Math.max(1, Math.ceil(total / pageSize));
+      document.getElementById('pageInfo').textContent = `Página ${page} de ${maxPage} (${total} usuarios)`;
+      setMsg('', '');
+    }
+
+    function render(rows) {
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><small>MSG-TU-INFO-003: No se encontraron usuarios con el criterio ingresado.</small></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map(u => {
+        const nombre = [u.nombre, u.apellido1, u.apellido2].filter(Boolean).join(' ');
+        const estado = (u.estado || '').toLowerCase();
+        const rol = (u.rol || '').toLowerCase();
+        const options = tipos.map(t => `<option value="${t.value}" ${t.value === rol ? 'selected' : ''}>${t.label}</option>`).join('');
+        return `
+          <tr data-id="${u.id_funcionario}">
+            <td>${nombre}<br><small>@${u.id_funcionario}</small></td>
+            <td>${u.codigo || '—'}</td>
+            <td>${u.area || '—'}</td>
+            <td><span class="pill">${estado || '—'}</span></td>
+            <td>
+              <select class="sel">${options}</select>
+            </td>
+            <td>
+              <button class="btnGuardar">Guardar</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      tbody.querySelectorAll('.btnGuardar').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const tr = e.target.closest('tr');
+          const id = tr.getAttribute('data-id');
+          const sel = tr.querySelector('.sel');
+          await guardarTipo(id, sel.value);
+        });
+      });
+    }
+
+    async function guardarTipo(id, tipoUsuario) {
+      setMsg('Guardando...', '');
+      confirmHint.style.display = 'none';
+      const res = await fetch(`${API_BASE}/api/usuarios/${id}/tipo`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipoUsuario })
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.status === 409 && data?.codigo === 'MSG-TU-ADV-001' && data?.confirmationId) {
+        setMsg(data.error, 'err');
+        showConfirmHint(data.confirmationId);
+        return;
+      }
+
+      if (!res.ok) {
+        setMsg(data?.error || 'Error al guardar.', 'err');
+        return;
+      }
+
+      setMsg(data?.mensaje || 'MSG-TU-001', 'ok');
+      await cargarUsuarios();
+    }
+
+    document.getElementById('btnBuscar').addEventListener('click', () => { page = 1; cargarUsuarios().catch(err => setMsg(err.message, 'err')); });
+    document.getElementById('btnRefrescar').addEventListener('click', () => cargarUsuarios().catch(err => setMsg(err.message, 'err')));
+    document.getElementById('prev').addEventListener('click', () => { if (page > 1) { page--; cargarUsuarios().catch(err => setMsg(err.message, 'err')); } });
+    document.getElementById('next').addEventListener('click', () => { const maxPage = Math.max(1, Math.ceil(total / pageSize)); if (page < maxPage) { page++; cargarUsuarios().catch(err => setMsg(err.message, 'err')); } });
+
+    (async function init() {
+      try {
+        await cargarTipos();
+        await cargarUsuarios();
+      } catch (err) {
+        setMsg(err.message || 'Error inicializando.', 'err');
+      }
+    })();
+  </script>
+</body>
+</html>
+

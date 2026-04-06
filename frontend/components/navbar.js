@@ -138,6 +138,7 @@ class AppNavbar extends HTMLElement {
           <div class="nav-submenu">
             <a class="nav-sub-item ${path.includes('autenticacion/registrar') ? 'active' : ''}" href="/frontend/pages/autenticacion/registrar.html">Registro de Funcionarios</a>
             <a class="nav-sub-item ${path.includes('editar-funcionario') ? 'active' : ''}" href="/frontend/pages/autenticacion/editar-funcionario.html">Modificación de Funcionarios</a>
+            <a id="navTiposUsuario" class="nav-sub-item ${path.includes('autenticacion/tipos-usuario') ? 'active' : ''}" href="/frontend/pages/autenticacion/tipos-usuario.html">Gestión de Tipos de Usuario</a>
           </div>
         </div>
 
@@ -229,6 +230,8 @@ class AppNavbar extends HTMLElement {
     const nombre = funcionario.nombre || 'Usuario';
     const rol    = (funcionario.rol   || '').toLowerCase();
 
+    this._applyMenuPermisos(rol);
+
     // ── Normalizar array de nombramientos ─────────────────────────────────
     // Soporta: array directo, objeto con clave 'data', 'nombramientos', o 'rows'
     let raw = null;
@@ -307,6 +310,27 @@ class AppNavbar extends HTMLElement {
     // ── Más de 1: construir dropdown ──────────────────────────────────────
     console.log('[Navbar] Construyendo dropdown con', nombramientos.length, 'nombramientos');
     this._buildDropdown(nombramientos, indexActivo);
+  }
+
+  _applyMenuPermisos(rol) {
+    const grpAuth = this.querySelector('#grp-auth');
+    const grpAprob = this.querySelector('#grp-aprobacion');
+    const linkTipos = this.querySelector('#navTiposUsuario');
+
+    // Autenticación (registro/modificación) solo RRHH o Admin
+    if (grpAuth) {
+      grpAuth.style.display = (rol === 'rrhh' || rol === 'admin') ? '' : 'none';
+    }
+
+    // Gestión de tipos de usuario solo Admin
+    if (linkTipos) {
+      linkTipos.style.display = (rol === 'admin') ? '' : 'none';
+    }
+
+    // Aprobación solo Jefe, RRHH o Admin
+    if (grpAprob) {
+      grpAprob.style.display = (rol === 'jefe' || rol === 'rrhh' || rol === 'admin') ? '' : 'none';
+    }
   }
 
   /** Actualiza el pill label con el nombramiento dado */
