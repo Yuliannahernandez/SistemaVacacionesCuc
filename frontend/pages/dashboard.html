@@ -1273,253 +1273,321 @@
     <script src="/frontend/js/session.js"></script>
     <app-navbar></app-navbar>
 
-    <script>
-        // ── Constantes ────────────────────────────────────────────────────────
-        const HOLIDAYS = [
-            { d: 1, m: 1, name: 'Año Nuevo', pay: true },
-            { d: 2, m: 4, name: 'Jueves Santo', pay: true },
-            { d: 3, m: 4, name: 'Viernes Santo', pay: true },
-            { d: 11, m: 4, name: 'Juan Santamaría', pay: true },
-            { d: 1, m: 5, name: 'Día del Trabajo', pay: true },
-            { d: 25, m: 7, name: 'Anexión de Nicoya', pay: true },
-            { d: 2, m: 8, name: 'Virgen de los Ángeles', pay: false },
-            { d: 15, m: 8, name: 'Día de la Madre', pay: true },
-            { d: 31, m: 8, name: 'Día de la Persona Negra', pay: false },
-            { d: 15, m: 9, name: 'Independencia', pay: true },
-            { d: 1, m: 12, name: 'Abolición del Ejército', pay: false },
-            { d: 25, m: 12, name: 'Navidad', pay: true }
-        ];
-        const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        const WDAYS = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
-        const NOMBRAMIENTOS = {
-            propiedad: { disp: 15, acum: 20 },
-            interino: { disp: 4, acum: 6 }
-        };
+    <script src="/frontend/components/navbar.js"></script>
+<script src="/frontend/js/session.js"></script>
+<app-navbar></app-navbar>
 
-        // ── Fecha ─────────────────────────────────────────────────────────────
-        const today = new Date();
-        let curMonth = today.getMonth();
-        const fd = today.toLocaleDateString('es-CR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        const fdc = fd.charAt(0).toUpperCase() + fd.slice(1);
-        document.getElementById('navDate').textContent = fdc;
-        document.getElementById('greetDate').textContent = fdc;
+<script>
+    // ═══════════════════════════════════════════════════════════════
+    // CONSTANTES
+    // ═══════════════════════════════════════════════════════════════
+    const HOLIDAYS = [
+        { d: 1,  m: 1,  name: 'Año Nuevo',                pay: true  },
+        { d: 2,  m: 4,  name: 'Jueves Santo',              pay: true  },
+        { d: 3,  m: 4,  name: 'Viernes Santo',             pay: true  },
+        { d: 11, m: 4,  name: 'Juan Santamaría',           pay: true  },
+        { d: 1,  m: 5,  name: 'Día del Trabajo',           pay: true  },
+        { d: 25, m: 7,  name: 'Anexión de Nicoya',         pay: true  },
+        { d: 2,  m: 8,  name: 'Virgen de los Ángeles',     pay: false },
+        { d: 15, m: 8,  name: 'Día de la Madre',           pay: true  },
+        { d: 31, m: 8,  name: 'Día de la Persona Negra',   pay: false },
+        { d: 15, m: 9,  name: 'Independencia',             pay: true  },
+        { d: 1,  m: 12, name: 'Abolición del Ejército',    pay: false },
+        { d: 25, m: 12, name: 'Navidad',                   pay: true  }
+    ];
+    const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const WDAYS  = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
 
-        // ── Sesión: nombre y rol ──────────────────────────────────────────────
-        const funcionario = JSON.parse(localStorage.getItem('funcionario') || '{}');
-        const nombre = funcionario.nombre || 'Usuario';
-        const ROL = (funcionario.rol || '').toLowerCase();
+    // ═══════════════════════════════════════════════════════════════
+    // FUNCIONES — se definen TODAS antes de cualquier ejecución
+    // ═══════════════════════════════════════════════════════════════
 
-        // Solo el primer nombre en el saludo
-        document.getElementById('greetName').textContent = nombre.split(' ')[0];
+    // ── Balance visual de un pill ─────────────────────────────────
+    function updateBalance(pill) {
+        const disp = parseFloat(pill.dataset.disp) || 0;
+        const acum = parseFloat(pill.dataset.acum) || 0;
+        const pct  = acum > 0 ? Math.round((disp / acum) * 100) : 0;
 
-        // Roles que NO tienen nombramiento propio
-        const ROLES_ADMIN = ['rrhh', 'jefe', 'admin'];
-        const esAdministrador = ROLES_ADMIN.includes(ROL);
+        document.getElementById('balNum').textContent  = disp % 1 === 0 ? disp : disp.toFixed(1);
+        document.getElementById('balSub').textContent  = `De ${acum} días acumulados`;
+        document.getElementById('balAcum').textContent = `${pct}% disponible`;
+        setTimeout(() => {
+            document.getElementById('balFill').style.width = Math.min(pct, 100) + '%';
+        }, 50);
+    }
 
-        // ── Construir card de saldo según rol ─────────────────────────────────
-        const saldoCard = document.getElementById('saldoCard');
+    // ── Seleccionar nombramiento (pill) ───────────────────────────
+    function selectNom(el) {
+        document.querySelectorAll('.nom-pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        updateBalance(el);
 
-        if (esAdministrador) {
-            // Mostrar mensaje informativo sin nombramientos
-            const etiquetaRol = ROL === 'rrhh' ? 'RRHH' : ROL.charAt(0).toUpperCase() + ROL.slice(1);
-            saldoCard.insertAdjacentHTML('beforeend', `
-                <div class="no-nom-msg">
-                    <div class="no-nom-icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                    </div>
-                    <div class="no-nom-text">
-                        Este perfil no tiene<br>nombramientos asociados.
-                    </div>
-                    <span class="rol-badge">${etiquetaRol}</span>
-                </div>
-            `);
-        } else {
-            const nombramientosGuardados = JSON.parse(localStorage.getItem('nombramientos') || '[]');
-
-            // Recuperar el nombramiento activo que eligió en el navbar
-            const nomActivo = JSON.parse(localStorage.getItem('tipoNombramiento') || 'null');
-            const idActivo = nomActivo?.id_nombramiento ?? null;
-
-            const pillsHtml = nombramientosGuardados.length > 0
-                ? nombramientosGuardados.map((n, i) => {
-                    const idEste = n.id_nombramiento;
-                    const activo = idActivo ? idEste === idActivo : i === 0;
-                    const nombre = n.nombre_tipo || '—';
-                    const disp = n.dias_vacaciones_disponibles ?? funcionario.dias_vacaciones_disponibles ?? 0;
-                    const acum = n.dias_vacaciones_acumulados ?? funcionario.dias_vacaciones_acumulados ?? 0;
-                    return `
-              <div class="nom-pill ${activo ? 'active' : ''}"
-                   data-id="${idEste}"
-                   data-disp="${disp}"
-                   data-acum="${acum}"
-                   onclick="selectNom(this)">
-                <span class="nom-pill-name">${nombre}</span>
-                <span class="nom-pill-sub">${n.numero_nombramiento ? 'Nº ' + n.numero_nombramiento : ''}</span>
-              </div>`;
-                }).join('')
-                : `<div class="nom-pill active" data-disp="${funcionario.dias_vacaciones_disponibles ?? 0}" data-acum="${funcionario.dias_vacaciones_acumulados ?? 0}" onclick="selectNom(this)">
-               <span class="nom-pill-name">${JSON.parse(localStorage.getItem('tipoNombramiento') || '{}').nombre_tipo || 'Mi nombramiento'}</span>
-           </div>`;
-
-            saldoCard.insertAdjacentHTML('beforeend', `
-        <div class="nom-pills" id="nomPills">${pillsHtml}</div>
-        <div class="balance-main">
-            <div class="balance-num" id="balNum">—</div>
-            <div class="balance-unit">días disp.</div>
-        </div>
-        <div class="balance-bar">
-            <div class="balance-fill" id="balFill" style="width:0%"></div>
-        </div>
-        <div class="balance-sub"  id="balSub">—</div>
-        <div class="balance-acum" id="balAcum">—</div>
-    `);
-
-            const primerPill = saldoCard.querySelector('.nom-pill.active') || saldoCard.querySelector('.nom-pill');
-            if (primerPill) updateBalance(primerPill);
+        const id  = parseInt(el.dataset.id);
+        const noms = JSON.parse(localStorage.getItem('nombramientos') || '[]');
+        const nom  = noms.find(n => n.id_nombramiento === id);
+        if (nom) {
+            localStorage.setItem('tipoNombramiento', JSON.stringify(nom));
+            localStorage.setItem('id_nombramiento_activo', id.toString());
         }
+    }
 
-        // ── Seleccionar nombramiento ──────────────────────────────────────────
-        function selectNom(el) {
-            document.querySelectorAll('.nom-pill').forEach(p => p.classList.remove('active'));
-            el.classList.add('active');
-            updateBalance(el);
+    // ── Cargar saldos reales desde el API y refrescar pills ───────
+    async function cargarSaldosDesdeAPI() {
+        const f  = JSON.parse(localStorage.getItem('funcionario') || '{}');
+        const id = f.id_funcionario || f.id;
+        if (!id) return;
 
-            // Sincronizar con el navbar: guardar el nombramiento seleccionado
-            const id = parseInt(el.dataset.id);
-            const noms = JSON.parse(localStorage.getItem('nombramientos') || '[]');
-            const nom = noms.find(n => n.id_nombramiento === id);
-            if (nom) {
-                localStorage.setItem('tipoNombramiento', JSON.stringify(nom));
-                localStorage.setItem('id_nombramiento_activo', id.toString());
-            }
-        }
+        try {
+            const res = await fetch(`/api/saldo/disponible/${id}`, { credentials: 'include' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
 
-        function updateBalance(pill) {
-            const disp = parseFloat(pill.dataset.disp) || 0;
-            const acum = parseFloat(pill.dataset.acum) || 0;
-            const pct = acum > 0 ? Math.round((disp / acum) * 100) : 0;
-
-            document.getElementById('balNum').textContent = disp % 1 === 0 ? disp : disp.toFixed(1);
-            document.getElementById('balSub').textContent = `De ${acum} días acumulados`;
-            document.getElementById('balAcum').textContent = `${pct}% disponible`;
-            setTimeout(() => {
-                document.getElementById('balFill').style.width = Math.min(pct, 100) + '%';
-            }, 50);
-        }
-
-        // ── Navbar / tema / sesión ────────────────────────────────────────────
-        function toggleGroup(id) {
-            const grp = document.getElementById('grp-' + id);
-            const isOpen = grp.classList.contains('open');
-            document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
-            document.getElementById('userWrap').classList.remove('open');
-            if (!isOpen) grp.classList.add('open');
-        }
-
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.nav-group')) document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
-            if (!e.target.closest('.user-wrap')) document.getElementById('userWrap').classList.remove('open');
-        });
-
-        function toggleUserMenu() {
-            const wrap = document.getElementById('userWrap');
-            const isOpen = wrap.classList.contains('open');
-            document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
-            wrap.classList.toggle('open', !isOpen);
-        }
-
-        function toggleTheme() {
-            const html = document.documentElement;
-            const dark = html.getAttribute('data-theme') === 'dark';
-            html.setAttribute('data-theme', dark ? 'light' : 'dark');
-            const icon = document.getElementById('themeIcon');
-            icon.innerHTML = dark
-                ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
-                : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-        }
-
-        function logout() {
-            if (confirm('¿Cerrar sesión?')) {
-                localStorage.clear();
-                window.location.href = 'autenticacion/login.html';
-            }
-        }
-
-        // ── Tooltip ───────────────────────────────────────────────────────────
-        const tt = document.getElementById('tt');
-        function showTT(e, name, type) { document.getElementById('ttName').textContent = name; document.getElementById('ttType').textContent = type; tt.classList.add('show'); moveTT(e); }
-        function moveTT(e) { tt.style.left = Math.min(e.clientX + 12, window.innerWidth - 180) + 'px'; tt.style.top = (e.clientY - 48) + 'px'; }
-        function hideTT() { tt.classList.remove('show'); }
-
-        // ── Calendario ────────────────────────────────────────────────────────
-        function buildCal(mo) {
-            curMonth = mo;
-            document.getElementById('calMonthLabel').textContent = MONTHS[mo];
-            const hdr = document.getElementById('weekHdr');
-            hdr.innerHTML = '';
-            WDAYS.forEach(d => { const el = document.createElement('div'); el.className = 'wday'; el.textContent = d; hdr.appendChild(el); });
-            const grid = document.getElementById('calGrid');
-            grid.innerHTML = '';
-            const first = new Date(2026, mo, 1).getDay();
-            const total = new Date(2026, mo + 1, 0).getDate();
-            for (let i = 0; i < first; i++) { const e = document.createElement('div'); e.className = 'day empty'; grid.appendChild(e); }
-            for (let d = 1; d <= total; d++) {
-                const cell = document.createElement('div');
-                cell.className = 'day';
-                cell.textContent = d;
-                const dow = new Date(2026, mo, d).getDay();
-                const hol = HOLIDAYS.find(h => h.d === d && h.m === mo + 1);
-                const isT = (today.getFullYear() === 2026 && today.getMonth() === mo && today.getDate() === d);
-                if (isT) {
-                    cell.classList.add('today');
-                } else if (hol) {
-                    cell.classList.add(hol.pay ? 'holiday' : 'nopay');
-                    const tipo = hol.pay ? 'Pago obligatorio' : 'No obligatorio';
-                    cell.addEventListener('mouseenter', e => showTT(e, hol.name, tipo));
-                    cell.addEventListener('mousemove', moveTT);
-                    cell.addEventListener('mouseleave', hideTT);
-                    const dot = document.createElement('div'); dot.className = 'day-dot'; cell.appendChild(dot);
-                } else if (dow === 0 || dow === 6) {
-                    cell.classList.add('weekend');
+            // Sobreescribir data-disp y data-acum de cada pill con valores reales
+            (data.saldos_por_nombramiento || []).forEach(nom => {
+                const pill = document.querySelector(`.nom-pill[data-id="${nom.id_nombramiento}"]`);
+                if (pill) {
+                    pill.dataset.disp = nom.dias_disponibles;
+                    pill.dataset.acum = nom.dias_acumulados;
                 }
-                grid.appendChild(cell);
-            }
+            });
+
+            // Refrescar la visualización del pill activo con datos reales
+            const pillActivo = document.querySelector('.nom-pill.active');
+            if (pillActivo) updateBalance(pillActivo);
+
+        } catch (err) {
+            // Fallback silencioso: las pills ya muestran los datos del localStorage
+            console.warn('Saldo API no disponible, mostrando datos del localStorage:', err.message);
+        }
+    }
+
+    // ── Tooltip ───────────────────────────────────────────────────
+    const tt = document.getElementById('tt');
+    function showTT(e, name, type) {
+        document.getElementById('ttName').textContent = name;
+        document.getElementById('ttType').textContent = type;
+        tt.classList.add('show');
+        moveTT(e);
+    }
+    function moveTT(e) {
+        tt.style.left = Math.min(e.clientX + 12, window.innerWidth - 180) + 'px';
+        tt.style.top  = (e.clientY - 48) + 'px';
+    }
+    function hideTT() { tt.classList.remove('show'); }
+
+    // ── Calendario ────────────────────────────────────────────────
+    let curMonth = new Date().getMonth();
+
+    function buildCal(mo) {
+        curMonth = mo;
+        document.getElementById('calMonthLabel').textContent = MONTHS[mo];
+
+        const hdr = document.getElementById('weekHdr');
+        hdr.innerHTML = '';
+        WDAYS.forEach(d => {
+            const el = document.createElement('div');
+            el.className   = 'wday';
+            el.textContent = d;
+            hdr.appendChild(el);
+        });
+
+        const grid  = document.getElementById('calGrid');
+        grid.innerHTML = '';
+        const today = new Date();
+        const first = new Date(2026, mo, 1).getDay();
+        const total = new Date(2026, mo + 1, 0).getDate();
+
+        for (let i = 0; i < first; i++) {
+            const e = document.createElement('div');
+            e.className = 'day empty';
+            grid.appendChild(e);
         }
 
-        function prevMonth() { buildCal(curMonth > 0 ? curMonth - 1 : 0); }
-        function nextMonth() { buildCal(curMonth < 11 ? curMonth + 1 : 11); }
-        buildCal(today.getMonth());
+        for (let d = 1; d <= total; d++) {
+            const cell = document.createElement('div');
+            cell.className  = 'day';
+            cell.textContent = d;
+            const dow = new Date(2026, mo, d).getDay();
+            const hol = HOLIDAYS.find(h => h.d === d && h.m === mo + 1);
+            const isT = (today.getFullYear() === 2026 && today.getMonth() === mo && today.getDate() === d);
 
-        // ── Próximos feriados ─────────────────────────────────────────────────
-        const upcoming = HOLIDAYS.filter(h => new Date(2026, h.m - 1, h.d) >= today).slice(0, 5);
-        const hl = document.getElementById('holidayList');
-        upcoming.forEach(h => {
-            const item = document.createElement('div');
-            item.className = 'h-item';
-            item.innerHTML = `
-                <div class="h-badge${h.pay ? '' : ' np'}">
-                    <div class="h-day">${h.d}</div>
-                    <div class="h-mon">${MONTHS[h.m - 1].slice(0, 3)}</div>
+            if (isT) {
+                cell.classList.add('today');
+            } else if (hol) {
+                cell.classList.add(hol.pay ? 'holiday' : 'nopay');
+                const tipo = hol.pay ? 'Pago obligatorio' : 'No obligatorio';
+                cell.addEventListener('mouseenter', e => showTT(e, hol.name, tipo));
+                cell.addEventListener('mousemove', moveTT);
+                cell.addEventListener('mouseleave', hideTT);
+                const dot = document.createElement('div');
+                dot.className = 'day-dot';
+                cell.appendChild(dot);
+            } else if (dow === 0 || dow === 6) {
+                cell.classList.add('weekend');
+            }
+            grid.appendChild(cell);
+        }
+    }
+
+    function prevMonth() { buildCal(curMonth > 0  ? curMonth - 1 : 0); }
+    function nextMonth() { buildCal(curMonth < 11 ? curMonth + 1 : 11); }
+
+    // ── Navbar ────────────────────────────────────────────────────
+    function toggleGroup(id) {
+        const grp    = document.getElementById('grp-' + id);
+        const isOpen = grp.classList.contains('open');
+        document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
+        document.getElementById('userWrap').classList.remove('open');
+        if (!isOpen) grp.classList.add('open');
+    }
+
+    function toggleUserMenu() {
+        const wrap   = document.getElementById('userWrap');
+        const isOpen = wrap.classList.contains('open');
+        document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
+        wrap.classList.toggle('open', !isOpen);
+    }
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        const dark = html.getAttribute('data-theme') === 'dark';
+        html.setAttribute('data-theme', dark ? 'light' : 'dark');
+        document.getElementById('themeIcon').innerHTML = dark
+            ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+            : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+    }
+
+    function logout() {
+        if (confirm('¿Cerrar sesión?')) {
+            localStorage.clear();
+            window.location.href = 'autenticacion/login.html';
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // EJECUCIÓN — solo después de que todas las funciones están listas
+    // ═══════════════════════════════════════════════════════════════
+
+    // ── Fecha ─────────────────────────────────────────────────────
+    const today = new Date();
+    const fd    = today.toLocaleDateString('es-CR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    const fdc   = fd.charAt(0).toUpperCase() + fd.slice(1);
+    document.getElementById('navDate').textContent   = fdc;
+    document.getElementById('greetDate').textContent = fdc;
+
+    // ── Sesión ────────────────────────────────────────────────────
+    const funcionario  = JSON.parse(localStorage.getItem('funcionario') || '{}');
+    const nombre       = funcionario.nombre || 'Usuario';
+    const ROL          = (funcionario.rol || '').toLowerCase();
+    const ROLES_ADMIN  = ['rrhh', 'jefe', 'admin'];
+    const esAdministrador = ROLES_ADMIN.includes(ROL);
+
+    document.getElementById('greetName').textContent = nombre.split(' ')[0];
+
+    // ── Card de saldo ─────────────────────────────────────────────
+    const saldoCard = document.getElementById('saldoCard');
+
+    if (esAdministrador) {
+        const etiquetaRol = ROL === 'rrhh' ? 'RRHH' : ROL.charAt(0).toUpperCase() + ROL.slice(1);
+        saldoCard.insertAdjacentHTML('beforeend', `
+            <div class="no-nom-msg">
+                <div class="no-nom-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
                 </div>
-                <div>
-                    <div class="h-name">${h.name}</div>
-                    <div class="h-type">${h.pay ? 'Pago obligatorio' : 'No obligatorio'}</div>
-                </div>`;
-            hl.appendChild(item);
-        });
-        document.addEventListener('nombramiento-changed', (e) => {
-            const nom = e.detail;
-            const pill = document.querySelector(`.nom-pill[data-id="${nom.id_nombramiento}"]`);
-            if (pill) selectNom(pill);
-        });
+                <div class="no-nom-text">Este perfil no tiene<br>nombramientos asociados.</div>
+                <span class="rol-badge">${etiquetaRol}</span>
+            </div>
+        `);
 
+    } else {
+        const nombramientosGuardados = JSON.parse(localStorage.getItem('nombramientos') || '[]');
+        const nomActivo  = JSON.parse(localStorage.getItem('tipoNombramiento') || 'null');
+        const idActivo   = nomActivo?.id_nombramiento ?? null;
 
-    </script>
+        // Pills — con datos del localStorage como placeholder inicial
+        // (se sobreescriben con datos reales al terminar cargarSaldosDesdeAPI)
+        const pillsHtml = nombramientosGuardados.length > 0
+            ? nombramientosGuardados.map((n, i) => {
+                const idEste = n.id_nombramiento;
+                const activo = idActivo ? idEste === idActivo : i === 0;
+                const disp   = n.dias_vacaciones_disponibles ?? funcionario.dias_vacaciones_disponibles ?? 0;
+                const acum   = n.dias_vacaciones_acumulados  ?? funcionario.dias_vacaciones_acumulados  ?? 0;
+                return `
+                    <div class="nom-pill ${activo ? 'active' : ''}"
+                         data-id="${idEste}"
+                         data-disp="${disp}"
+                         data-acum="${acum}"
+                         onclick="selectNom(this)">
+                        <span class="nom-pill-name">${n.nombre_tipo || '—'}</span>
+                        <span class="nom-pill-sub">${n.numero_nombramiento ? 'Nº ' + n.numero_nombramiento : ''}</span>
+                    </div>`;
+            }).join('')
+            : `<div class="nom-pill active"
+                    data-disp="${funcionario.dias_vacaciones_disponibles ?? 0}"
+                    data-acum="${funcionario.dias_vacaciones_acumulados  ?? 0}"
+                    onclick="selectNom(this)">
+                   <span class="nom-pill-name">${JSON.parse(localStorage.getItem('tipoNombramiento') || '{}').nombre_tipo || 'Mi nombramiento'}</span>
+               </div>`;
+
+        saldoCard.insertAdjacentHTML('beforeend', `
+            <div class="nom-pills" id="nomPills">${pillsHtml}</div>
+            <div class="balance-main">
+                <div class="balance-num" id="balNum">—</div>
+                <div class="balance-unit">días disp.</div>
+            </div>
+            <div class="balance-bar">
+                <div class="balance-fill" id="balFill" style="width:0%"></div>
+            </div>
+            <div class="balance-sub"  id="balSub">—</div>
+            <div class="balance-acum" id="balAcum">—</div>
+        `);
+
+        // 1. Mostrar placeholder con datos del localStorage inmediatamente
+        const primerPill = saldoCard.querySelector('.nom-pill.active') || saldoCard.querySelector('.nom-pill');
+        if (primerPill) updateBalance(primerPill); // ✅ updateBalance ya está definida arriba
+
+        // 2. Luego sobreescribir con datos reales del API
+        cargarSaldosDesdeAPI(); // ✅ también ya está definida arriba
+    }
+
+    // ── Calendario ────────────────────────────────────────────────
+    buildCal(today.getMonth());
+
+    // ── Próximos feriados ─────────────────────────────────────────
+    const upcoming = HOLIDAYS.filter(h => new Date(2026, h.m - 1, h.d) >= today).slice(0, 5);
+    const hl = document.getElementById('holidayList');
+    upcoming.forEach(h => {
+        const item = document.createElement('div');
+        item.className = 'h-item';
+        item.innerHTML = `
+            <div class="h-badge${h.pay ? '' : ' np'}">
+                <div class="h-day">${h.d}</div>
+                <div class="h-mon">${MONTHS[h.m - 1].slice(0, 3)}</div>
+            </div>
+            <div>
+                <div class="h-name">${h.name}</div>
+                <div class="h-type">${h.pay ? 'Pago obligatorio' : 'No obligatorio'}</div>
+            </div>`;
+        hl.appendChild(item);
+    });
+
+    // ── Eventos globales ──────────────────────────────────────────
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.nav-group')) document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
+        if (!e.target.closest('.user-wrap')) document.getElementById('userWrap').classList.remove('open');
+    });
+
+    document.addEventListener('nombramiento-changed', e => {
+        const nom  = e.detail;
+        const pill = document.querySelector(`.nom-pill[data-id="${nom.id_nombramiento}"]`);
+        if (pill) selectNom(pill);
+    });
+</script>
 
 
 </body>
