@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIGEVAC — Funcionarios</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --g900: #001f52;
+            --g800: #002D72;
+            --g700: #1a5ba8;
+            --g500: #2d7dd2;
+            --g300: #7da6d8;
+            --g100: #ccddf0;
+            --g050: #e8f0fa;
+            --gold: #b8922a;
+            --gold-bg: rgba(185, 150, 60, 0.1);
+            --bone: #f4f6fb;
+            --text: #001530;
+            --muted: rgba(0, 30, 80, 0.45);
+            --dim: rgba(0, 30, 80, 0.22);
+            --red: #E4002B;
+            --red-bg: rgba(228, 0, 43, 0.08);
+            --nav-h: 56px;
+            --radius: 14px;
+            --trans: all .2s cubic-bezier(.4, 0, .2, 1);
+            --glass: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.75);
+        }
+
+        [data-theme="dark"] {
+            --bone: #060d1a;
+            --text: #ccddf0;
+            --muted: rgba(125, 166, 216, 0.45);
+            --dim: rgba(125, 166, 216, 0.22);
+            --g050: rgba(0, 45, 114, 0.3);
+            --g100: rgba(0, 45, 114, 0.55);
+            --glass: rgba(0, 45, 114, 0.22);
+            --glass-border: rgba(125, 166, 216, 0.1);
+            --red-bg: rgba(228, 0, 43, 0.15);
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bone);
+            color: var(--text);
+            transition: background .3s, color .3s
+        }
+
+        body {
+            overflow-x: hidden
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: var(--bone);
+            transition: background .3s
+        }
+
+        .bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 55% 40% at 80% 5%, rgba(45, 125, 210, 0.07) 0%, transparent 60%), radial-gradient(ellipse 30% 50% at 5% 95%, rgba(26, 91, 168, 0.05) 0%, transparent 55%)
+        }
+
+        /* NAV */
+        .topnav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-h);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(0, 45, 114, 0.96);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05)
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 20px;
+            flex-shrink: 0
+        }
+
+        .logo-icon {
+            width: 29px;
+            height: 29px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #002D72, #7da6d8);
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .logo-icon svg {
+            width: 13px;
+            height: 13px;
+            stroke: #fff;
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round
+        }
+
+        .logo-text strong {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(204, 220, 240, 0.9);
+            letter-spacing: .1em;
+            display: block;
+            line-height: 1
+        }
+
+        .logo-text small {
+            font-size: 8px;
+            font-weight: 300;
+            color: rgba(125, 166, 216, 0.3);
+            letter-spacing: .18em;
+            text-transform: uppercase
+        }
+
+        .nav-vdiv {
+            width: 1px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.07);
+            margin-right: 16px;
+            flex-shrink: 0
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1px;
+            flex: 1
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 12px;
+            border-radius: 9px;
+            font-size: 11.5px;
+            font-weight: 300;
+            color: rgba(204, 220, 240, 0.4);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--trans);
+            white-space: nowrap
+        }
+
+        .nav-link svg {
+            width: 13px;
+            height: 13px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(204, 220, 240, 0.7)
+        }
+
+        .nav-link.active {
+            background: rgba(125, 166, 216, 0.11);
+            color: var(--g300)
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+            flex-shrink: 0
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 300;
+            color: rgba(125, 166, 216, 0.38);
+            transition: var(--trans)
+        }
+
+        .action-btn svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(204, 220, 240, 0.62)
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px 4px 5px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            cursor: pointer
+        }
+
+        .avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--g800), var(--g700));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9.5px;
+            font-weight: 500;
+            color: #fff
+        }
+
+        .user-pill-name {
+            font-size: 11px;
+            font-weight: 300;
+            color: rgba(204, 220, 240, 0.62)
+        }
+
+        /* LOADING */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: rgba(0, 21, 48, 0.7);
+            backdrop-filter: blur(6px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            transition: opacity .3s
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 2px solid rgba(125, 166, 216, 0.2);
+            border-top-color: var(--g300);
+            border-radius: 50%;
+            animation: spin .8s linear infinite
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .loading-text {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--g300)
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 600;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 11.5px;
+            font-weight: 300;
+            font-family: 'DM Mono', monospace;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity .25s, transform .25s;
+            pointer-events: none
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .toast.ok {
+            background: rgba(0, 45, 114, 0.95);
+            color: var(--g300);
+            border: 1px solid rgba(125, 166, 216, 0.2)
+        }
+
+        .toast.err {
+            background: rgba(228, 0, 43, 0.12);
+            color: var(--red);
+            border: 1px solid rgba(228, 0, 43, 0.25)
+        }
+
+        .toast.info {
+            background: rgba(0, 30, 80, 0.08);
+            color: var(--muted);
+            border: 1px solid var(--dim)
+        }
+
+        /* LAYOUT */
+        .page-wrap {
+            position: relative;
+            z-index: 10;
+            margin-top: var(--nav-h);
+            min-height: calc(100vh - var(--nav-h));
+            padding: 32px 40px 60px;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(7px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* PAGE HEADER */
+        .page-hd {
+            margin-bottom: 28px;
+            animation: fadeUp .35s both;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 9.5px;
+            font-weight: 300;
+            color: var(--dim);
+            font-family: 'DM Mono', monospace;
+            margin-bottom: 6px
+        }
+
+        .breadcrumb span {
+            color: var(--muted)
+        }
+
+        .page-hd h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 26px;
+            color: var(--text)
+        }
+
+        .page-hd h1 em {
+            font-style: italic;
+            color: var(--g700)
+        }
+
+        [data-theme="dark"] .page-hd h1 em {
+            color: var(--g300)
+        }
+
+        .page-hd p {
+            font-size: 10px;
+            font-weight: 300;
+            color: var(--muted);
+            font-family: 'DM Mono', monospace;
+            margin-top: 4px
+        }
+
+        .hd-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: var(--trans);
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            text-decoration: none
+        }
+
+        .hd-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            flex-shrink: 0
+        }
+
+        .hd-btn-primary {
+            background: var(--g800);
+            color: var(--g300)
+        }
+
+        .hd-btn-primary:hover {
+            background: var(--g700);
+            color: #fff
+        }
+
+        /* BARRA DE BÚSQUEDA Y FILTROS */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            animation: fadeUp .35s .05s both
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 220px
+        }
+
+        .search-wrap svg {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 13px;
+            height: 13px;
+            stroke: var(--muted);
+            fill: none;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            pointer-events: none
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 9px 12px 9px 32px;
+            font-size: 12px;
+            font-weight: 300;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            outline: none;
+            transition: var(--trans)
+        }
+
+        [data-theme="dark"] .search-input {
+            background: rgba(0, 45, 114, 0.22);
+            border-color: rgba(125, 166, 216, 0.15)
+        }
+
+        .search-input:focus {
+            border-color: var(--g500);
+            box-shadow: 0 0 0 3px rgba(45, 125, 210, 0.1)
+        }
+
+        .search-input::placeholder {
+            color: var(--muted)
+        }
+
+        .filter-sel {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 9px 28px 9px 12px;
+            font-size: 12px;
+            font-weight: 300;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            outline: none;
+            transition: var(--trans);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232d7dd2' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 9px center;
+            cursor: pointer;
+            min-width: 160px
+        }
+
+        [data-theme="dark"] .filter-sel {
+            background-color: rgba(0, 45, 114, 0.22);
+            border-color: rgba(125, 166, 216, 0.15)
+        }
+
+        .filter-sel:focus {
+            border-color: var(--g500);
+            box-shadow: 0 0 0 3px rgba(45, 125, 210, 0.1)
+        }
+
+        .count-badge {
+            font-size: 9.5px;
+            font-weight: 300;
+            color: var(--muted);
+            font-family: 'DM Mono', monospace;
+            white-space: nowrap;
+            padding: 0 4px
+        }
+
+        /* TABLA */
+        .table-wrap {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            animation: fadeUp .4s .08s both
+        }
+
+        [data-theme="dark"] .table-wrap {
+            background: rgba(0, 45, 114, 0.18)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        thead {
+            background: rgba(0, 45, 114, 0.06);
+            border-bottom: 1px solid var(--dim)
+        }
+
+        [data-theme="dark"] thead {
+            background: rgba(0, 45, 114, 0.4)
+        }
+
+        th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 8.5px;
+            font-weight: 400;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-family: 'DM Mono', monospace;
+            white-space: nowrap
+        }
+
+        th:last-child {
+            text-align: right
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--dim);
+            transition: background .15s;
+            cursor: pointer
+        }
+
+        tbody tr:last-child {
+            border-bottom: none
+        }
+
+        tbody tr:hover {
+            background: rgba(45, 125, 210, 0.05)
+        }
+
+        [data-theme="dark"] tbody tr:hover {
+            background: rgba(45, 125, 210, 0.08)
+        }
+
+        td {
+            padding: 13px 16px;
+            font-size: 12px;
+            font-weight: 300;
+            color: var(--text);
+            vertical-align: middle
+        }
+
+        td:last-child {
+            text-align: right
+        }
+
+        /* AVATAR MINI */
+        .av-mini {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--g700), var(--g500));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            font-size: 13px;
+            color: #fff;
+            flex-shrink: 0
+        }
+
+        .td-name {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .td-name-info {
+            display: flex;
+            flex-direction: column
+        }
+
+        .td-full {
+            font-size: 12.5px;
+            font-weight: 400;
+            color: var(--text)
+        }
+
+        .td-ced {
+            font-size: 9.5px;
+            font-weight: 300;
+            color: var(--muted);
+            font-family: 'DM Mono', monospace;
+            margin-top: 1px
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 300;
+            font-family: 'DM Mono', monospace
+        }
+
+        .badge-dept {
+            background: var(--g050);
+            border: 1px solid var(--g100);
+            color: var(--g700)
+        }
+
+        [data-theme="dark"] .badge-dept {
+            color: var(--g300)
+        }
+
+        /* BOTÓN EDITAR */
+        .btn-edit {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: var(--trans);
+            border: 1px solid var(--g300);
+            background: transparent;
+            color: var(--g700);
+            font-family: 'DM Sans', sans-serif;
+            text-decoration: none
+        }
+
+        .btn-edit svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.6;
+            stroke-linecap: round
+        }
+
+        .btn-edit:hover {
+            background: var(--g800);
+            border-color: transparent;
+            color: var(--g300)
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            gap: 12px
+        }
+
+        .empty-state svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--dim);
+            fill: none;
+            stroke-width: 1.2;
+            stroke-linecap: round
+        }
+
+        .empty-state p {
+            font-size: 12px;
+            font-weight: 300;
+            color: var(--muted);
+            font-family: 'DM Mono', monospace
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg"></div>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Cargando funcionarios...</div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- NAV -->
+    <nav class="topnav">
+        <div class="nav-logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+            </div>
+            <div class="logo-text">
+                <strong>SIGEVAC</strong>
+                <small>Sistema de Gestión de Vacaciones</small>
+            </div>
+        </div>
+        <div class="nav-vdiv"></div>
+        <div class="nav-links">
+            <a class="nav-link" href="../dashboard.html">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                </svg>Dashboard
+            </a>
+            <a class="nav-link active" href="lista-funcionarios.html">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>Funcionarios
+            </a>
+            <a class="nav-link" href="registrar.html">
+                <svg viewBox="0 0 24 24">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <line x1="19" y1="8" x2="19" y2="14" />
+                    <line x1="22" y1="11" x2="16" y2="11" />
+                </svg>Registrar
+            </a>
+        </div>
+        <div class="nav-right">
+            <button class="action-btn" onclick="toggleTheme()">
+                <svg viewBox="0 0 24 24" id="themeIcon">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                </svg>
+            </button>
+            <div class="user-pill">
+                <div class="avatar" id="navAvatar">?</div>
+                <span class="user-pill-name" id="navName">Usuario</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO -->
+    <div class="page-wrap">
+
+        <!-- Header -->
+        <div class="page-hd">
+            <div>
+                <div class="breadcrumb">SIGEVAC <span>›</span> Funcionarios</div>
+                <h1>Gestión de <em>Funcionarios</em></h1>
+                <p>Seleccione un funcionario para ver o modificar su información.</p>
+            </div>
+            <a class="hd-btn hd-btn-primary" href="registrar.html">
+                <svg viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Registrar Funcionario
+            </a>
+        </div>
+
+        <!-- Toolbar: búsqueda + filtro -->
+        <div class="toolbar">
+            <div class="search-wrap">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input class="search-input" type="text" id="searchInput"
+                    placeholder="Buscar por nombre, cédula o usuario..." oninput="filtrar()">
+            </div>
+            <select class="filter-sel" id="filtroDept" onchange="filtrar()">
+                <option value="">Todos los departamentos</option>
+            </select>
+            <span class="count-badge" id="countBadge">— funcionarios</span>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionario</th>
+                        <th>Departamento</th>
+                        <th>ID</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tablaBody">
+                    <!-- filas dinámicas -->
+                </tbody>
+            </table>
+            <div class="empty-state hidden" id="emptyState">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                </svg>
+                <p id="emptyMsg">No hay funcionarios registrados.</p>
+            </div>
+        </div>
+
+    </div><!-- /page-wrap -->
+
+    <script>
+        var API_BASE = (function () {
+            var p = window.location.port;
+            if (p && p !== '3000') return window.location.protocol + '//' + window.location.hostname + ':3000';
+            return '';
+        })();
+
+        var _todos = [];
+
+        function showToast(msg, type) {
+            var t = document.getElementById('toast');
+            t.textContent = msg; t.className = 'toast ' + (type || 'ok') + ' show';
+            setTimeout(function () { t.classList.remove('show'); }, 4000);
+        }
+
+        function toggleTheme() {
+            var html = document.documentElement;
+            html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+            document.getElementById('themeIcon').innerHTML = html.getAttribute('data-theme') === 'dark'
+                ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+                : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>';
+        }
+
+        function iniciales(nombre, apellido) {
+            return [(nombre || '')[0], (apellido || '')[0]].filter(Boolean).map(function (c) { return c.toUpperCase(); }).join('') || '?';
+        }
+
+        function poblarFiltroDept(lista) {
+            var deptos = {};
+            lista.forEach(function (f) { if (f.nombre_departamento) deptos[f.nombre_departamento] = true; });
+            var sel = document.getElementById('filtroDept');
+            Object.keys(deptos).sort().forEach(function (d) {
+                var o = document.createElement('option'); o.value = d; o.textContent = d; sel.appendChild(o);
+            });
+        }
+
+        function renderTabla(lista) {
+            var tbody = document.getElementById('tablaBody');
+            var empty = document.getElementById('emptyState');
+            var emptyMsg = document.getElementById('emptyMsg');
+            tbody.innerHTML = '';
+
+            if (lista.length === 0) {
+                empty.classList.remove('hidden');
+                emptyMsg.textContent = _todos.length === 0
+                    ? 'No hay funcionarios activos registrados.'
+                    : 'No se encontraron funcionarios con ese criterio.';
+                document.getElementById('countBadge').textContent = '0 funcionarios';
+                return;
+            }
+
+            empty.classList.add('hidden');
+            document.getElementById('countBadge').textContent = lista.length + ' funcionario' + (lista.length !== 1 ? 's' : '');
+
+            lista.forEach(function (f) {
+                var ini = iniciales(f.nombre, f.apellido1);
+                var nombreCompleto = [f.nombre, f.apellido1, f.apellido2].filter(Boolean).join(' ');
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><div class="td-name">' +
+                    '<div class="av-mini">' + ini + '</div>' +
+                    '<div class="td-name-info">' +
+                    '<div class="td-full">' + nombreCompleto + '</div>' +
+                    '<div class="td-ced">' + (f.cedula || '—') + '</div>' +
+                    '</div>' +
+                    '</div></td>' +
+                    '<td><span class="badge badge-dept">' + (f.nombre_departamento || '—') + '</span></td>' +
+                    '<td style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--muted)">#' + f.id_funcionario + '</td>' +
+                    '<td>' +
+                    '<a class="btn-edit" href="editar-funcionario.html?id=' + f.id_funcionario + '">' +
+                    '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+                    'Editar' +
+                    '</a>' +
+                    '</td>';
+                // Click en la fila también navega
+                tr.addEventListener('click', function (e) {
+                    if (!e.target.closest('.btn-edit')) {
+                        window.location.href = 'editar-funcionario.html?id=' + f.id_funcionario;
+                    }
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filtrar() {
+            var q = document.getElementById('searchInput').value.trim().toLowerCase();
+            var dept = document.getElementById('filtroDept').value;
+            var resultado = _todos.filter(function (f) {
+                var nombreCompleto = [f.nombre, f.apellido1, f.apellido2].filter(Boolean).join(' ').toLowerCase();
+                var matchQ = !q || nombreCompleto.includes(q) || (f.cedula || '').toLowerCase().includes(q) || (f.usuario || '').toLowerCase().includes(q);
+                var matchDept = !dept || f.nombre_departamento === dept;
+                return matchQ && matchDept;
+            });
+            renderTabla(resultado);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var overlay = document.getElementById('loadingOverlay');
+
+            // Sesión
+            try {
+                var sesion = { funcionario: JSON.parse(localStorage.getItem('funcionario') || 'null') };
+                if (sesion.funcionario) {
+                    var ini = iniciales(sesion.funcionario.nombre, sesion.funcionario.apellido1);
+                    document.getElementById('navAvatar').textContent = ini;
+                    document.getElementById('navName').textContent = sesion.funcionario.nombre || 'Usuario';
+                }
+            } catch (e) { }
+
+            fetch(API_BASE + '/api/registro/funcionarios/lista')
+                .then(function (res) { return res.json().then(function (j) { return { ok: res.ok, json: j }; }); })
+                .then(function (r) {
+                    if (!r.ok) { showToast('Error al cargar la lista de funcionarios.', 'err'); return; }
+                    _todos = r.json;
+                    poblarFiltroDept(_todos);
+                    renderTabla(_todos);
+                })
+                .catch(function (err) {
+                    console.error('[SIGEVAC] lista error:', err);
+                    showToast('Error de conexión al cargar funcionarios.', 'err');
+                })
+                .finally(function () {
+                    overlay.classList.add('hidden');
+                });
+        });
+    </script>
+</body>
+
+</html>

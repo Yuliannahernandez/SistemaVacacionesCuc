@@ -131,6 +131,7 @@ class AppNavbar extends HTMLElement {
           </div>
           <div class="nav-submenu">
             <a class="nav-sub-item ${path.includes('autenticacion/registrar') ? 'active' : ''}" href="/frontend/pages/autenticacion/registrar.html">Registro de Funcionarios</a>
+            <a class="nav-sub-item ${path.includes('lista-funcionarios') ? 'active' : ''}" href="/frontend/pages/autenticacion/lista-funcionarios.html">Lista de Funcionarios</a>
             <a class="nav-sub-item ${path.includes('editar-funcionario') ? 'active' : ''}" href="/frontend/pages/autenticacion/editar-funcionario.html">Modificación de Funcionarios</a>
           </div>
         </div>
@@ -222,9 +223,9 @@ class AppNavbar extends HTMLElement {
     const path = window.location.pathname;
     const grupos = {
       'solicitudes': path.includes('solicitudes'),
-      'saldo':       path.includes('saldo'),
-      'auth':        path.includes('autenticacion'),
-      'aprobacion':  path.includes('aprobacion'),
+      'saldo': path.includes('saldo'),
+      'auth': path.includes('autenticacion'),
+      'aprobacion': path.includes('aprobacion'),
     };
     for (const [key, isActive] of Object.entries(grupos)) {
       const btn = this.querySelector(`#grp-${key} .nav-group-btn`);
@@ -257,7 +258,7 @@ function toggleUserMenu() {
 }
 
 // ── Cerrar al hacer click fuera ──
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
   if (!e.target.closest('.nav-group')) {
     document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open'));
   }
