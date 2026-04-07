@@ -1269,9 +1269,7 @@
         </aside>
     </div>
 
-    <script src="/frontend/components/navbar.js"></script>
-    <script src="/frontend/js/session.js"></script>
-    <app-navbar></app-navbar>
+
 
     <script src="/frontend/components/navbar.js"></script>
 <script src="/frontend/js/session.js"></script>
@@ -1331,35 +1329,54 @@
         }
     }
 
-    // ── Cargar saldos reales desde el API y refrescar pills ───────
-    async function cargarSaldosDesdeAPI() {
-        const f  = JSON.parse(localStorage.getItem('funcionario') || '{}');
-        const id = f.id_funcionario || f.id;
-        if (!id) return;
+   async function cargarSaldosDesdeAPI() {
+    const sesionRaw = localStorage.getItem('funcionario');
+    console.log('[Dashboard] funcionario raw:', sesionRaw);
 
-        try {
-            const res = await fetch(`/api/saldo/disponible/${id}`, { credentials: 'include' });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
+    const f  = JSON.parse(sesionRaw || '{}');
+    const id = f.id_funcionario || f.id;
 
-            // Sobreescribir data-disp y data-acum de cada pill con valores reales
-            (data.saldos_por_nombramiento || []).forEach(nom => {
-                const pill = document.querySelector(`.nom-pill[data-id="${nom.id_nombramiento}"]`);
-                if (pill) {
-                    pill.dataset.disp = nom.dias_disponibles;
-                    pill.dataset.acum = nom.dias_acumulados;
-                }
-            });
-
-            // Refrescar la visualización del pill activo con datos reales
-            const pillActivo = document.querySelector('.nom-pill.active');
-            if (pillActivo) updateBalance(pillActivo);
-
-        } catch (err) {
-            // Fallback silencioso: las pills ya muestran los datos del localStorage
-            console.warn('Saldo API no disponible, mostrando datos del localStorage:', err.message);
-        }
+    console.log('[Dashboard] id usado para fetch:', id);
+    if (!id) {
+        console.warn('[Dashboard] Sin id_funcionario, no se puede cargar saldo');
+        return;
     }
+
+    try {
+        const url = `/api/saldo/disponible/${id}`;
+        console.log('[Dashboard] Fetching:', url);
+
+        const res = await fetch(url, { credentials: 'include' });
+        console.log('[Dashboard] HTTP status:', res.status);
+
+        const data = await res.json();
+        console.log('[Dashboard] Respuesta completa:', data);
+
+        (data.saldos_por_nombramiento || []).forEach(nom => {
+            console.log('[Dashboard] Saldo recibido:', nom.id_nombramiento, 
+                        '→ disp:', nom.dias_disponibles, 
+                        '/ acum:', nom.dias_acumulados);
+
+            const pill = document.querySelector(`.nom-pill[data-id="${nom.id_nombramiento}"]`);
+            console.log('[Dashboard] Pill encontrado para id', nom.id_nombramiento, ':', pill);
+
+            if (pill) {
+                pill.dataset.disp = nom.dias_disponibles;
+                pill.dataset.acum = nom.dias_acumulados;
+            }
+        });
+
+        const pillActivo = document.querySelector('.nom-pill.active');
+        console.log('[Dashboard] Pill activo:', pillActivo, 
+                    'data-id:', pillActivo?.dataset.id,
+                    'data-disp:', pillActivo?.dataset.disp);
+
+        if (pillActivo) updateBalance(pillActivo);
+
+    } catch (err) {
+        console.error('[Dashboard] Error cargando saldo:', err);
+    }
+}
 
     // ── Tooltip ───────────────────────────────────────────────────
     const tt = document.getElementById('tt');

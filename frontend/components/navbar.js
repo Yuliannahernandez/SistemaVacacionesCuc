@@ -224,13 +224,11 @@ class AppNavbar extends HTMLElement {
     }
   }
 
-  _applyRolUI() {
+_applyRolUI() {
     const funcionario = JSON.parse(localStorage.getItem('funcionario') || '{}');
     const nombre = funcionario.nombre || 'Usuario';
     const rol    = (funcionario.rol   || '').toLowerCase();
 
-    // ── Normalizar array de nombramientos ─────────────────────────────────
-    // Soporta: array directo, objeto con clave 'data', 'nombramientos', o 'rows'
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem('nombramientos') || 'null'); } catch(e) {}
 
@@ -238,11 +236,9 @@ class AppNavbar extends HTMLElement {
     if (Array.isArray(raw)) {
       nombramientos = raw;
     } else if (raw && typeof raw === 'object') {
-      // Si el backend devolvió { data: [...] } o { nombramientos: [...] }
       nombramientos = raw.data || raw.nombramientos || raw.rows || [];
     }
 
-    // ── DEBUG: ver qué hay en localStorage ───────────────────────────────
     console.group('[Navbar] _applyRolUI');
     console.log('funcionario:', funcionario);
     console.log('nombramientos raw:', raw);
@@ -250,7 +246,6 @@ class AppNavbar extends HTMLElement {
     console.log('cantidad:', nombramientos.length);
     console.groupEnd();
 
-    // ── Nombre e iniciales ────────────────────────────────────────────────
     const primerNombre = nombre.split(' ')[0];
     const iniciales    = nombre.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
 
@@ -263,8 +258,9 @@ class AppNavbar extends HTMLElement {
     const dropdown = this.querySelector('#userDropdown');
     const pill     = this.querySelector('.user-pill');
 
-    // ── Roles administrativos: sin nombramiento ───────────────────────────
     const ROLES_ADMIN = ['rrhh', 'jefe', 'admin'];
+
+    // ── Roles administrativos: sin nombramiento ───────────────────────────
     if (ROLES_ADMIN.includes(rol)) {
       if (pillNom) {
         pillNom.textContent = rol === 'rrhh' ? 'RRHH' : rol.charAt(0).toUpperCase() + rol.slice(1);
@@ -276,7 +272,28 @@ class AppNavbar extends HTMLElement {
       if (dropdown) dropdown.style.display = 'none';
       if (pill)     pill.style.cursor = 'default';
       if (pill)     pill.onclick = null;
-      return;
+        if (rol === 'rrhh') {
+    const grpAuth = this.querySelector('#grp-aprobacion');
+    if (grpAuth) grpAuth.style.display = 'none';
+  }
+      return; // admins no necesitan restricciones de navbar
+    }
+
+ 
+
+    // ── Control de acceso: funcionario ───────────────────────────────────
+    // Va aquí, ANTES de cualquier return, para que aplique siempre
+    if (rol === 'funcionario') {
+      const grpAuth = this.querySelector('#grp-auth');
+      const grpAprobacion = this.querySelector('#grp-aprobacion');
+      if (grpAuth)       grpAuth.style.display = 'none';
+      if (grpAprobacion) grpAprobacion.style.display = 'none';
+
+      this.querySelectorAll('.nav-sub-item').forEach(item => {
+        if (item.href && item.href.includes('historial-departamento')) {
+          item.style.display = 'none';
+        }
+      });
     }
 
     // ── Sin nombramientos en sesión ───────────────────────────────────────
@@ -288,7 +305,7 @@ class AppNavbar extends HTMLElement {
       return;
     }
 
-    // ── Nombramiento activo: cargar desde localStorage o usar el primero ──
+    // ── Nombramiento activo ───────────────────────────────────────────────
     let idActivo    = parseInt(localStorage.getItem('id_nombramiento_activo') || '0');
     let indexActivo = nombramientos.findIndex(n => (n.id_historial_nombramiento ?? n.id_nombramiento) === idActivo);
     if (indexActivo < 0) indexActivo = 0;
