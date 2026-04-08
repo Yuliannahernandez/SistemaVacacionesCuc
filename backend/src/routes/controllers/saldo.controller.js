@@ -294,14 +294,15 @@ async function getDiasColectivasAplicados(id_nombramiento) {
  */
 async function buildSaldosPorNombramiento(nombramientos, id_funcionario, antiguedad) {
   return Promise.all(nombramientos.map(async (nom) => {
-    const semanasInfo     = cumpleMinimoDeSemanas(nom);
-    const regla           = obtenerReglaAcumulacion(nom, antiguedad);
+       const semanasInfo   = cumpleMinimoDeSemanas(nom);
+const antiguedadNom = calcularAntiguedad(nom.fecha_nombramiento); // ← por nombramiento
+const regla         = obtenerReglaAcumulacion(nom, antiguedadNom);
 
     // Enriquecer nom con días colectivos reales desde solicitudes_vacaciones
     const diasColAplicados = await getDiasColectivasAplicados(nom.id_nombramiento);
     const nomEnriquecido = { ...nom, dias_colectivas_descontados: diasColAplicados };
 
-    const diasAcumulados   = calcularDiasAcumuladosPorNom(nomEnriquecido, antiguedad);
+    const diasAcumulados = calcularDiasAcumuladosPorNom(nomEnriquecido, antiguedadNom);
     const diasUsados       = await getDiasUsadosPorNom(id_funcionario, nom.id_nombramiento);
     const diasDisponibles  = Math.max(diasAcumulados - diasUsados, 0);
 
