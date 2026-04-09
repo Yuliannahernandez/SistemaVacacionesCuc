@@ -1293,7 +1293,9 @@
         </svg>
         <div class="tab-tt">Descuento por Disfrute</div>
       </div>
-      <div class="tab-icon" onclick="showView('historial')" id="tab-historial">
+      <div class="tab-icon" onclick="showView('historial')" id="tab-historial"
+     data-module="saldo" data-submodule="historial-departamento">
+
         <svg viewBox="0 0 24 24">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
           <circle cx="9" cy="7" r="4" />
@@ -1721,6 +1723,9 @@
 
       // ── Vistas ───────────────────────────────────────────────────────────
       window.showView = function (v) {
+        // Bloquear acceso a historial si no tiene permiso
+        if (v === 'historial' && window.AccessControl?.esFuncionario()) return;
+
         ['saldo', 'acumulacion', 'descuento', 'historial', 'simulacion'].forEach(id => {
           document.getElementById('view-' + id).style.display = id === v ? '' : 'none';
           const tab = document.getElementById('tab-' + id);
@@ -2026,6 +2031,22 @@
       document.addEventListener('click', e => { if (!e.target.closest('.nav-group')) document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open')); if (!e.target.closest('.user-wrap')) document.getElementById('userWrap')?.classList.remove('open') });
       window.toggleUserMenu = function () { const w = document.getElementById('userWrap'); const o = w.classList.contains('open'); document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('open')); w.classList.toggle('open', !o) };
       window.logout = function () { if (confirm('¿Cerrar sesión?')) { localStorage.clear(); window.location.href = '../autenticacion/login.html'; } };
+
+      // ── Ocultar tab historial si es funcionario ───────────────────────────
+(function aplicarAccesoHistorial() {
+  try {
+    const f = JSON.parse(localStorage.getItem('funcionario') || '{}');
+    const rol = (f.rol || '').toLowerCase();
+    const rolesPermitidos = ['rrhh', 'jefe', 'admin'];
+    
+    if (!rolesPermitidos.includes(rol)) {
+      // Ocultar el tab visualmente
+      const tabHistorial = document.getElementById('tab-historial');
+      if (tabHistorial) tabHistorial.style.display = 'none';
+    }
+  } catch (e) {}
+})();
+
 
       // ── Arranque ──────────────────────────────────────────────────────────
       calcSim();
