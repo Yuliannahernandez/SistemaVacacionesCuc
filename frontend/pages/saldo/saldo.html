@@ -1584,55 +1584,93 @@
         </div>
       </div>
 
-      <!-- VIEW: HISTORIAL DEPTO -->
-      <div id="view-historial" style="display:none">
-        <div class="page-hd">
-          <div class="page-hd-left">
-            <div class="breadcrumb">Saldo <span>/</span> Historial por Departamento</div>
-            <h1>Historial por <em>Departamento</em></h1>
-            <p>Acceso según rol · GIRH: todos los departamentos · Jefe: solo el suyo · PA-GIRH-10</p>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="filter-bar">
-            <span class="filter-label">Estado:</span>
-            <select class="filter-select" id="filtEstado" onchange="cargarHistorial()">
-              <option value="">Todos</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="aprobada">Aprobada</option>
-              <option value="rechazada">Rechazada</option>
-              <option value="cancelada">Cancelada</option>
-            </select>
-            <div class="filter-divider"></div>
-            <span class="filter-label">Desde:</span>
-            <input type="date" class="filter-select" id="filtDesde" onchange="cargarHistorial()">
-            <span class="filter-label">Hasta:</span>
-            <input type="date" class="filter-select" id="filtHasta" onchange="cargarHistorial()">
-            <div class="p-btn primary" style="margin-left:auto" onclick="cargarHistorial()">Filtrar</div>
-          </div>
-          <div class="tbl-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Funcionario</th>
-                  <th>Cédula</th>
-                  <th>Departamento</th>
-                  <th>Tipo Nombramiento</th>
-                  <th>Fecha Inicio</th>
-                  <th>Fecha Fin</th>
-                  <th>Días Sol.</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody id="tbodyHistorial">
-                <tr class="loading-row">
-                  <td colspan="8">Cargando...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+      
+     <!-- VIEW: HISTORIAL DEPTO -->
+<div id="view-historial" style="display:none">
+  <div class="page-hd">
+    <div class="page-hd-left">
+      <div class="breadcrumb">Saldo <span>/</span> Historial por Departamento</div>
+      <h1>Historial por <em>Departamento</em></h1>
+      <p>GIRH: todos los departamentos · Jefe: solo el suyo · PA-GIRH-10 §3.2</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="p-btn primary" onclick="exportarHistorial()">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
       </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="filter-bar" style="flex-wrap:wrap;gap:8px">
+      <!-- Departamento — solo GIRH puede cambiarlo -->
+      <span class="filter-label">Depto:</span>
+      <select class="filter-select" id="filtDepto" onchange="cargarHistorial()">
+        <option value="">Todos</option>
+      </select>
+      <div class="filter-divider"></div>
+      <!-- Búsqueda libre -->
+      <input type="text" class="filter-select" id="filtBusqueda"
+             placeholder="Nombre o cédula..." style="min-width:160px"
+             oninput="cargarHistorial()">
+      <div class="filter-divider"></div>
+      <span class="filter-label">Estado:</span>
+      <select class="filter-select" id="filtEstado" onchange="cargarHistorial()">
+        <option value="">Todos</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="aprobada">Aprobada</option>
+        <option value="rechazada">Rechazada</option>
+        <option value="cancelada">Cancelada</option>
+      </select>
+      <div class="filter-divider"></div>
+      <span class="filter-label">Tipo:</span>
+      <select class="filter-select" id="filtTipoNom" onchange="cargarHistorial()">
+        <option value="">Todos</option>
+        <option value="1">Administrativo en Propiedad</option>
+        <option value="2">Administrativo Interino</option>
+        <option value="3">Docente en Propiedad</option>
+        <option value="4">Docente-Adm. Interino</option>
+      </select>
+      <div class="filter-divider"></div>
+      <span class="filter-label">Desde:</span>
+      <input type="date" class="filter-select" id="filtDesde" onchange="cargarHistorial()">
+      <span class="filter-label">Hasta:</span>
+      <input type="date" class="filter-select" id="filtHasta" onchange="cargarHistorial()">
+      <div id="filtError" style="display:none;color:var(--red);font-size:10px;font-family:'DM Mono',monospace"></div>
+    </div>
+    <div style="padding:6px 18px;font-size:9px;color:var(--dim);font-family:'DM Mono',monospace" id="histTotal"></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Funcionario</th>
+            <th>Cédula</th>
+            <th>Departamento</th>
+            <th>Tipo Nombramiento</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Días Sol.</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyHistorial">
+          <tr class="loading-row"><td colspan="9">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal detalle solicitud -->
+  <div id="modalDetalle" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,20,60,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+    <div style="background:var(--bone);border:1px solid var(--g100);border-radius:16px;padding:24px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">DETALLE DE SOLICITUD</span>
+        <div class="p-btn" onclick="cerrarDetalle()">Cerrar</div>
+      </div>
+      <div id="detalleContent"></div>
+    </div>
+  </div>
+</div>
 
       <!-- VIEW: SIMULACIÓN -->
       <div id="view-simulacion" style="display:none">
@@ -1979,45 +2017,139 @@
         } catch (err) { console.warn('[DESCUENTOS] error:', err.message); }
       };
 
-      // ── Vista HISTORIAL DEPTO ─────────────────────────────────────────────
-      window.cargarHistorial = async function () {
-        const f = JSON.parse(localStorage.getItem('funcionario') || '{}');
-        const idDep = f.id_departamento;
-        const estado = document.getElementById('filtEstado')?.value || '';
-        const desde = document.getElementById('filtDesde')?.value || '';
-        const hasta = document.getElementById('filtHasta')?.value || '';
-        const params = new URLSearchParams();
-        if (idDep) params.set('id_departamento', idDep);
-        if (estado) params.set('estado', estado);
-        if (desde) params.set('desde', desde);
-        if (hasta) params.set('hasta', hasta);
+     // ── Vista HISTORIAL DEPTO ─────────────────────────────────────────────
+window.cargarHistorial = async function () {
+  const f   = JSON.parse(localStorage.getItem('funcionario') || '{}');
+  const rol = (f.rol || '').toLowerCase();
 
-        try {
-          const res = await fetch(`${API_BASE}/api/saldo/historial-departamento?${params}`);
-          if (!res.ok) return;
-          const data = await res.json();
-          const rows = data.historial || [];
-          const tbody = document.getElementById('tbodyHistorial');
-          if (!rows.length) {
-            tbody.innerHTML = '<tr class="loading-row"><td colspan="8">Sin registros para los filtros seleccionados</td></tr>';
-            return;
-          }
-          tbody.innerHTML = rows.map(r => {
-            const cls = r.estado === 'aprobada' ? 'ok' : r.estado === 'pendiente' ? 'warn' : 'zero';
-            return `
-          <tr>
-            <td>${r.funcionario || '—'}</td>
-            <td class="td-year">${r.cedula || '—'}</td>
-            <td>${r.nombre_departamento || '—'}</td>
-            <td><span class="rule-chip">${r.tipo_nombramiento || '—'}</span></td>
-            <td class="td-year">${fmt(r.fecha_inicio)}</td>
-            <td class="td-year">${fmt(r.fecha_fin)}</td>
-            <td><span class="td-num">${r.dias_solicitados || 0}</span></td>
-            <td><span class="badge ${cls}">${r.estado || '—'}</span></td>
-          </tr>`;
-          }).join('');
-        } catch (err) { console.warn('[HISTORIAL] error:', err.message); }
-      };
+  // Validar fecha V4
+  const desde = document.getElementById('filtDesde')?.value || '';
+  const hasta = document.getElementById('filtHasta')?.value || '';
+  const errEl = document.getElementById('filtError');
+  if (desde && hasta && new Date(desde) > new Date(hasta)) {
+    errEl.textContent = 'MSG-HVD-ERR-003: La fecha de inicio no puede ser posterior a la fecha de fin.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const estado        = document.getElementById('filtEstado')?.value || '';
+  const busqueda      = document.getElementById('filtBusqueda')?.value || '';
+  const tipoNom       = document.getElementById('filtTipoNom')?.value || '';
+  const idDepto       = document.getElementById('filtDepto')?.value || '';
+
+  const params = new URLSearchParams();
+  // Jefe solo ve su depto
+  if (rol === 'jefe') {
+    params.set('id_departamento', f.id_departamento);
+  } else if (idDepto) {
+    params.set('id_departamento', idDepto);
+  }
+  if (estado)   params.set('estado', estado);
+  if (desde)    params.set('desde', desde);
+  if (hasta)    params.set('hasta', hasta);
+  if (busqueda) params.set('busqueda', busqueda);
+  if (tipoNom)  params.set('id_tipo_nombramiento', tipoNom);
+
+  const tbody = document.getElementById('tbodyHistorial');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="9">MSG-HVD-INFO-003: Cargando historial...</td></tr>';
+
+  try {
+    const res  = await fetch(`${API_BASE}/api/saldo/historial-departamento?${params}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="9">${data.codigo || 'MSG-HVD-ERR-008'}: ${data.error || 'Error al cargar.'}</td></tr>`;
+      return;
+    }
+
+    const rows = data.historial || [];
+    document.getElementById('histTotal').textContent =
+      rows.length ? `Mostrando ${rows.length} registro(s)` : '';
+
+    if (!rows.length) {
+      tbody.innerHTML = `<tr class="loading-row"><td colspan="9">${data.codigo || 'MSG-HVD-INFO-001'}: ${data.mensaje || 'Sin registros.'}</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => {
+      const cls = r.estado === 'aprobada' ? 'ok' : r.estado === 'pendiente' ? 'warn' : 'zero';
+      return `
+        <tr>
+          <td>${r.funcionario || '—'}</td>
+          <td class="td-year">${r.cedula || '—'}</td>
+          <td>${r.nombre_departamento || '—'}</td>
+          <td><span class="rule-chip">${r.tipo_nombramiento || '—'}</span></td>
+          <td class="td-year">${fmt(r.fecha_inicio)}</td>
+          <td class="td-year">${fmt(r.fecha_fin)}</td>
+          <td><span class="td-num">${r.dias_solicitados || 0}</span></td>
+          <td><span class="badge ${cls}">${r.estado || '—'}</span></td>
+          <td><div class="p-btn" onclick='verDetalle(${JSON.stringify(r)})'>Ver Detalle</div></td>
+        </tr>`;
+    }).join('');
+  } catch (err) {
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="9">MSG-HVD-ERR-007: No se pudo conectar con el servidor.</td></tr>';
+  }
+};
+
+// ── Cargar departamentos según rol ────────────────────────────────────
+async function cargarDepartamentosHistorial() {
+  const f   = JSON.parse(localStorage.getItem('funcionario') || '{}');
+  const rol = (f.rol || '').toLowerCase();
+  const sel = document.getElementById('filtDepto');
+  if (!sel) return;
+
+  if (rol === 'jefe') {
+    // Jefe solo ve su depto, selector deshabilitado
+    sel.innerHTML = `<option value="${f.id_departamento}">${f.nombre_departamento || 'Mi departamento'}</option>`;
+    sel.disabled = true;
+    return;
+  }
+
+  // GIRH/admin: cargar todos los deptos
+  try {
+    const res  = await fetch(`${API_BASE}/api/departamentos`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const deptos = data.departamentos || data || [];
+    sel.innerHTML = '<option value="">Todos</option>' +
+      deptos.map(d => `<option value="${d.id_departamento}">${d.nombre_departamento}</option>`).join('');
+  } catch (e) {
+    sel.innerHTML = '<option value="">Todos</option>';
+  }
+}
+
+// ── Ver detalle de solicitud ──────────────────────────────────────────
+window.verDetalle = function (r) {
+  const cls = r.estado === 'aprobada' ? 'ok' : r.estado === 'pendiente' ? 'warn' : 'zero';
+  document.getElementById('detalleContent').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:11px;font-weight:300;color:var(--text)">
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-family:'DM Mono',monospace;color:var(--muted)">${r.numero_solicitud || '—'}</span>
+        <span class="badge ${cls}">${r.estado || '—'}</span>
+      </div>
+      <div><strong style="font-weight:400">Funcionario:</strong> ${r.funcionario || '—'}</div>
+      <div><strong style="font-weight:400">Cédula:</strong> ${r.cedula || '—'}</div>
+      <div><strong style="font-weight:400">Departamento:</strong> ${r.nombre_departamento || '—'}</div>
+      <div><strong style="font-weight:400">Tipo nombramiento:</strong> ${r.tipo_nombramiento || '—'}</div>
+      <div><strong style="font-weight:400">Período:</strong> ${fmt(r.fecha_inicio)} — ${fmt(r.fecha_fin)}</div>
+      <div><strong style="font-weight:400">Días solicitados:</strong> ${r.dias_solicitados || 0}</div>
+      <div><strong style="font-weight:400">Fecha aprobación:</strong> ${fmt(r.fecha_aprobacion)}</div>
+      <div><strong style="font-weight:400">Aprobador:</strong> ${r.aprobador || '—'}</div>
+      ${r.motivo ? `<div><strong style="font-weight:400">Motivo:</strong> ${r.motivo}</div>` : ''}
+      ${r.comentarios_aprobador ? `<div><strong style="font-weight:400">Comentarios:</strong> ${r.comentarios_aprobador}</div>` : ''}
+    </div>`;
+  document.getElementById('modalDetalle').style.display = 'flex';
+};
+
+window.cerrarDetalle = function () {
+  document.getElementById('modalDetalle').style.display = 'none';
+};
+
+// ── Exportar (placeholder) ────────────────────────────────────────────
+window.exportarHistorial = function () {
+  alert('MSG-HVD-INFO-005: Generando archivo de exportación...\n(Función de exportación pendiente de implementar)');
+};
 
       // ── Sincronizar con navbar ────────────────────────────────────────────
       document.addEventListener('nombramiento-changed', (e) => {
@@ -2049,8 +2181,20 @@
 
 
       // ── Arranque ──────────────────────────────────────────────────────────
+      (function aplicarAccesoHistorial() {
+  try {
+    const f   = JSON.parse(localStorage.getItem('funcionario') || '{}');
+    const rol = (f.rol || '').toLowerCase();
+    if (!['rrhh', 'jefe', 'admin'].includes(rol)) {
+      const tab = document.getElementById('tab-historial');
+      if (tab) tab.style.display = 'none';
+    }
+  } catch (e) {}
+})();
+
       calcSim();
       cargarSaldo();
+      cargarDepartamentosHistorial();
     }
   </script>
 </body>

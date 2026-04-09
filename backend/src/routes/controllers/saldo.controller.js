@@ -598,24 +598,43 @@ const getDescuentos = async (req, res) => {
 // GET /api/saldo/historial-departamento
 // ═════════════════════════════════════════════════════════════════════════════
 const getHistorialDepartamento = async (req, res) => {
-  const { id_departamento, estado, desde, hasta, tipo_solicitud } = req.query;
+  const { id_departamento, estado, desde, hasta, tipo_solicitud, busqueda, id_tipo_nombramiento } = req.query;
+  
+  // Obtener rol del usuario desde el token/sesión
+  // Por ahora lo recibimos como query param hasta integrar auth middleware
+  const { id_funcionario_solicitante } = req.query;
+
   try {
-    const condiciones = ['1=1'];
+    // Validar fechas V4
+    if (desde && hasta && new Date(desde) > new Date(hasta)) {
+      return res.status(400).json({ error: 'La fecha de inicio no puede ser posterior a la fecha de fin.', codigo: 'MSG-HVD-ERR-003' });
+    }
+
+    const condiciones = ['sv.id_solicitud IS NOT NULL'];
     const params = [];
+
     if (id_departamento) { condiciones.push('f.id_departamento = ?'); params.push(id_departamento); }
-    if (estado)          { condiciones.push('sv.estado = ?');         params.push(estado); }
-    if (desde)           { condiciones.push('sv.fecha_inicio >= ?');  params.push(desde); }
-    if (hasta)           { condiciones.push('sv.fecha_fin <= ?');     params.push(hasta); }
-    if (tipo_solicitud)  { condiciones.push('sv.tipo_solicitud = ?'); params.push(tipo_solicitud); }
+    if (estado)          { condiciones.push('sv.estado = ?');          params.push(estado); }
+    if (desde)           { condiciones.push('sv.fecha_inicio >= ?');   params.push(desde); }
+    if (hasta)           { condiciones.push('sv.fecha_fin <= ?');      params.push(hasta); }
+    if (tipo_solicitud)  { condiciones.push('sv.tipo_solicitud = ?');  params.push(tipo_solicitud); }
+    if (id_tipo_nombramiento) { condiciones.push('tn.id_tipo_nombramiento = ?'); params.push(id_tipo_nombramiento); }
+    if (busqueda) {
+     condiciones.push("(CONCAT(f.nombre,' ',f.apellido1) LIKE ? OR f.cedula LIKE ?)");
+      params.push(`%${busqueda}%`, `%${busqueda}%`);
+    }
 
     const [rows] = await db.query(
       `SELECT sv.id_solicitud, sv.numero_solicitud,
               CONCAT(f.nombre,' ',f.apellido1,IFNULL(CONCAT(' ',f.apellido2),'')) AS funcionario,
               f.cedula, d.nombre_departamento,
               tn.nombre_tipo AS tipo_nombramiento,
+              tn.id_tipo_nombramiento,
               sv.fecha_inicio, sv.fecha_fin, sv.dias_solicitados,
               sv.estado, sv.tipo_solicitud,
               sv.fecha_aprobacion,
+              sv.motivo,
+              sv.comentarios_aprobador,
               CONCAT(ap.nombre,' ',ap.apellido1) AS aprobador
        FROM solicitudes_vacaciones sv
        JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
@@ -627,10 +646,18 @@ const getHistorialDepartamento = async (req, res) => {
        ORDER BY sv.fecha_creacion DESC`,
       params
     );
+
+    if (!rows.length) {
+      const msg = (desde || hasta || estado || busqueda || id_tipo_nombramiento)
+        ? { mensaje: 'No se encontraron solicitudes con los criterios seleccionados.', codigo: 'MSG-HVD-INFO-002' }
+        : { mensaje: 'No hay funcionarios que hayan realizado solicitudes en los departamentos disponibles.', codigo: 'MSG-HVD-INFO-001' };
+      return res.json({ historial: [], total: 0, ...msg });
+    }
+
     res.json({ historial: rows, total: rows.length });
   } catch (err) {
     console.error('getHistorialDepartamento:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'No se pudo cargar el historial.', codigo: 'MSG-HVD-ERR-008' });
   }
 };
 
