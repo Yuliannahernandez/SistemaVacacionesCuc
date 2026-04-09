@@ -1549,10 +1549,10 @@ async function cargarSaldosDesdeAPI() {
 
         // 1. Mostrar placeholder con datos del localStorage inmediatamente
         const primerPill = saldoCard.querySelector('.nom-pill.active') || saldoCard.querySelector('.nom-pill');
-        if (primerPill) updateBalance(primerPill); // ✅ updateBalance ya está definida arriba
+        if (primerPill) updateBalance(primerPill); 
 
         // 2. Luego sobreescribir con datos reales del API
-        cargarSaldosDesdeAPI(); // ✅ también ya está definida arriba
+        cargarSaldosDesdeAPI(); 
     }
 
     // ── Calendario ────────────────────────────────────────────────

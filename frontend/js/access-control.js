@@ -15,8 +15,7 @@
     const ROLES_ADMIN = ['rrhh', 'jefe', 'admin'];
 
     // ── Mapa de restricciones para el rol "funcionario" ───────────────────────
-    // Cada entrada: { module: string, submodule: string|null }
-    // submodule null = todo el módulo está restringido
+    
     const RESTRICCIONES_FUNCIONARIO = [
         { module: 'autenticacion', submodule: null },   // módulo completo bloqueado
         { module: 'aprobacion',    submodule: null },   // módulo completo bloqueado
@@ -34,8 +33,7 @@
     }
 
     // ── Verificar si la URL actual está restringida para el rol dado ──────────
-    // Recibe el pathname, ej: "/frontend/pages/autenticacion/usuarios.html"
-    // o "/frontend/pages/saldo/historial-departamento.html"
+    
     function estaRestringido(pathname, rol) {
         if (ROLES_ADMIN.includes(rol)) return false; // admin/jefe/rrhh: acceso total
 
@@ -65,11 +63,7 @@
     }
 
     // ── Ocultar ítems del navbar sin permiso ──────────────────────────────────
-    // Llama esta función después de que el navbar esté renderizado.
-    // Usa el atributo data-module y data-submodule en los <a> / .nav-sub-item del navbar.
-    // Ejemplo en navbar.js:
-    //   <a data-module="autenticacion" href="...">Usuarios</a>
-    //   <a data-module="saldo" data-submodule="historial-departamento" href="...">Historial Dpto</a>
+   
     function ocultarNavItems() {
         const rol = getRol();
         if (ROLES_ADMIN.includes(rol)) return; // admin ve todo

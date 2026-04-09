@@ -34,7 +34,7 @@ const listarPendientes = async (req, res) => {
   }
 };
 
-// ─── PUT /api/aprobacion/aprobar/:id   body: { comentario } ─────────────────
+// ─── PUT /api/aprobacion/aprobar/:id    ─────────────────
 const aprobarSolicitud = async (req, res) => {
   const { id } = req.params;
   const { comentario, id_aprobador } = req.body;

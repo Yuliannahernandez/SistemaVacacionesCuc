@@ -11,7 +11,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type']
 }));
-app.use(express.json());  // ← esto debe ir antes del static
+app.use(express.json());  
 
 // ── Frontend estático ─────────────────────────────────────────────────────
 app.use('/frontend', express.static(path.join(__dirname, '../frontend')));

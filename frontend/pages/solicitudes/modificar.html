@@ -467,9 +467,7 @@
       solicitudActual = data.solicitud;
       const historial = data.historial || [];
 
-      // ✅ FIX PRINCIPAL: Number() en dias_solicitados evita concatenación de strings.
-      // Sin este fix: parseFloat("55.00") + "2" = "552" (JavaScript concatena en vez de sumar)
-      // Con este fix: parseFloat("55.00") + Number("2") = 57 (suma numérica correcta)
+      
       saldoReal = parseFloat(solicitudActual.saldo_actual || 0) + Number(solicitudActual.dias_solicitados || 0);
 
       poblarFormulario(historial);

@@ -238,7 +238,7 @@ exports.registrarFuncionario = async (req, res) => {
         });
     }
 
-    // ── V9: Validar saldo manual solo para no-interinos (interinos se calculan) ──
+    
     // Nota: el saldo real se calcula más abajo luego de consultar los tipos en BD.
     // Esta validación aplica solo al campo manual cuando el tipo aún no está resuelto.
     const tipoNom = parseInt(id_tipo_nombramiento);
