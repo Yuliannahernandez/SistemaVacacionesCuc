@@ -560,13 +560,22 @@
       return;
     }
 
+    // ── Leer saldo fresco del localStorage en cada cambio ─────────────────
+    const nombramientos = JSON.parse(localStorage.getItem('nombramientos') || '[]');
+    const nomData = nombramientos.find(n => n.id_nombramiento === parseInt(sel.value));
+    const saldoFresco = parseFloat(nomData?.dias_vacaciones_disponibles) || 0;
+    // Sincronizar el dataset también
+    opt.dataset.saldo = saldoFresco;
+    // ─────────────────────────────────────────────────────────────────────
+
     const esInterino   = opt.dataset.esInterino === '1';
     const enPrueba     = opt.dataset.enPrueba === '1';
-    const saldo        = parseFloat(opt.dataset.saldo) || 0;
+    const saldo        = saldoFresco; 
     const acum         = parseFloat(opt.dataset.acum) || 0;
     const idTipo       = parseInt(opt.dataset.tipo);
     const numNom       = opt.dataset.numero;
 
+    
     nomActivo = {
       id_nombramiento: parseInt(sel.value),
       nombre_tipo: opt.textContent,
@@ -842,27 +851,47 @@
     try {
       const res = await fetch(`${API_BASE}/api/solicitudes`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       const data = await res.json();
       cerrarModal();
+
       if (res.ok) {
-        alert(` Solicitud registrada.\nNúmero: ${data.numero_solicitud || '—'}\nEstado: Pendiente de aprobación.`);
+        // ── Actualizar saldo en memoria, localStorage y select ────────────
+        const nuevoSaldo = saldoActivo - diasHabiles;
+        saldoActivo = nuevoSaldo;
+
+        // Actualizar dataset del option en el select
+        const sel = document.getElementById('tipoNom');
+        const opt = sel.options[sel.selectedIndex];
+        opt.dataset.saldo = nuevoSaldo;
+
+        // Actualizar localStorage para que otras páginas también lo vean
+        const nombramientos = JSON.parse(localStorage.getItem('nombramientos') || '[]');
+        const idx = nombramientos.findIndex(n => n.id_nombramiento === nomActivo.id_nombramiento);
+        if (idx !== -1) {
+          nombramientos[idx].dias_vacaciones_disponibles = nuevoSaldo;
+          localStorage.setItem('nombramientos', JSON.stringify(nombramientos));
+        }
+
+        // Refrescar el saldoBox visualmente
+        nomActivo.saldo = nuevoSaldo;
+        cambiarNom();
+
+        alert(`Solicitud registrada.\nNúmero: ${data.numero_solicitud || '—'}\nEstado: Pendiente de aprobación.`);
         limpiar();
       } else {
-        alert(` Error: ${data.error || 'No se pudo registrar la solicitud.'}`);
+        alert(`Error: ${data.error || 'No se pudo registrar la solicitud.'}`);
       }
     } catch (err) {
       cerrarModal();
-      alert(' No se pudo conectar con el servidor.');
+      alert('No se pudo conectar con el servidor.');
     }
 
     btn.textContent = 'Confirmar y enviar';
     btn.disabled = false;
-  }
+}
 
   function limpiar() {
     ['tipoNom','fechaInicio','fechaFin','motivo'].forEach(id => document.getElementById(id).value = '');
@@ -895,7 +924,33 @@
       sel.value = nom.id_nombramiento;
       if (sel.value) cambiarNom();
     }
+
+
   });
+      // ── Sincronizar saldo cuando cambia desde otra página (ej: cancelación) ──
+window.addEventListener('storage', (e) => {
+  if (e.key !== 'nombramientos') return;
+
+  const nombramientos = JSON.parse(e.newValue || '[]');
+  const sel = document.getElementById('tipoNom');
+
+  // Actualizar dataset.saldo de cada option con el valor nuevo
+  Array.from(sel.options).forEach(opt => {
+    if (!opt.value) return;
+    const nom = nombramientos.find(n => n.id_nombramiento === parseInt(opt.value));
+    if (nom) opt.dataset.saldo = nom.dias_vacaciones_disponibles;
+  });
+
+  // Si hay un nombramiento activo seleccionado, refrescar el saldoBox
+  if (nomActivo) {
+    const nomActualizado = nombramientos.find(n => n.id_nombramiento === nomActivo.id_nombramiento);
+    if (nomActualizado) {
+      saldoActivo = parseFloat(nomActualizado.dias_vacaciones_disponibles) || 0;
+      nomActivo.saldo = saldoActivo;
+      cambiarNom();
+    }
+  }
+});
 </script>
 </body>
 </html>

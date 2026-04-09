@@ -640,13 +640,25 @@ async function confirmarCancelacion() {
       return;
     }
 
-    // Éxito
+   // Éxito
+    // ── Actualizar localStorage con los días restaurados ──────────────────
+    const diasRestaurados = parseFloat(data.dias_restaurados) || 0;
+    const idNombramiento  = solicitudActual.id_nombramiento;
+
+    const nombramientos = JSON.parse(localStorage.getItem('nombramientos') || '[]');
+    const idx = nombramientos.findIndex(n => n.id_nombramiento === idNombramiento);
+    if (idx !== -1) {
+      nombramientos[idx].dias_vacaciones_disponibles =
+        (parseFloat(nombramientos[idx].dias_vacaciones_disponibles) || 0) + diasRestaurados;
+      localStorage.setItem('nombramientos', JSON.stringify(nombramientos));
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
     const msg = data.requiere_actualizacion_girh
       ? `${data.codigo}: Solicitud aprobada cancelada. ${data.dias_restaurados} días restaurados. GIRH notificado.`
       : `${data.codigo}: Solicitud cancelada. ${data.dias_restaurados} días restaurados al saldo.`;
 
     mostrarToast('success', msg);
-
     // Remover de la lista local y refrescar
     solicitudesCancelables = solicitudesCancelables.filter(s => s.id_solicitud !== solicitudActual.id_solicitud);
     volverLista();
