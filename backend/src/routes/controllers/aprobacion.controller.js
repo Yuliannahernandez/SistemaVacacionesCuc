@@ -1,4 +1,14 @@
 const db = require("./db");
+const nodemailer = require("nodemailer");
+
+// Configurar el transportador de correo
+const transporter = nodemailer.createTransport({
+  service:"gmail",
+  auth: {
+    user: process.env.MAIL_USER,
+    pass:process.env.MAIL_PASS
+  }
+});
 
 function validarAcceso(req, res) {
   // Ahora lo leemos de req.query en vez de req.headers
@@ -143,8 +153,166 @@ const listarPendientes = async (req, res) => {
 // Gime para lo de jefatura es que solo jefatura puede aprobar o rechazar entonces ésto de abajo te sirve:::
 // if (!validarJefatura(req, res)) return;
 
+// ─── PUT /api/aprobacion/aprobar/:id ───────────────────────────────
+const aprobarSolicitud = async (req, res) => {
+  if (!validarJefatura(req, res)) return;
+
+  const { id } = req.params;
+  const { id_aprobador, comentario } = req.body;
+
+  try {
+    if (!id_aprobador) {
+      return res.status(400).json({
+        error: "El id_aprobador es obligatorio.",
+        codigo: "MSG-AE-ERR-002"
+      });
+    }
+
+    const [rows] = await db.query(
+      `SELECT 
+         sv.id_solicitud,
+         sv.numero_solicitud,
+         f.email,
+         CONCAT(f.nombre, ' ', f.apellido1, IFNULL(CONCAT(' ', f.apellido2), '')) AS funcionario
+       FROM solicitudes_vacaciones sv
+       JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
+       WHERE sv.id_solicitud = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        error: "Solicitud no encontrada.",
+        codigo: "MSG-AE-ERR-003"
+      });
+    }
+
+    await db.query("CALL sp_aprobar_solicitud(?, ?, ?)", [
+      id,
+      id_aprobador,
+      comentario || null
+    ]);
+
+    try {
+      if (rows[0].email) {
+        const asunto = `Solicitud de vacaciones aprobada #${rows[0].numero_solicitud}`;
+        const texto =
+          `Hola ${rows[0].funcionario},\n\n` +
+          `Tu solicitud de vacaciones #${rows[0].numero_solicitud} fue aprobada.\n` +
+          `Puedes ingresar al sistema para revisar el detalle.\n\n` +
+          `SIGEVAC`;
+
+        await transporter.sendMail({
+          from: process.env.MAIL_FROM || process.env.MAIL_USER,
+          to: rows[0].email,
+          subject: asunto,
+          text: texto
+        });
+      }
+    } catch (mailErr) {
+      console.error("Error al enviar correo de aprobación:", mailErr);
+    }
+
+    return res.json({
+      mensaje: "Solicitud aprobada correctamente.",
+      codigo: "MSG-AE-OK-001"
+    });
+
+  } catch (err) {
+    console.error("aprobarSolicitud:", err);
+    return res.status(500).json({
+      error: err.message,
+      codigo: "MSG-AE-ERR-004"
+    });
+  }
+};
+
+// ─── PUT /api/aprobacion/rechazar/:id ───────────────────────────────
+const rechazarSolicitud = async (req, res) => {
+  if (!validarJefatura(req, res)) return;
+
+  const { id } = req.params;
+  const { id_aprobador, motivo_rechazo } = req.body;
+
+  try {
+    if (!id_aprobador) {
+      return res.status(400).json({
+        error: "El id_aprobador es obligatorio.",
+        codigo: "MSG-AE-ERR-002"
+      });
+    }
+
+    if (!motivo_rechazo || !motivo_rechazo.trim()) {
+      return res.status(400).json({
+        error: "El motivo de rechazo es obligatorio.",
+        codigo: "MSG-AE-ERR-005"
+      });
+    }
+
+    const [rows] = await db.query(
+      `SELECT 
+         sv.id_solicitud,
+         sv.numero_solicitud,
+         f.email,
+         CONCAT(f.nombre, ' ', f.apellido1, IFNULL(CONCAT(' ', f.apellido2), '')) AS funcionario
+       FROM solicitudes_vacaciones sv
+       JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
+       WHERE sv.id_solicitud = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        error: "Solicitud no encontrada.",
+        codigo: "MSG-AE-ERR-003"
+      });
+    }
+
+    await db.query("CALL sp_rechazar_solicitud(?, ?, ?)", [
+      id,
+      id_aprobador,
+      motivo_rechazo.trim()
+    ]);
+
+    try {
+      if (rows[0].email) {
+        const asunto = `Solicitud de vacaciones rechazada #${rows[0].numero_solicitud}`;
+        const texto =
+          `Hola ${rows[0].funcionario},\n\n` +
+          `Tu solicitud de vacaciones #${rows[0].numero_solicitud} fue rechazada.\n` +
+          `Motivo: ${motivo_rechazo.trim()}\n` +
+          `Puedes ingresar al sistema para revisar el detalle.\n\n` +
+          `SIGEVAC`;
+
+        await transporter.sendMail({
+          from: process.env.MAIL_FROM || process.env.MAIL_USER,
+          to: rows[0].email,
+          subject: asunto,
+          text: texto
+        });
+      }
+    } catch (mailErr) {
+      console.error("Error al enviar correo de rechazo:", mailErr);
+    }
+
+    return res.json({
+      mensaje: "Solicitud rechazada correctamente.",
+      codigo: "MSG-AE-OK-002"
+    });
+
+  } catch (err) {
+    console.error("rechazarSolicitud:", err);
+    return res.status(500).json({
+      error: err.message,
+      codigo: "MSG-AE-ERR-006"
+    });
+  }
+};
+
 module.exports = {
   todasLasSolicitudes,
   verSolicitud,
-  listarPendientes
+  listarPendientes,
+  aprobarSolicitud,
+  rechazarSolicitud
 };

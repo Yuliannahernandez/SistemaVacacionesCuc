@@ -724,8 +724,8 @@ function renderTable() {
     let accionesHtml = '';
     if (puedeModificarSolicitudes) {
       accionesHtml =
-        '<button class="btn-aprobar ' + disabledClass + '" ' + disabledAttr + ' onclick="aprobarSolicitud(\'' + s.id_solicitud + '\')" title="' + (locked ? 'Solo solicitudes pendientes' : 'Aprobar solicitud') + '"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Aprobar</button>' +
-        '<button class="btn-rechazar ' + disabledClass + '" ' + disabledAttr + ' onclick="rechazarSolicitud(\'' + s.id_solicitud + '\')" title="' + (locked ? 'Solo solicitudes pendientes' : 'Rechazar solicitud') + '"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Rechazar</button>';
+        '<button class="btn-aprobar ' + disabledClass + '" ' + disabledAttr + ' onclick="aprobarSolicitud(\'' + s.id_solicitud + '\')" title="' + (locked ? 'Solo solicitudes pendientes' : 'Aprobar solicitud') + '"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> </button>' +
+        '<button class="btn-rechazar ' + disabledClass + '" ' + disabledAttr + ' onclick="rechazarSolicitud(\'' + s.id_solicitud + '\')" title="' + (locked ? 'Solo solicitudes pendientes' : 'Rechazar solicitud') + '"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> </button>';
     } else {
       accionesHtml = '<span class="td-dept">Solo lectura</span>';
     }
@@ -908,17 +908,18 @@ function aprobarSolicitud(id) {
     return;
   }
 
+    if (!s) {
+    showToast('Solicitud no encontrada.', 'err');
+    return;
+  }
+
   if (norm(s.estado) !== 'pendiente') {
     showToast('No se puede modificar una solicitud que no está pendiente.', 'err');
     return;
   }
 
-  s.estado = 'aprobada';
-  showToast('Solicitud aprobada correctamente.', 'ok');
+ prepararModalAprobacion(s);
 
-  renderTable();
-
-  // Aquí luego metes backend / correo
 }
 
 function rechazarSolicitud(id) {
@@ -934,12 +935,92 @@ function rechazarSolicitud(id) {
     return;
   }
 
-  s.estado = 'rechazada';
-  showToast('Solicitud rechazada.', 'info');
+   prepararModalRechazo(s);
+  
+}
 
-  renderTable();
+async function confirmarAprobar() {
+  try {
+    if (!currentSolicitud) {
+      showToast('No hay solicitud seleccionada.', 'err');
+      return;
+    }
 
-  // Aquí luego metes backend / correo
+    const idAprobador = getIdAprobador();
+    if (!idAprobador) {
+      showToast('No se pudo identificar al aprobador.', 'err');
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/api/aprobacion/aprobar/${currentSolicitud.id_solicitud}?rol=${rol}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id_aprobador: idAprobador,
+        comentario: 'Aprobada por jefatura'
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'No se pudo aprobar la solicitud.');
+    }
+
+    closeModal('modalAprobar');
+    currentSolicitud = null;
+    showToast(data.mensaje || 'Solicitud aprobada correctamente.', 'ok');
+    await loadSolicitudes();
+  } catch (err) {
+    showToast(err.message || 'Error al aprobar la solicitud.', 'err');
+  }
+}
+
+async function confirmarRechazar() {
+  try {
+    if (!currentSolicitud) {
+      showToast('No hay solicitud seleccionada.', 'err');
+      return;
+    }
+
+    const motivo = document.getElementById('motivoRechazo').value.trim();
+    if (!motivo) {
+      showToast('Debe ingresar un motivo de rechazo.', 'err');
+      return;
+    }
+
+    const idAprobador = getIdAprobador();
+    if (!idAprobador) {
+      showToast('No se pudo identificar al aprobador.', 'err');
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/api/aprobacion/rechazar/${currentSolicitud.id_solicitud}?rol=${rol}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id_aprobador: idAprobador,
+        motivo_rechazo: motivo
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'No se pudo rechazar la solicitud.');
+    }
+
+    closeModal('modalRechazar');
+    currentSolicitud = null;
+    showToast(data.mensaje || 'Solicitud rechazada correctamente.', 'ok');
+    await loadSolicitudes();
+  } catch (err) {
+    showToast(err.message || 'Error al rechazar la solicitud.', 'err');
+  }
 }
 
 function validarSolicitud(s) {
@@ -970,6 +1051,29 @@ function validarSolicitud(s) {
   */
 
   return null; // todo OK
+}
+
+function getIdAprobador() {
+  return funcionario.id_funcionario || funcionario.id || null;
+}
+
+function prepararModalAprobacion(s) {
+  currentSolicitud = s;
+  document.getElementById('apr-nombre').textContent = safeText(s.funcionario);
+  document.getElementById('apr-dias').textContent = safeText(s.dias_solicitados);
+  document.getElementById('apr-inicio').textContent = fmtDate(s.fecha_inicio);
+  document.getElementById('apr-fin').textContent = fmtDate(s.fecha_fin);
+  openModal('modalAprobar');
+}
+
+function prepararModalRechazo(s) {
+  currentSolicitud = s;
+  document.getElementById('rej-nombre').textContent = safeText(s.funcionario);
+  document.getElementById('rej-dias').textContent = safeText(s.dias_solicitados);
+  document.getElementById('rej-inicio').textContent = fmtDate(s.fecha_inicio);
+  document.getElementById('rej-fin').textContent = fmtDate(s.fecha_fin);
+  document.getElementById('motivoRechazo').value = '';
+  openModal('modalRechazar');
 }
 
 </script>

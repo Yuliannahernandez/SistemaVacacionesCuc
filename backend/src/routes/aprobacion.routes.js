@@ -3,7 +3,9 @@ const router = express.Router();
 const {
   listarPendientes,
   todasLasSolicitudes,
-  verSolicitud
+  verSolicitud,
+  aprobarSolicitud,
+  rechazarSolicitud
 } = require("./controllers/aprobacion.controller");
 
 // GET  /api/aprobacion/pendientes?id_departamento=X
@@ -15,10 +17,10 @@ router.get("/todas", todasLasSolicitudes);
 // GET /api/aprobacion/pendientes?id_departamento=X
 router.get("/:id", verSolicitud);
 
-// PUT  /api/aprobacion/aprobar/:id   body: { comentario }
-//router.put("/aprobar/:id", aprobarSolicitud);
+// PUT  /api/aprobacion/aprobar/:id  
+router.put("/aprobar/:id", aprobarSolicitud);
 
-// PUT  /api/aprobacion/rechazar/:id  body: { motivo_rechazo }
-//router.put("/rechazar/:id", rechazarSolicitud);
+// PUT  /api/aprobacion/rechazar/:id  
+router.put("/rechazar/:id", rechazarSolicitud);
 
 module.exports = router;
