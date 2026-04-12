@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
 <head>
@@ -121,6 +122,9 @@ body{overflow-x:hidden}
 .table-row{display:grid;grid-template-columns:64px 1fr 130px 110px 110px 110px 140px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--dim);transition:var(--trans);cursor:pointer}
 .table-row:last-child{border-bottom:none}
 .table-row:hover{background:rgba(74,140,101,0.04)}
+.table-row.locked{opacity:.58;filter:grayscale(.85)}
+.table-row.locked:hover{background:inherit}
+.table-row.locked .td-name,.table-row.locked .td-days,.table-row.locked .td-date{color:var(--muted)}
 .td-id{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
 .td-user{display:flex;align-items:center;gap:9px}
 .td-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--g700),var(--g500));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:#fff;flex-shrink:0}
@@ -132,6 +136,7 @@ body{overflow-x:hidden}
 .status-chip.pendiente{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(184,146,42,0.25)}
 .status-chip.aprobada{background:rgba(74,140,101,0.1);color:var(--g500);border:1px solid rgba(74,140,101,0.2)}
 .status-chip.rechazada{background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,0.2)}
+.status-chip.cancelada{background:rgba(120,120,120,0.12);color:#6f7782;border:1px solid rgba(120,120,120,0.22)}
 .status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
 .td-actions{display:flex;align-items:center;gap:6px}
 .btn-aprobar{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:10.5px;font-weight:400;cursor:pointer;transition:var(--trans);border:1px solid rgba(74,140,101,0.3);background:rgba(74,140,101,0.08);color:var(--g500)}
@@ -195,6 +200,55 @@ body{overflow-x:hidden}
 .toast.ok{background:var(--g800);color:var(--g100);border:1px solid rgba(140,201,163,0.2)}
 .toast.err{background:#3b1110;color:#f5a09a;border:1px solid rgba(192,57,43,0.3)}
 .toast.info{background:rgba(30,50,40,0.9);color:var(--g300);border:1px solid rgba(140,201,163,0.15)}
+
+/* CONNECTED FILTER FORM */
+.filter-form{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(150px,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+.filter-input,.filter-select{
+  width:100%;
+  padding:7px 10px;
+  border-radius:9px;
+  border:1px solid var(--glass-border);
+  background:var(--g050);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:11.5px;
+  font-weight:300;
+  outline:none;
+  backdrop-filter:blur(8px);
+}
+.filter-input::placeholder{color:var(--dim)}
+.filter-input:focus,.filter-select:focus{
+  border-color:var(--g500);
+  box-shadow:0 0 0 3px rgba(74,140,101,0.08);
+}
+.filter-actions{
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+}
+.filter-btn{
+  padding:7px 12px;
+  border-radius:9px;
+  font-size:11px;
+  font-weight:400;
+  border:none;
+  cursor:pointer;
+}
+.filter-btn.primary{
+  background:linear-gradient(135deg,var(--g700),var(--g500));
+  color:#fff;
+}
+.filter-btn.secondary{
+  background:var(--g050);
+  color:var(--muted);
+  border:1px solid var(--g100);
+}
+
 </style>
 </head>
 <body>
@@ -266,7 +320,39 @@ body{overflow-x:hidden}
     <div class="filter-chip" id="f-rechazada" onclick="setFilter('rechazada')">
       <div class="filter-dot" style="background:var(--red)"></div>Rechazadas
     </div>
+    <div class="filter-chip" id="f-cancelada" onclick="setFilter('cancelada')">
+      <div class="filter-dot" style="background:#8b8f98"></div>Cerradas
+    </div>
   </div>
+
+
+  <div class="filter-form">
+    <input class="filter-input" id="fDepartamento" type="number" min="1" placeholder="ID departamento"/>
+    <input class="filter-input" id="fSolicitante" type="number" min="1" placeholder="ID funcionario"/>
+    <input class="filter-input" id="fSolicitud" type="number" min="1" placeholder="ID solicitud"/>
+    <input class="filter-input" id="fNombramiento" type="number" min="1" placeholder="ID nombramiento"/>
+    <input class="filter-input" id="fInicio" type="date" placeholder="Fecha inicio"/>
+    <input class="filter-input" id="fFin" type="date" placeholder="Fecha fin"/>
+    <input class="filter-input" id="fPagina" type="number" min="1" value="1" placeholder="Página"/>
+    <input class="filter-input" id="fLimite" type="number" min="1" value="10" placeholder="Límite"/>
+    <select class="filter-select" id="fOrden">
+      <option value="fecha_creacion">Orden: fecha_creacion</option>
+      <option value="estado">Orden: estado</option>
+      <option value="fecha_inicio">Orden: fecha_inicio</option>
+      <option value="numero_solicitud">Orden: número</option>
+    </select>
+    <select class="filter-select" id="fTipo">
+      <option value="">Tipo solicitud</option>
+      <option value="personal">Personal</option>
+      <option value="colectiva">Colectiva</option>
+      <option value="liquidacion">Liquidación</option>
+    </select>
+    <div class="filter-actions">
+      <button class="filter-btn primary" type="button" onclick="applyFilters()">Aplicar</button>
+      <button class="filter-btn secondary" type="button" onclick="clearFilters()">Limpiar</button>
+    </div>
+  </div>
+
 
   <!-- TABLE -->
   <div class="table-wrap">
@@ -288,33 +374,45 @@ body{overflow-x:hidden}
 <div class="modal-overlay" id="modalDetalle">
   <div class="modal detail-modal">
     <div class="detail-section">
-      <div class="detail-section-title">Información de la solicitud</div>
+      <div class="detail-section-title">Información general</div>
       <div class="detail-grid">
-        <div class="detail-item"><span class="detail-label">ID Solicitud</span><span class="detail-val" id="det-id">—</span></div>
-        <div class="detail-item"><span class="detail-label">Estado actual</span><span class="detail-val" id="det-estado">—</span></div>
-        <div class="detail-item"><span class="detail-label">Funcionario</span><span class="detail-val" id="det-nombre">—</span></div>
-        <div class="detail-item"><span class="detail-label">Usuario</span><span class="detail-val" id="det-usuario">—</span></div>
-        <div class="detail-item"><span class="detail-label">Fecha de inicio</span><span class="detail-val" id="det-inicio">—</span></div>
-        <div class="detail-item"><span class="detail-label">Fecha de fin</span><span class="detail-val" id="det-fin">—</span></div>
+        <div class="detail-item"><span class="detail-label">ID solicitud</span><span class="detail-val" id="det-id">—</span></div>
+        <div class="detail-item"><span class="detail-label">Número solicitud</span><span class="detail-val" id="det-numero">—</span></div>
+        <div class="detail-item"><span class="detail-label">Funcionario</span><span class="detail-val" id="det-funcionario">—</span></div>
+        <div class="detail-item"><span class="detail-label">ID funcionario</span><span class="detail-val" id="det-funcionario-id">—</span></div>
+        <div class="detail-item"><span class="detail-label">Fecha inicio</span><span class="detail-val" id="det-inicio">—</span></div>
+        <div class="detail-item"><span class="detail-label">Fecha fin</span><span class="detail-val" id="det-fin">—</span></div>
         <div class="detail-item"><span class="detail-label">Días solicitados</span><span class="detail-val" id="det-dias">—</span></div>
-        <div class="detail-item"><span class="detail-label">Días disponibles</span><span class="detail-val" id="det-saldo">—</span></div>
-      </div>
-      <div style="margin-top:10px">
-        <div class="saldo-bar"><div class="saldo-fill" id="det-saldo-bar" style="width:0%"></div></div>
+        <div class="detail-item"><span class="detail-label">Estado</span><span class="detail-val" id="det-estado">—</span></div>
+        <div class="detail-item"><span class="detail-label">Tipo solicitud</span><span class="detail-val" id="det-tipo-solicitud">—</span></div>
+        <div class="detail-item"><span class="detail-label">ID nombramiento</span><span class="detail-val" id="det-nombramiento">—</span></div>
+        <div class="detail-item"><span class="detail-label">Modalidad</span><span class="detail-val" id="det-modalidad">—</span></div>
+        <div class="detail-item"><span class="detail-label">ID período lectivo</span><span class="detail-val" id="det-periodo">—</span></div>
       </div>
     </div>
     <div class="detail-section">
-      <div class="detail-section-title">Observaciones</div>
-      <div class="detail-val" id="det-obs" style="font-size:12px;font-weight:300;color:var(--muted);line-height:1.6">—</div>
+      <div class="detail-section-title">Detalle de la solicitud</div>
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">Motivo</span><span class="detail-val" id="det-motivo">—</span></div>
+        <div class="detail-item"><span class="detail-label">Motivo cancelación</span><span class="detail-val" id="det-motivo-cancelacion">—</span></div>
+        <div class="detail-item"><span class="detail-label">Estado previo cancelación</span><span class="detail-val" id="det-estado-previo">—</span></div>
+        <div class="detail-item"><span class="detail-label">Confirmación jefatura</span><span class="detail-val" id="det-confirmacion">—</span></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Aprobación y saldos</div>
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">Saldo antes</span><span class="detail-val" id="det-saldo-antes">—</span></div>
+        <div class="detail-item"><span class="detail-label">Saldo después</span><span class="detail-val" id="det-saldo-despues">—</span></div>
+        <div class="detail-item"><span class="detail-label">Fecha aprobación</span><span class="detail-val" id="det-fecha-aprobacion">—</span></div>
+        <div class="detail-item"><span class="detail-label">Aprobador</span><span class="detail-val" id="det-aprobador">—</span></div>
+        <div class="detail-item"><span class="detail-label">Comentarios aprobador</span><span class="detail-val" id="det-comentarios">—</span></div>
+        <div class="detail-item"><span class="detail-label">Fecha creación</span><span class="detail-val" id="det-creacion">—</span></div>
+        <div class="detail-item"><span class="detail-label">Fecha modificación</span><span class="detail-val" id="det-modificacion">—</span></div>
+      </div>
     </div>
     <div class="modal-btn-row">
       <button class="btn-cancel" onclick="closeModal('modalDetalle')">Cerrar</button>
-      <button class="btn-detail-rechazar" id="btnDetRechazar" onclick="openRechazar(currentSolicitud)">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Rechazar
-      </button>
-      <button class="btn-detail-aprobar" id="btnDetAprobar" onclick="openAprobar(currentSolicitud)">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Aprobar
-      </button>
     </div>
   </div>
 </div>
@@ -367,205 +465,617 @@ body{overflow-x:hidden}
 
 <script src="/frontend/components/navbar.js"></script>
 <script src="/frontend/js/session.js"></script>
-<script src="/frontend/js/access-control.js"></script>
 
 <app-navbar></app-navbar>
 
+
 <script>
-/* ── MOCK DATA ── */
-var MOCK = [
-  { id: 'SOL-001', usuario: 'msolis', nombre: 'Mario Solís', apellido: 'Vargas', depto: 'Informática', dias: 5, inicio: '2026-04-07', fin: '2026-04-11', estado: 'Pendiente', saldo_disponible: 8.5, saldo_acumulado: 10, obs: 'Vacaciones de semana santa. Sin actividades pendientes.' },
-  { id: 'SOL-002', usuario: 'lhidalgo', nombre: 'Laura Hidalgo', apellido: 'Mora', depto: 'Contabilidad', dias: 3, inicio: '2026-03-25', fin: '2026-03-27', estado: 'Pendiente', saldo_disponible: 6, saldo_acumulado: 9, obs: 'Asuntos personales.' },
-  { id: 'SOL-003', usuario: 'earias', nombre: 'Esteban Arias', apellido: 'Castro', depto: 'Biblioteca', dias: 2, inicio: '2026-04-01', fin: '2026-04-02', estado: 'Pendiente', saldo_disponible: 4, saldo_acumulado: 6, obs: '' },
-  { id: 'SOL-004', usuario: 'kmolina', nombre: 'Karen Molina', apellido: 'Rojas', depto: 'Recursos Humanos', dias: 7, inicio: '2026-04-14', fin: '2026-04-22', estado: 'Aprobada', saldo_disponible: 10, saldo_acumulado: 12, obs: 'Viaje al exterior aprobado por dirección.' },
-  { id: 'SOL-005', usuario: 'dchavarria', nombre: 'Diego Chavarría', apellido: 'Núñez', depto: 'Informática', dias: 4, inicio: '2026-03-30', fin: '2026-04-02', estado: 'Rechazada', saldo_disponible: 5, saldo_acumulado: 7, obs: 'Fecha solicitada en período de cierre.' },
-];
+const API_BASE = 'http://localhost:3000';
+const funcionario = JSON.parse(localStorage.getItem('funcionario') || '{}');
+const rol = (funcionario.rol || '').toLowerCase(); // Agregamos .toLowerCase()
 
-var solicitudes = JSON.parse(JSON.stringify(MOCK));
-var currentSolicitud = null;
-var activeFilter = 'todas';
-var sessionAprobadas = 0;
-var sessionRechazadas = 0;
+const puedeVerModulo = ['jefe', 'rrhh'].includes(rol);
+const puedeModificarSolicitudes = rol === 'jefe';
 
-/* ── INIT ── */
+function protegerModulo() {
+  if (!['jefe', 'rrhh'].includes(rol)) {
+
+    // Mostrar mensaje bonito
+    document.body.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#0f172a;color:white;">
+        <div style="text-align:center;">
+          <h2 style="margin-bottom:10px;">Acceso denegado</h2>
+          <p style="margin-bottom:20px;">No tienes permisos para acceder al módulo de aprobación.</p>
+          <button onclick="window.location.href='http://127.0.0.1:5500/frontend/pages/dashboard.html'"
+            style="padding:10px 20px;border:none;border-radius:8px;background:#22c55e;color:white;cursor:pointer;">
+            Volver al inicio
+          </button>
+        </div>
+      </div>
+    `;
+
+    return false;
+  }
+  return true;
+}
+
+let solicitudes = [];
+let solicitudesBase = [];
+let activeFilter = 'todas';
+let currentSolicitud = null;
+
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('metaTs').textContent = fmtDate(new Date().toISOString());
-  setTimeout(function() {
-    renderTable();
-    updateStats();
-    document.getElementById('loadingOverlay').classList.add('hidden');
-  }, 700);
-});
-
-/* ── FORMAT ── */
-function fmtDate(iso) {
-  if (!iso) return '—';
-  var d = new Date(iso);
-  return d.toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-function initials(nombre, apellido) {
-  return ((nombre||'')[0]||'') + ((apellido||'')[0]||'');
-}
-
-/* ── RENDER ── */
-function renderTable() {
-  var q = (document.getElementById('searchInput').value || '').toLowerCase();
-  var list = solicitudes.filter(function(s) {
-    var matchFilter = activeFilter === 'todas' || s.estado.toLowerCase() === activeFilter;
-    var matchSearch = !q || s.nombre.toLowerCase().includes(q) || s.id.toLowerCase().includes(q) || s.usuario.toLowerCase().includes(q);
-    return matchFilter && matchSearch;
-  });
-  var body = document.getElementById('tableBody');
-  if (list.length === 0) {
-    body.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg><div class="empty-title">Sin solicitudes</div><div class="empty-sub">No hay resultados para los filtros actuales.</div></div>';
+  if (!puedeVerModulo) {
+    document.body.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#0f172a;color:white;">
+        <div style="text-align:center;">
+          <h2 style="margin-bottom:10px;">Acceso denegado</h2>
+          <p style="margin-bottom:20px;">No tienes permisos para acceder al módulo de aprobación.</p>
+          <button onclick="window.location.href='http://127.0.0.1:5500/frontend/pages/dashboard.html'"
+            style="padding:10px 20px;border:none;border-radius:8px;background:#22c55e;color:white;cursor:pointer;">
+            Volver al inicio
+          </button>
+        </div>
+      </div>
+    `;
     return;
   }
-  body.innerHTML = list.map(function(s) {
-    var isPendiente = s.estado === 'Pendiente';
-    var estadoClass = s.estado.toLowerCase();
-    return '<div class="table-row" onclick="openDetalle(\'' + s.id + '\')">' +
-      '<div class="td-id">' + s.id + '<\/div>' +
-      '<div class="td-user"><div class="td-avatar">' + initials(s.nombre, s.apellido) + '<\/div><div><div class="td-name">' + s.nombre + ' ' + s.apellido + '<\/div><div class="td-dept">' + s.depto + '<\/div><\/div><\/div>' +
-      '<div class="td-days">' + s.dias + ' días<\/div>' +
-      '<div class="td-date">' + fmtDate(s.inicio) + '<\/div>' +
-      '<div class="td-date">' + fmtDate(s.fin) + '<\/div>' +
-      '<div><span class="status-chip ' + estadoClass + '"><span class="status-dot"><\/span>' + s.estado + '<\/span><\/div>' +
-      '<div class="td-actions" onclick="event.stopPropagation()">' +
-        '<button class="btn-aprobar' + (isPendiente ? '' : ' btn-disabled') + '" onclick="openAprobar(\'' + s.id + '\')">' +
-          '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"\/><\/svg>Aprobar' +
-        '<\/button>' +
-        '<button class="btn-rechazar' + (isPendiente ? '' : ' btn-disabled') + '" onclick="openRechazar(\'' + s.id + '\')">' +
-          '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"\/><line x1="6" y1="6" x2="18" y2="18"\/><\/svg>Rechazar' +
-        '<\/button>' +
-      '<\/div>' +
-    '<\/div>';
-  }).join('');
+
+  document.getElementById('metaTs').textContent = new Date().toLocaleString('es-CR');
+  updateStats([]);
+  loadSolicitudes();
+});
+
+function fmtDate(value) {
+  if (!value) return '—';
+  var d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function updateStats() {
-  var pendientes = solicitudes.filter(function(s){return s.estado==='Pendiente';}).length;
-  var total = solicitudes.length;
+function fmtDateTime(value) {
+  if (!value) return '—';
+  var d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleString('es-CR');
+}
+
+function safeText(value) {
+  return value === null || value === undefined || value === '' ? '—' : value;
+}
+
+function norm(value) {
+  return String(value ?? '').toLowerCase();
+}
+
+function initials(nombre, apellido) {
+  return ((nombre || '')[0] || '?') + ((apellido || '')[0] || '');
+}
+
+function estadoClass(estado) {
+  const e = norm(estado);
+  if (e === 'aprobada') return 'aprobada';
+  if (e === 'cancelada') return 'cancelada';
+  if (e === 'rechazada') return 'rechazada';
+  return 'pendiente';
+}
+
+function estadoLabel(estado) {
+  const e = norm(estado);
+  if (e === 'cancelada') return 'Cerrada';
+  if (!estado) return 'Pendiente';
+  return String(estado).replace(/^./, c => c.toUpperCase());
+}
+function showModuleMessage(code, text, type) {
+  showToast(code + ' · ' + text, type || 'info');
+}
+
+function isValidDateString(value) {
+  if (!value) return true;
+  const d = new Date(value);
+  return !Number.isNaN(d.getTime());
+}
+
+function validateConsultaFiltros(f) {
+  if (f.inicio && !isValidDateString(f.inicio)) {
+    return 'MSG-RV-ERR-002 · Formato de fecha inválido.';
+  }
+
+  if (f.fin && !isValidDateString(f.fin)) {
+    return 'MSG-RV-ERR-002 · Formato de fecha inválido.';
+  }
+
+  if (f.inicio && f.fin && f.inicio > f.fin) {
+    return 'MSG-RV-ERR-002 · La fecha inicio no puede ser mayor que la fecha fin.';
+  }
+
+  if (!Number.isInteger(f.pagina) || f.pagina < 1) {
+    return 'MSG-RV-ERR-004 · Error en paginación.';
+  }
+
+  if (!Number.isInteger(f.limite) || f.limite < 1) {
+    return 'MSG-RV-ERR-004 · Error en paginación.';
+  }
+
+  return null;
+}
+
+function getFilters() {
+  return {
+    q: norm(document.getElementById('searchInput').value),
+    departamento: document.getElementById('fDepartamento').value.trim(),
+    solicitante: document.getElementById('fSolicitante').value.trim(),
+    solicitud: document.getElementById('fSolicitud').value.trim(),
+    nombramiento: document.getElementById('fNombramiento').value.trim(),
+    inicio: document.getElementById('fInicio').value,
+    fin: document.getElementById('fFin').value,
+    orden: document.getElementById('fOrden').value || 'fecha_creacion',
+    pagina: Math.max(parseInt(document.getElementById('fPagina').value || '1', 10), 1),
+    limite: Math.max(parseInt(document.getElementById('fLimite').value || '10', 10), 1),
+    tipo: document.getElementById('fTipo').value.trim()
+  };
+}
+
+function applyEstadoChip(f) {
+  activeFilter = f;
+  ['todas','pendiente','aprobada','rechazada','cancelada'].forEach(function(id) {
+    var el = document.getElementById('f-' + id);
+    if (el) el.classList.toggle('active', id === f);
+  });
+  renderTable();
+}
+
+function setFilter(f) {
+  applyEstadoChip(f);
+}
+
+function filterTable() {
+  renderTable();
+}
+
+function updateStats(list) {
+  const pendientes = list.filter(s => norm(s.estado) === 'pendiente').length;
+  const aprobadas = list.filter(s => norm(s.estado) === 'aprobada').length;
+  const rechazadas = list.filter(s => norm(s.estado) === 'rechazada').length;
+  const total = list.length;
+
   document.getElementById('statPendientes').textContent = pendientes;
-  document.getElementById('statAprobadas').textContent = sessionAprobadas;
-  document.getElementById('statRechazadas').textContent = sessionRechazadas;
+  document.getElementById('statAprobadas').textContent = aprobadas;
+  document.getElementById('statRechazadas').textContent = rechazadas;
   document.getElementById('statTotal').textContent = total;
 }
 
-/* ── FILTERS ── */
-function setFilter(f) {
-  activeFilter = f;
-  ['todas','pendiente','aprobada','rechazada'].forEach(function(id) {
-    document.getElementById('f-' + id).classList.toggle('active', id === f);
+
+function filteredList() {
+  const f = getFilters();
+  let list = Array.isArray(solicitudesBase) ? [...solicitudesBase] : [];
+
+  if (activeFilter !== 'todas') {
+    list = list.filter(s => norm(s.estado) === activeFilter);
+  }
+
+  if (f.q) {
+    list = list.filter(s =>
+      norm(s.numero_solicitud).includes(f.q) ||
+      norm(s.funcionario).includes(f.q) ||
+      norm(s.departamento).includes(f.q) ||
+      norm(s.id_solicitud).includes(f.q) ||
+      norm(s.id_funcionario).includes(f.q)
+    );
+  }
+
+  if (f.solicitud) {
+    list = list.filter(s => norm(s.id_solicitud).includes(norm(f.solicitud)));
+  }
+
+  if (f.solicitante) {
+    list = list.filter(s => norm(s.id_funcionario).includes(norm(f.solicitante)));
+  }
+
+  if (f.nombramiento) {
+    list = list.filter(s => norm(s.id_nombramiento).includes(norm(f.nombramiento)));
+  }
+
+  if (f.tipo) {
+    list = list.filter(s => norm(s.tipo_solicitud) === norm(f.tipo));
+  }
+
+  if (f.inicio) {
+    list = list.filter(s => !s.fecha_inicio || String(s.fecha_inicio).slice(0, 10) >= f.inicio);
+  }
+
+  if (f.fin) {
+    list = list.filter(s => !s.fecha_fin || String(s.fecha_fin).slice(0, 10) <= f.fin);
+  }
+
+  if (f.orden === 'estado') {
+    list.sort((a, b) => norm(a.estado).localeCompare(norm(b.estado)));
+  } else if (f.orden === 'fecha_inicio') {
+    list.sort((a, b) => String(a.fecha_inicio || '').localeCompare(String(b.fecha_inicio || '')));
+  } else if (f.orden === 'numero_solicitud') {
+    list.sort((a, b) => String(a.numero_solicitud || '').localeCompare(String(b.numero_solicitud || '')));
+  } else {
+    list.sort((a, b) => String(b.fecha_creacion || '').localeCompare(String(a.fecha_creacion || '')));
+  }
+
+  return { list, pagina: f.pagina, limite: f.limite };
+}
+
+function renderTable() {
+  const { list, pagina, limite } = filteredList();
+  updateStats(list);
+
+  const start = (pagina - 1) * limite;
+  const pageItems = list.slice(start, start + limite);
+  const body = document.getElementById('tableBody');
+
+  if (!pageItems.length) {
+    body.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><div class="empty-title">Sin solicitudes</div><div class="empty-sub">Podés cargar todas las solicitudes o usar los filtros opcionales.</div></div>';
+    return;
+  }
+
+  body.innerHTML = pageItems.map(function(s) {
+    const locked = norm(s.estado) !== 'pendiente';
+    const rowClass = locked ? 'table-row locked' : 'table-row';
+    const rowTitle = locked ? 'Solo las solicitudes pendientes están habilitadas.' : 'Solicitud pendiente habilitada.';
+    const disabledAttr = locked ? 'disabled' : '';
+    const disabledClass = locked ? 'btn-disabled' : '';
+
+    let accionesHtml = '';
+    if (puedeModificarSolicitudes) {
+      accionesHtml =
+        '<button class="btn-aprobar ' + disabledClass + '" ' + disabledAttr + ' onclick="aprobarSolicitud(\'' + s.id_solicitud + '\')" title="' + (locked ? 'Solo solicitudes pendientes' : 'Aprobar solicitud') + '"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> </button>' +
+        '<button class="btn-rechazar ' + disabledClass + '" ' + disabledAttr + ' onclick="rechazarSolicitud(\'' + s.id_solicitud + '\')" title="' + (locked ? 'Solo solicitudes pendientes' : 'Rechazar solicitud') + '"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> </button>';
+    } else {
+      accionesHtml = '<span class="td-dept">Solo lectura</span>';
+    }
+
+    return '<div class="' + rowClass + '" title="' + rowTitle + '">' +
+      '<div class="td-id">' + safeText(s.id_solicitud) + '</div>' +
+      '<div class="td-user">' +
+        '<div class="td-avatar">' + initials(s.funcionario || '', '') + '</div>' +
+        '<div><div class="td-name">' + safeText(s.funcionario) + '</div><div class="td-dept">' + safeText(s.departamento) + '</div></div>' +
+      '</div>' +
+      '<div class="td-days">' + safeText(s.dias_solicitados) + '</div>' +
+      '<div class="td-date">' + fmtDate(s.fecha_inicio) + '</div>' +
+      '<div class="td-date">' + fmtDate(s.fecha_fin) + '</div>' +
+      '<div><span class="status-chip ' + estadoClass(s.estado) + '">' +
+        '<span class="status-dot"></span>' + estadoLabel(s.estado) +
+      '</span></div>' +
+      '<div class="td-actions">' + accionesHtml + '</div>' +
+    '</div>';
+  }).join('');
+}
+async function loadSolicitudes() {
+  const filters = getFilters();
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const loadingText = document.getElementById('loadingText');
+
+  try {
+    const validationError = validateConsultaFiltros(filters);
+    if (validationError) {
+      solicitudesBase = [];
+      renderTable();
+      showModuleMessage('MSG-RV-ERR-002', 'Formato de filtro inválido.', 'err');
+      return;
+    }
+
+    loadingText.textContent = 'Cargando solicitudes...';
+    loadingOverlay.classList.remove('hidden');
+    showModuleMessage('MSG-RV-001', 'Cargando solicitudes...', 'info');
+
+    const params = new URLSearchParams();
+
+    if (activeFilter !== 'todas') params.set('estado', activeFilter);
+    if (filters.departamento) params.set('id_departamento', filters.departamento);
+    if (filters.solicitante) params.set('id_funcionario', filters.solicitante);
+    if (filters.solicitud) params.set('id_solicitud', filters.solicitud);
+    if (filters.nombramiento) params.set('id_nombramiento', filters.nombramiento);
+    if (filters.tipo) params.set('tipo_solicitud', filters.tipo);
+    if (filters.inicio) params.set('fecha_inicio', filters.inicio);
+    if (filters.fin) params.set('fecha_fin', filters.fin);
+    if (filters.q) params.set('q', filters.q);
+    params.set('orden', filters.orden);
+    params.set('pagina', String(filters.pagina));
+    params.set('limite', String(filters.limite));
+    params.set('rol', rol);
+
+    let url = `${API_BASE}/api/aprobacion/todas`;
+    if ([...params.keys()].length) url += `?${params.toString()}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (res.status === 401 || res.status === 403) {
+      throw new Error('MSG-RV-ERR-001 · Acceso denegado. Usuario no autenticado o sin permisos.');
+    }
+
+    if (!res.ok) {
+      throw new Error(data.error || 'MSG-RV-ERR-004 · Error al cargar solicitudes.');
+    }
+
+    solicitudesBase = Array.isArray(data) ? data : [];
+    document.getElementById('metaTs').textContent = `Última actualización: ${new Date().toLocaleString('es-CR')}`;
+    renderTable();
+
+    if (!solicitudesBase.length) {
+      showModuleMessage('MSG-RV-ADV-001', 'No se encontraron solicitudes con esos filtros.', 'info');
+    } else {
+      showModuleMessage('MSG-RV-002', 'Solicitudes cargadas correctamente.', 'ok');
+    }
+  } catch (err) {
+    solicitudesBase = [];
+    renderTable();
+
+    const msg = String(err.message || '');
+    if (msg.includes('MSG-RV-ERR-001')) {
+      showModuleMessage('MSG-RV-ERR-001', 'Acceso denegado. Usuario no autenticado o sin permisos.', 'err');
+    } else if (msg.includes('MSG-RV-ERR-004')) {
+      showModuleMessage('MSG-RV-ERR-004', 'Error al cargar solicitudes.', 'err');
+    } else {
+      showModuleMessage('MSG-RV-ERR-004', 'Error al cargar solicitudes.', 'err');
+    }
+  } finally {
+    loadingOverlay.classList.add('hidden');
+  }
+}
+
+function applyFilters() {
+  loadSolicitudes();
+}
+
+function clearFilters() {
+  ['searchInput','fDepartamento','fSolicitante','fSolicitud','fNombramiento','fInicio','fFin','fPagina','fLimite','fOrden','fTipo'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
   });
-  renderTable();
-}
-function filterTable() { renderTable(); }
-
-/* ── DETALLE MODAL ── */
-function openDetalle(id) {
-  var s = getSolicitud(id);
-  currentSolicitud = id;
-  document.getElementById('det-id').textContent = s.id;
-  document.getElementById('det-nombre').textContent = s.nombre + ' ' + s.apellido;
-  document.getElementById('det-usuario').textContent = s.usuario;
-  document.getElementById('det-inicio').textContent = fmtDate(s.inicio);
-  document.getElementById('det-fin').textContent = fmtDate(s.fin);
-  document.getElementById('det-dias').textContent = s.dias + ' días';
-  document.getElementById('det-saldo').textContent = s.saldo_disponible + ' días';
-  document.getElementById('det-obs').textContent = s.obs || 'Sin observaciones.';
-  var pct = Math.min(100, Math.round((s.saldo_disponible / (s.saldo_acumulado || 1)) * 100));
-  document.getElementById('det-saldo-bar').style.width = pct + '%';
-  // Status chip
-  var estadoClass = s.estado.toLowerCase();
-  document.getElementById('det-estado').innerHTML = '<span class="status-chip ' + estadoClass + '"><span class="status-dot"><\/span>' + s.estado + '<\/span>';
-  // Disable buttons if not pending
-  var isPendiente = s.estado === 'Pendiente';
-  document.getElementById('btnDetAprobar').classList.toggle('btn-disabled', !isPendiente);
-  document.getElementById('btnDetRechazar').classList.toggle('btn-disabled', !isPendiente);
-  openModal('modalDetalle');
+  applyEstadoChip('todas');
+  loadSolicitudes();
 }
 
-/* ── APROBAR MODAL ── */
-function openAprobar(id) {
-  var s = getSolicitud(id);
-  if (!s || s.estado !== 'Pendiente') { showToast('Esta solicitud no está pendiente','info'); return; }
-  currentSolicitud = id;
-  closeModal('modalDetalle');
-  document.getElementById('apr-nombre').textContent = s.nombre + ' ' + s.apellido;
-  document.getElementById('apr-dias').textContent = s.dias + ' días';
-  document.getElementById('apr-inicio').textContent = fmtDate(s.inicio);
-  document.getElementById('apr-fin').textContent = fmtDate(s.fin);
-  openModal('modalAprobar');
-}
-function confirmarAprobar() {
-  var s = getSolicitud(currentSolicitud);
-  s.estado = 'Aprobada';
-  sessionAprobadas++;
-  closeModal('modalAprobar');
-  renderTable();
-  updateStats();
-  showToast('Solicitud ' + s.id + ' aprobada correctamente.','ok'); // MSG-003
+async function openDetalle(id) {
+  try {
+    const found = solicitudesBase.find(s => String(s.id_solicitud) === String(id));
+    if (found) {
+      fillDetalle(found);
+      openModal('modalDetalle');
+      return;
+    }
+
+    // PASAMOS EL ROL DIRECTO EN LA URL
+    const res = await fetch(`${API_BASE}/api/aprobacion/${encodeURIComponent(id)}?rol=${rol}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Solicitud no encontrada.');
+    }
+
+    fillDetalle(data);
+    openModal('modalDetalle');
+  } catch (err) {
+    showToast(err.message || 'No se pudo cargar el detalle.', 'err');
+  }
 }
 
-/* ── RECHAZAR MODAL ── */
-function openRechazar(id) {
-  var s = getSolicitud(id);
-  if (!s || s.estado !== 'Pendiente') { showToast('Esta solicitud no está pendiente','info'); return; }
-  currentSolicitud = id;
-  closeModal('modalDetalle');
-  document.getElementById('rej-nombre').textContent = s.nombre + ' ' + s.apellido;
-  document.getElementById('rej-dias').textContent = s.dias + ' días';
-  document.getElementById('rej-inicio').textContent = fmtDate(s.inicio);
-  document.getElementById('rej-fin').textContent = fmtDate(s.fin);
-  document.getElementById('motivoRechazo').value = '';
-  openModal('modalRechazar');
-}
-function confirmarRechazar() {
-  var motivo = document.getElementById('motivoRechazo').value.trim();
-  if (!motivo) { showToast('Debe ingresar un motivo de rechazo','err'); return; }
-  var s = getSolicitud(currentSolicitud);
-  s.estado = 'Rechazada';
-  s.obs = motivo;
-  sessionRechazadas++;
-  closeModal('modalRechazar');
-  renderTable();
-  updateStats();
-  showToast('Solicitud ' + s.id + ' rechazada correctamente.','info'); // MSG-004
+function fillDetalle(s) {
+  document.getElementById('det-id').textContent = safeText(s.id_solicitud);
+  document.getElementById('det-numero').textContent = safeText(s.numero_solicitud);
+  document.getElementById('det-funcionario').textContent = safeText(s.funcionario || s.nombre_funcionario || s.nombre);
+  document.getElementById('det-funcionario-id').textContent = safeText(s.id_funcionario);
+  document.getElementById('det-inicio').textContent = fmtDate(s.fecha_inicio);
+  document.getElementById('det-fin').textContent = fmtDate(s.fecha_fin);
+  document.getElementById('det-dias').textContent = safeText(s.dias_solicitados);
+  document.getElementById('det-estado').innerHTML = '<span class="status-chip ' + estadoClass(s.estado) + '"><span class="status-dot"></span>' + estadoLabel(s.estado) + '</span>';
+  document.getElementById('det-tipo-solicitud').textContent = safeText(s.tipo_solicitud);
+  document.getElementById('det-nombramiento').textContent = safeText(s.id_nombramiento);
+  document.getElementById('det-modalidad').textContent = safeText(s.modalidad);
+  document.getElementById('det-periodo').textContent = safeText(s.id_periodo_lectivo);
+  document.getElementById('det-motivo').textContent = safeText(s.motivo);
+  document.getElementById('det-motivo-cancelacion').textContent = safeText(s.motivo_cancelacion);
+  document.getElementById('det-estado-previo').textContent = safeText(s.estado_previo_cancelacion);
+  document.getElementById('det-confirmacion').textContent = String(s.confirmacion_autorizacion_jefatura) === '1' ? 'Sí' : 'No';
+  document.getElementById('det-saldo-antes').textContent = safeText(s.saldo_antes);
+  document.getElementById('det-saldo-despues').textContent = safeText(s.saldo_despues);
+  document.getElementById('det-fecha-aprobacion').textContent = fmtDateTime(s.fecha_aprobacion);
+  document.getElementById('det-aprobador').textContent = safeText(s.id_aprobador);
+  document.getElementById('det-comentarios').textContent = safeText(s.comentarios_aprobador);
+  document.getElementById('det-creacion').textContent = fmtDateTime(s.fecha_creacion);
+  document.getElementById('det-modificacion').textContent = fmtDateTime(s.fecha_modificacion);
 }
 
-/* ── HELPERS ── */
-function getSolicitud(id) { return solicitudes.find(function(s){return s.id===id;}); }
 function openModal(id) { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
 function showToast(msg, type) {
   var t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast ' + (type||'ok') + ' show';
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'ok') + ' show';
   setTimeout(function(){ t.classList.remove('show'); }, 2800);
 }
-function toggleTheme() {
-  var html = document.documentElement;
-  var dark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', dark ? 'light' : 'dark');
-  document.getElementById('themeIcon').innerHTML = dark
-    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"\/>'
-    : '<circle cx="12" cy="12" r="5"\/><line x1="12" y1="1" x2="12" y2="3"\/><line x1="12" y1="21" x2="12" y2="23"\/>';
-}
-function toggleGroup(id) {
-  var grp = document.getElementById('grp-' + id);
-  var isOpen = grp.classList.contains('open');
-  document.querySelectorAll('.nav-group').forEach(function(g){ g.classList.remove('open'); });
-  if (!isOpen) grp.classList.add('open');
-}
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.nav-group')) document.querySelectorAll('.nav-group').forEach(function(g){ g.classList.remove('open'); });
+
+document.getElementById('modalDetalle').addEventListener('click', function(e) {
+  if (e.target === this) closeModal('modalDetalle');
 });
-// Close modals on overlay click
-['modalDetalle','modalAprobar','modalRechazar'].forEach(function(id) {
-  document.getElementById(id).addEventListener('click', function(e) {
-    if (e.target === this) closeModal(id);
-  });
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal('modalDetalle');
 });
+
+function aprobarSolicitud(id) {
+  const s = solicitudesBase.find(x => x.id_solicitud == id);
+
+  const error = validarSolicitud(s);
+  if (error) {
+    showToast(error, 'err');
+    return;
+  }
+
+    if (!s) {
+    showToast('Solicitud no encontrada.', 'err');
+    return;
+  }
+
+  if (norm(s.estado) !== 'pendiente') {
+    showToast('No se puede modificar una solicitud que no está pendiente.', 'err');
+    return;
+  }
+
+ prepararModalAprobacion(s);
+
+}
+
+function rechazarSolicitud(id) {
+  const s = solicitudesBase.find(x => x.id_solicitud == id);
+
+  if (!s) {
+    showToast('Solicitud no encontrada.', 'err');
+    return;
+  }
+  
+  if (norm(s.estado) !== 'pendiente') {
+    showToast('No se puede modificar una solicitud que no está pendiente.', 'err');
+    return;
+  }
+
+   prepararModalRechazo(s);
+  
+}
+
+async function confirmarAprobar() {
+  try {
+    if (!currentSolicitud) {
+      showToast('No hay solicitud seleccionada.', 'err');
+      return;
+    }
+
+    const idAprobador = getIdAprobador();
+    if (!idAprobador) {
+      showToast('No se pudo identificar al aprobador.', 'err');
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/api/aprobacion/aprobar/${currentSolicitud.id_solicitud}?rol=${rol}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id_aprobador: idAprobador,
+        comentario: 'Aprobada por jefatura'
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'No se pudo aprobar la solicitud.');
+    }
+
+    closeModal('modalAprobar');
+    currentSolicitud = null;
+    showToast(data.mensaje || 'Solicitud aprobada correctamente.', 'ok');
+    await loadSolicitudes();
+  } catch (err) {
+    showToast(err.message || 'Error al aprobar la solicitud.', 'err');
+  }
+}
+
+async function confirmarRechazar() {
+  try {
+    if (!currentSolicitud) {
+      showToast('No hay solicitud seleccionada.', 'err');
+      return;
+    }
+
+    const motivo = document.getElementById('motivoRechazo').value.trim();
+    if (!motivo) {
+      showToast('Debe ingresar un motivo de rechazo.', 'err');
+      return;
+    }
+
+    const idAprobador = getIdAprobador();
+    if (!idAprobador) {
+      showToast('No se pudo identificar al aprobador.', 'err');
+      return;
+    }
+
+    const res = await fetch(`${API_BASE}/api/aprobacion/rechazar/${currentSolicitud.id_solicitud}?rol=${rol}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id_aprobador: idAprobador,
+        motivo_rechazo: motivo
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'No se pudo rechazar la solicitud.');
+    }
+
+    closeModal('modalRechazar');
+    currentSolicitud = null;
+    showToast(data.mensaje || 'Solicitud rechazada correctamente.', 'ok');
+    await loadSolicitudes();
+  } catch (err) {
+    showToast(err.message || 'Error al rechazar la solicitud.', 'err');
+  }
+}
+
+function validarSolicitud(s) {
+
+  if (!s) return 'Solicitud inválida';
+  
+  /*
+  // V3: saldo insuficiente
+  if (Number(s.dias_solicitados) > Number(s.saldo_antes)) {
+    return 'MSG-ERR-002: No cuenta con saldo de vacaciones suficientes.';
+  }
+
+  // V4: confirma si el usuario es de jefatura para confirmar
+  if (String(s.confirmacion_autorizacion_jefatura) !== '1') {
+    return 'MSG-ERR-003: La solicitud no ha sido aceptada por la jefatura.';
+  }
+
+  // V5: fechas
+  if (new Date(s.fecha_fin) < new Date(s.fecha_inicio)) {
+    return 'Error: Fecha fin menor que fecha inicio.';
+  }
+
+  // V6: días > 0
+  if (Number(s.dias_solicitados) <= 0) {
+    return 'Error: Los días solicitados deben ser mayor a 0.';
+  }
+
+  */
+
+  return null; // todo OK
+}
+
+function getIdAprobador() {
+  return funcionario.id_funcionario || funcionario.id || null;
+}
+
+function prepararModalAprobacion(s) {
+  currentSolicitud = s;
+  document.getElementById('apr-nombre').textContent = safeText(s.funcionario);
+  document.getElementById('apr-dias').textContent = safeText(s.dias_solicitados);
+  document.getElementById('apr-inicio').textContent = fmtDate(s.fecha_inicio);
+  document.getElementById('apr-fin').textContent = fmtDate(s.fecha_fin);
+  openModal('modalAprobar');
+}
+
+function prepararModalRechazo(s) {
+  currentSolicitud = s;
+  document.getElementById('rej-nombre').textContent = safeText(s.funcionario);
+  document.getElementById('rej-dias').textContent = safeText(s.dias_solicitados);
+  document.getElementById('rej-inicio').textContent = fmtDate(s.fecha_inicio);
+  document.getElementById('rej-fin').textContent = fmtDate(s.fecha_fin);
+  document.getElementById('motivoRechazo').value = '';
+  openModal('modalRechazar');
+}
+
 </script>
 </body>
 </html>

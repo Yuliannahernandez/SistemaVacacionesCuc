@@ -45,6 +45,9 @@ app.use('/api/registro', registroRoutes);
 const catalogosRoutes = require('./src/routes/catalogos.routes');
 app.use('/api/catalogos', catalogosRoutes);
 
+const modificacionRoutes = require('./src/routes/modificacion.routes');
+app.use('/api/modificacion', modificacionRoutes);
+
 
 
 const PORT = process.env.PORT || 3000;

@@ -1,57 +1,110 @@
 const db = require("./db");
+const nodemailer = require("nodemailer");
 
-// ─── GET /api/aprobacion/pendientes?id_departamento=X ───────────────────────
-const listarPendientes = async (req, res) => {
+// Configurar el transportador de correo
+const transporter = nodemailer.createTransport({
+  service:"gmail",
+  auth: {
+    user: process.env.MAIL_USER,
+    pass:process.env.MAIL_PASS
+  }
+});
+
+function validarAcceso(req, res) {
+  // Ahora lo leemos de req.query en vez de req.headers
+  const rol = req.query.rol;
+
+  if (!rol || !['jefe', 'rrhh'].includes(rol)) {
+    res.status(403).json({
+      error: 'No tiene permisos para acceder a este módulo.',
+      codigo: 'MSG-RV-ERR-001'
+    });
+    return false;
+  }
+  return true;
+}
+
+function validarJefatura(req, res) {
+  // Ahora lo leemos de req.query
+  const rol = req.query.rol;
+
+  if (rol !== 'jefe') {
+    res.status(403).json({
+      error: 'Solo jefatura puede aprobar o rechazar solicitudes.',
+      codigo: 'MSG-AE-ERR-001'
+    });
+    return false;
+  }
+  return true;
+}
+
+// ─── GET /api/aprobacion/todas ───────────────────────────────
+// 🔹 Trae TODAS las solicitudes (con departamento opcional)
+const todasLasSolicitudes = async (req, res) => {
+  if (!validarAcceso(req, res)) return;
+
   const { id_departamento } = req.query;
 
-  if (!id_departamento) {
-    return res.status(400).json({ error: "Se requiere id_departamento" });
-  }
-
   try {
-    const [rows] = await db.query(
-      `SELECT sv.id_solicitud,
-              sv.numero_solicitud,
-              CONCAT(f.nombre,' ',f.apellido1, IFNULL(CONCAT(' ',f.apellido2),'')) AS funcionario,
-              f.id_funcionario,
-              sv.fecha_inicio, sv.fecha_fin,
-              sv.dias_solicitados, sv.estado,
-              sv.motivo AS observaciones,
-              sv.fecha_creacion AS fecha_solicitud,
-              d.nombre_departamento AS departamento
-       FROM solicitudes_vacaciones sv
-       JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
-       LEFT JOIN departamentos d ON f.id_departamento = d.id_departamento
-       WHERE f.id_departamento = ? AND sv.estado = 'pendiente'
-       ORDER BY sv.fecha_creacion ASC`,
-      [id_departamento]
-    );
+    let query = `
+      SELECT 
+        sv.id_solicitud,
+        sv.numero_solicitud,
+        CONCAT(f.nombre, ' ', f.apellido1, IFNULL(CONCAT(' ', f.apellido2), '')) AS funcionario,
+        sv.id_funcionario,
+        sv.id_nombramiento,
+        sv.fecha_inicio,
+        sv.fecha_fin,
+        sv.dias_solicitados,
+        sv.estado,
+        sv.tipo_solicitud,
+        sv.modalidad,
+        sv.motivo AS observaciones,
+        sv.fecha_creacion AS fecha_solicitud,
+        d.nombre_departamento AS departamento
+      FROM solicitudes_vacaciones sv
+      JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
+      LEFT JOIN departamentos d ON f.id_departamento = d.id_departamento
+      WHERE 1=1
+    `;
 
+    const params = [];
+
+    // 🔹 OPCIONAL (NO obligatorio)
+    if (id_departamento) {
+      query += ` AND f.id_departamento = ?`;
+      params.push(id_departamento);
+    }
+
+    query += ` ORDER BY sv.fecha_creacion DESC`;
+
+    const [rows] = await db.query(query, params);
     return res.json(rows);
+
   } catch (err) {
-    console.error("listarPendientes:", err);
+    console.error("todasLasSolicitudes:", err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// ─── PUT /api/aprobacion/aprobar/:id    ─────────────────
-const aprobarSolicitud = async (req, res) => {
-  const { id } = req.params;
-  const { comentario, id_aprobador } = req.body;
 
-  // id_aprobador es el funcionario (jefe/rrhh) que aprueba
-  if (!id_aprobador) {
-    return res.status(400).json({ error: "Se requiere id_aprobador en el body" });
-  }
+
+// ─── GET /api/aprobacion/:id ───────────────────────────────
+// 🔹 Trae UNA solicitud (detalle)
+const verSolicitud = async (req, res) => {
+  if (!validarAcceso(req, res)) return;
+
+  const { id } = req.params;
 
   try {
     const [rows] = await db.query(
-      `SELECT sv.id_solicitud, sv.estado, sv.dias_solicitados,
-              sv.id_funcionario,
-              f.dias_vacaciones_disponibles,
-              f.fecha_ingreso
+      `SELECT 
+         sv.*,
+         CONCAT(f.nombre, ' ', f.apellido1, IFNULL(CONCAT(' ', f.apellido2), '')) AS funcionario,
+         d.nombre_departamento AS departamento
        FROM solicitudes_vacaciones sv
        JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
+       LEFT JOIN departamentos d ON f.id_departamento = d.id_departamento
        WHERE sv.id_solicitud = ?`,
       [id]
     );
@@ -60,156 +113,206 @@ const aprobarSolicitud = async (req, res) => {
       return res.status(404).json({ error: "Solicitud no encontrada" });
     }
 
-    const solicitud = rows[0];
+    return res.json(rows[0]);
 
-    if (solicitud.estado !== "pendiente") {
-      return res.status(409).json({ error: "Solo se pueden aprobar solicitudes pendientes" });
-    }
-
-    const disponibles = Number(solicitud.dias_vacaciones_disponibles);
-
-    if (Number(solicitud.dias_solicitados) > disponibles) {
-      return res.status(409).json({
-        error: `Saldo insuficiente. Disponibles: ${disponibles}, requeridos: ${solicitud.dias_solicitados}`,
-      });
-    }
-
-    // Calcular saldo nuevo
-    const saldoDespues = disponibles - Number(solicitud.dias_solicitados);
-
-    // Aprobar y actualizar saldo del funcionario en una transacción
-    const conn = await db.getConnection();
-    try {
-      await conn.beginTransaction();
-
-      await conn.query(
-        `UPDATE solicitudes_vacaciones
-         SET estado = 'aprobada',
-             comentarios_aprobador = ?,
-             id_aprobador = ?,
-             fecha_aprobacion = NOW(),
-             saldo_antes = ?,
-             saldo_despues = ?
-         WHERE id_solicitud = ?`,
-        [comentario || null, id_aprobador, disponibles, saldoDespues, id]
-      );
-
-      // Descontar días del saldo del funcionario
-      await conn.query(
-        `UPDATE funcionarios
-         SET dias_vacaciones_disponibles = dias_vacaciones_disponibles - ?
-         WHERE id_funcionario = ?`,
-        [solicitud.dias_solicitados, solicitud.id_funcionario]
-      );
-
-      await conn.commit();
-    } catch (txErr) {
-      await conn.rollback();
-      throw txErr;
-    } finally {
-      conn.release();
-    }
-
-    return res.json({
-      mensaje: "Solicitud aprobada. Días descontados del saldo.",
-      dias_descontados: solicitud.dias_solicitados,
-      saldo_restante: saldoDespues,
-    });
   } catch (err) {
-    console.error("aprobarSolicitud:", err);
+    console.error("verSolicitud:", err);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+
+// ─── SOLO SI QUIERES VER SOLO PENDIENTES ─────────
+const listarPendientes = async (req, res) => {
+  if (!validarAcceso(req, res)) return;
+
+  try {
+    const [rows] = await db.query(
+      `SELECT 
+        sv.id_solicitud,
+        sv.numero_solicitud,
+        CONCAT(f.nombre, ' ', f.apellido1, IFNULL(CONCAT(' ', f.apellido2), '')) AS funcionario,
+        sv.fecha_inicio,
+        sv.fecha_fin,
+        sv.dias_solicitados,
+        sv.estado
+       FROM solicitudes_vacaciones sv
+       JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
+       WHERE sv.estado = 'pendiente'
+       ORDER BY sv.fecha_creacion ASC`
+    );
+
+    return res.json(rows);
+
+  } catch (err) {
+    console.error("listarPendientes:", err);
     res.status(500).json({ error: err.message });
   }
 };
 
-// ─── PUT /api/aprobacion/rechazar/:id   body: { motivo_rechazo, id_aprobador } ─
-const rechazarSolicitud = async (req, res) => {
-  const { id } = req.params;
-  const { motivo_rechazo, id_aprobador } = req.body;
+// Gime para lo de jefatura es que solo jefatura puede aprobar o rechazar entonces ésto de abajo te sirve:::
+// if (!validarJefatura(req, res)) return;
 
-  if (!motivo_rechazo) {
-    return res.status(400).json({ error: "Se requiere motivo_rechazo" });
-  }
-  if (!id_aprobador) {
-    return res.status(400).json({ error: "Se requiere id_aprobador" });
-  }
+// ─── PUT /api/aprobacion/aprobar/:id ───────────────────────────────
+const aprobarSolicitud = async (req, res) => {
+  if (!validarJefatura(req, res)) return;
+
+  const { id } = req.params;
+  const { id_aprobador, comentario } = req.body;
 
   try {
+    if (!id_aprobador) {
+      return res.status(400).json({
+        error: "El id_aprobador es obligatorio.",
+        codigo: "MSG-AE-ERR-002"
+      });
+    }
+
     const [rows] = await db.query(
-      `SELECT estado FROM solicitudes_vacaciones WHERE id_solicitud = ?`,
+      `SELECT 
+         sv.id_solicitud,
+         sv.numero_solicitud,
+         f.email,
+         CONCAT(f.nombre, ' ', f.apellido1, IFNULL(CONCAT(' ', f.apellido2), '')) AS funcionario
+       FROM solicitudes_vacaciones sv
+       JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
+       WHERE sv.id_solicitud = ?`,
       [id]
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: "Solicitud no encontrada" });
+      return res.status(404).json({
+        error: "Solicitud no encontrada.",
+        codigo: "MSG-AE-ERR-003"
+      });
     }
 
-    if (rows[0].estado !== "pendiente") {
-      return res.status(409).json({ error: "Solo se pueden rechazar solicitudes pendientes" });
+    await db.query("CALL sp_aprobar_solicitud(?, ?, ?)", [
+      id,
+      id_aprobador,
+      comentario || null
+    ]);
+
+    try {
+      if (rows[0].email) {
+        const asunto = `Solicitud de vacaciones aprobada #${rows[0].numero_solicitud}`;
+        const texto =
+          `Hola ${rows[0].funcionario},\n\n` +
+          `Tu solicitud de vacaciones #${rows[0].numero_solicitud} fue aprobada.\n` +
+          `Puedes ingresar al sistema para revisar el detalle.\n\n` +
+          `SIGEVAC`;
+
+        await transporter.sendMail({
+          from: process.env.MAIL_FROM || process.env.MAIL_USER,
+          to: rows[0].email,
+          subject: asunto,
+          text: texto
+        });
+      }
+    } catch (mailErr) {
+      console.error("Error al enviar correo de aprobación:", mailErr);
     }
 
-    // El motivo_rechazo se guarda en comentarios_aprobador (no hay columna separada en la BD)
-    await db.query(
-      `UPDATE solicitudes_vacaciones
-       SET estado = 'rechazada',
-           comentarios_aprobador = ?,
-           id_aprobador = ?,
-           fecha_aprobacion = NOW()
-       WHERE id_solicitud = ?`,
-      [motivo_rechazo, id_aprobador, id]
-    );
+    return res.json({
+      mensaje: "Solicitud aprobada correctamente.",
+      codigo: "MSG-AE-OK-001"
+    });
 
-    return res.json({ mensaje: "Solicitud rechazada" });
   } catch (err) {
-    console.error("rechazarSolicitud:", err);
-    res.status(500).json({ error: err.message });
+    console.error("aprobarSolicitud:", err);
+    return res.status(500).json({
+      error: err.message,
+      codigo: "MSG-AE-ERR-004"
+    });
   }
 };
 
-// ─── GET /api/aprobacion/todas?id_departamento=X&estado=X ───────────────────
-const todasLasSolicitudes = async (req, res) => {
-  const { id_departamento, estado } = req.query;
+// ─── PUT /api/aprobacion/rechazar/:id ───────────────────────────────
+const rechazarSolicitud = async (req, res) => {
+  if (!validarJefatura(req, res)) return;
 
-  if (!id_departamento) {
-    return res.status(400).json({ error: "Se requiere id_departamento" });
-  }
+  const { id } = req.params;
+  const { id_aprobador, motivo_rechazo } = req.body;
 
   try {
-    let query = `
-      SELECT sv.id_solicitud,
-             sv.numero_solicitud,
-             CONCAT(f.nombre,' ',f.apellido1, IFNULL(CONCAT(' ',f.apellido2),'')) AS funcionario,
-             sv.fecha_inicio, sv.fecha_fin,
-             sv.dias_solicitados, sv.estado,
-             sv.motivo AS observaciones,
-             sv.comentarios_aprobador,
-             sv.fecha_creacion AS fecha_solicitud,
-             sv.fecha_aprobacion AS fecha_resolucion,
-             sv.saldo_antes,
-             sv.saldo_despues
-      FROM solicitudes_vacaciones sv
-      JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
-      WHERE f.id_departamento = ?`;
-
-    const params = [id_departamento];
-
-    if (estado) {
-      query += ` AND sv.estado = ?`;
-      params.push(estado);
+    if (!id_aprobador) {
+      return res.status(400).json({
+        error: "El id_aprobador es obligatorio.",
+        codigo: "MSG-AE-ERR-002"
+      });
     }
 
-    query += ` ORDER BY sv.fecha_creacion DESC`;
+    if (!motivo_rechazo || !motivo_rechazo.trim()) {
+      return res.status(400).json({
+        error: "El motivo de rechazo es obligatorio.",
+        codigo: "MSG-AE-ERR-005"
+      });
+    }
 
-    const [rows] = await db.query(query, params);
-    return res.json(rows);
+    const [rows] = await db.query(
+      `SELECT 
+         sv.id_solicitud,
+         sv.numero_solicitud,
+         f.email,
+         CONCAT(f.nombre, ' ', f.apellido1, IFNULL(CONCAT(' ', f.apellido2), '')) AS funcionario
+       FROM solicitudes_vacaciones sv
+       JOIN funcionarios f ON sv.id_funcionario = f.id_funcionario
+       WHERE sv.id_solicitud = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        error: "Solicitud no encontrada.",
+        codigo: "MSG-AE-ERR-003"
+      });
+    }
+
+    await db.query("CALL sp_rechazar_solicitud(?, ?, ?)", [
+      id,
+      id_aprobador,
+      motivo_rechazo.trim()
+    ]);
+
+    try {
+      if (rows[0].email) {
+        const asunto = `Solicitud de vacaciones rechazada #${rows[0].numero_solicitud}`;
+        const texto =
+          `Hola ${rows[0].funcionario},\n\n` +
+          `Tu solicitud de vacaciones #${rows[0].numero_solicitud} fue rechazada.\n` +
+          `Motivo: ${motivo_rechazo.trim()}\n` +
+          `Puedes ingresar al sistema para revisar el detalle.\n\n` +
+          `SIGEVAC`;
+
+        await transporter.sendMail({
+          from: process.env.MAIL_FROM || process.env.MAIL_USER,
+          to: rows[0].email,
+          subject: asunto,
+          text: texto
+        });
+      }
+    } catch (mailErr) {
+      console.error("Error al enviar correo de rechazo:", mailErr);
+    }
+
+    return res.json({
+      mensaje: "Solicitud rechazada correctamente.",
+      codigo: "MSG-AE-OK-002"
+    });
+
   } catch (err) {
-    console.error("todasLasSolicitudes:", err);
-    res.status(500).json({ error: err.message });
+    console.error("rechazarSolicitud:", err);
+    return res.status(500).json({
+      error: err.message,
+      codigo: "MSG-AE-ERR-006"
+    });
   }
 };
 
 module.exports = {
+  todasLasSolicitudes,
+  verSolicitud,
   listarPendientes,
   aprobarSolicitud,
-  rechazarSolicitud,
-  todasLasSolicitudes,
+  rechazarSolicitud
 };

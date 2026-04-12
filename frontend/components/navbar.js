@@ -137,7 +137,7 @@ class AppNavbar extends HTMLElement {
           </div>
           <div class="nav-submenu">
             <a class="nav-sub-item ${path.includes('autenticacion/registrar') ? 'active' : ''}" href="/frontend/pages/autenticacion/registrar.html">Registro de Funcionarios</a>
-            <a class="nav-sub-item ${path.includes('editar-funcionario') ? 'active' : ''}" href="/frontend/pages/autenticacion/editar-funcionario.html">Modificación de Funcionarios</a>
+            <a class="nav-sub-item ${path.includes('autenticacion/modificar') ? 'active' : ''}" href="/frontend/pages/autenticacion/modificar.html">Modificación de Funcionarios</a>
           </div>
         </div>
 
