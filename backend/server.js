@@ -42,6 +42,8 @@ app.use('/api/aprobacion', aprobacionRoutes);
 const registroRoutes = require('./src/routes/registro-funcionario.routes');
 app.use('/api/registro', registroRoutes);
 
+
+
 const catalogosRoutes = require('./src/routes/catalogos.routes');
 app.use('/api/catalogos', catalogosRoutes);
 
