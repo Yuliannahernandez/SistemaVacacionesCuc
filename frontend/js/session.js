@@ -11,7 +11,7 @@
 (function () {
     'use strict';
 
-    const API_BASE = 'http://localhost:3000';
+    const API_BASE = '';
     const INACTIVIDAD_MS = 10 * 60 * 1000; // 10 minutos — V5
     const LOGIN_URL = '/frontend/pages/autenticacion/login.html';
 
