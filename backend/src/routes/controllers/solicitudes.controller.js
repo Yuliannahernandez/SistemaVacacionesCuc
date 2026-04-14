@@ -338,6 +338,17 @@ exports.registrar = async (req, res) => {
         return res.status(500).json({ error: 'Error interno del servidor.' });
     }
 };
+exports.diasHabiles = async (req, res) => {
+    const { fecha_inicio, fecha_fin } = req.query;
+    if (!fecha_inicio || !fecha_fin)
+        return res.status(400).json({ error: 'Fechas requeridas.' });
+    try {
+        const { cantidad } = await calcularDiasHabiles(fecha_inicio, fecha_fin);
+        return res.json({ dias_habiles: cantidad });
+    } catch(err) {
+        return res.status(500).json({ error: 'Error interno.' });
+    }
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/solicitudes?id_funcionario=X  —  Consultar solicitudes del funcionario
@@ -372,4 +383,6 @@ exports.consultar = async (req, res) => {
         console.error('[solicitudes.controller] consultar error:', err.message);
         return res.status(500).json({ error: 'Error interno del servidor.' });
     }
+
+    
 };

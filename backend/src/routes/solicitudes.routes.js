@@ -12,7 +12,7 @@ router.delete('/:id_solicitud', cancelar.cancelar);
 router.post('/',   solicitudes.registrar);
 router.get('/',    solicitudes.consultar);
 
-
+router.get('/dias-habiles', solicitudes.diasHabiles);
 router.get('/:id', modificarController.obtener);
 router.put('/:id', modificarController.modificar);
 module.exports = router;

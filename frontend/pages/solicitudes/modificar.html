@@ -533,11 +533,12 @@
     actualizarCambios();
   }
 
-  function onFechasChange() {
+  async function onFechasChange() {
     clearErr('fieldFechaI', 'errFechaI');
     clearErr('fieldFechaF', 'errFechaF');
     ocultarAlertas();
     if (!solicitudActual) return;
+
     const fi = document.getElementById('fechaInicio').value;
     const ff = document.getElementById('fechaFin').value;
     if (!fi || !ff) return;
@@ -549,8 +550,18 @@
     if (dI < hoy) { setErr('fieldFechaI', 'errFechaI', 'La fecha de inicio no puede ser anterior a hoy'); return; }
     if (dF < dI)  { setErr('fieldFechaF', 'errFechaF', 'La fecha fin debe ser igual o posterior al inicio'); return; }
 
-    let dias = 0; let c = new Date(dI);
-    while (c <= dF) { if (c.getDay() !== 0 && c.getDay() !== 6) dias++; c.setDate(c.getDate() + 1); }
+    // ── Consultar días hábiles reales al backend (incluye feriados) ──
+    let dias = 0;
+    try {
+        const res = await fetch(`${API_BASE}/solicitudes/dias-habiles?fecha_inicio=${fi}&fecha_fin=${ff}`, 
+                                { credentials: 'include' });
+        const data = await res.json();
+        dias = data.dias_habiles || 0;
+    } catch(err) {
+        // Fallback: solo fines de semana si el backend no responde
+        let c = new Date(dI);
+        while (c <= dF) { if (c.getDay() !== 0 && c.getDay() !== 6) dias++; c.setDate(c.getDate() + 1); }
+    }
     diasNuevosCalc = dias;
 
     const restantes = saldoReal - dias;
